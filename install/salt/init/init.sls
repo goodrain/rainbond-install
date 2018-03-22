@@ -1,11 +1,11 @@
 include:
 {% if "manage" in grains['host']%}
+  - init.key_build
   - init.user
   - init.config
   - init.swap
   - init.create_dir
   - init.service
-  - init.key_build
   - init.router
 {% else %}
   - init.user
