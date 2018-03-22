@@ -1,0 +1,2 @@
+rbd-path:
+  - /opt
