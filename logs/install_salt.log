@@ -1,0 +1,47 @@
+[1;32m *  INFO[0m: Running version: 2017.12.13
+[1;32m *  INFO[0m: Executed by: -
+[1;32m *  INFO[0m: Command line: './scripts/bootstrap-salt.sh -M -X -R mirrors.ustc.edu.cn/salt stable 2017.7.4'
+[1;33m *  WARN[0m: Detected -R option. No other repositories will be configured when -R is used. Setting -r option to True.
+
+[1;32m *  INFO[0m: System Information:
+[1;32m *  INFO[0m:   CPU:          GenuineIntel
+[1;32m *  INFO[0m:   CPU Arch:     x86_64
+[1;32m *  INFO[0m:   OS Name:      Linux
+[1;32m *  INFO[0m:   OS Version:   3.10.0-514.el7.x86_64
+[1;32m *  INFO[0m:   Distribution: CentOS 7.3
+
+[1;32m *  INFO[0m: Installing minion
+[1;32m *  INFO[0m: Installing master
+[1;32m *  INFO[0m: Daemons will not be started
+[1;32m *  INFO[0m: Found function install_centos_stable_deps
+[1;32m *  INFO[0m: Found function config_salt
+[1;32m *  INFO[0m: Found function preseed_master
+[1;32m *  INFO[0m: Found function install_centos_stable
+[1;32m *  INFO[0m: Found function install_centos_stable_post
+[1;32m *  INFO[0m: Found function install_centos_restart_daemons
+[1;32m *  INFO[0m: Found function daemons_running
+[1;32m *  INFO[0m: Found function install_centos_check_services
+[1;32m *  INFO[0m: Running install_centos_stable_deps()
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirror.bit.edu.cn
+ * epel: mirrors.aliyun.com
+ * extras: mirrors.aliyun.com
+ * updates: ftp.sjtu.edu.cn
+Package yum-utils-1.1.31-42.el7.noarch already installed and latest version
+Package chkconfig-1.7.4-1.el7.x86_64 already installed and latest version
+Package PyYAML-3.11-1.el7.x86_64 already installed and latest version
+Nothing to do
+[1;32m *  INFO[0m: Running install_centos_stable()
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirror.bit.edu.cn
+ * epel: mirrors.aliyun.com
+ * extras: mirrors.aliyun.com
+ * updates: ftp.sjtu.edu.cn
+Package salt-master-2017.7.4-1.el7.noarch already installed and latest version
+Package salt-minion-2017.7.4-1.el7.noarch already installed and latest version
+Nothing to do
+[1;32m *  INFO[0m: Running install_centos_stable_post()
+[1;32m *  INFO[0m: Running install_centos_check_services()
+[1;32m *  INFO[0m: Salt installed!

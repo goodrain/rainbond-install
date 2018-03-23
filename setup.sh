@@ -1,5 +1,10 @@
 #!/bin/bash
 
-salt-call --config-dir install --file-root install/salt --pillar-root install/pillar --local state.apply
+. scripts/common.sh
 
-salt-call  --config-dir install --file-root install/salt --pillar-root install/pillar --local pillar.get role
+[ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
+
+clear
+
+# check system
+/bin/bash  ./scripts/check.sh
