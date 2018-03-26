@@ -12,7 +12,8 @@ LOG_DIR="logs"
 CHECK_LOG="check.log"
 SALT_LOG="install_salt.log"
 DEFAULT_HOSTNAME="manage01"
-
+OSS_DOMAIN="https://dl.repo.goodrain.com"
+OSS_PATH="repo"
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  __detect_color_support
