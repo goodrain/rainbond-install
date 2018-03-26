@@ -9,22 +9,7 @@
 . scripts/common.sh
 
 
-# Name   : Check_System_Version
-# Args   : sys_name、sys_version
-# Return : 0|!0
-function Check_System_Version(){
-    sys_name=$(salt '*' grains.get os | tail -n 1)
-    sys_version=$(salt '*' grains.get osrelease | tail -n 1)
-      [[ $sys_name != *CentOS* ]]\
-    &&[[ $sys_name != *Ubuntu* ]]\
-    &&[[ $sys_name != *Debian* ]]\
-    &&[[ $sys_version != *7* ]]\
-    &&[[ $sys_version != *8* ]]\
-    &&[[ $sys_version != *9* ]]\
-    &&[[ $sys_version != *16.04* ]]\
-    &&Echo_Info "$sys_name$sys_version is not supported temporarily"\
-    ||Echo_Info "Your system is $sys_name$sys_version"
-}
+
 
 # Function : Check internet
 # Args     : Check url
@@ -82,9 +67,27 @@ function Get_Rainbond_Install_Path(){
 function Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG}
 
-  echo
+ # echo interface: xx >> /etc/salt/master
+ # echo master: xx >> /etc/salt/minion
 }
 
+
+# Name   : Check_System_Version
+# Args   : sys_name、sys_version
+# Return : 0|!0
+function Check_System_Version(){
+    sys_name=$(salt '*' grains.get os | tail -n 1)
+    sys_version=$(salt '*' grains.get osrelease | tail -n 1)
+      [[ $sys_name != *CentOS* ]]\
+    &&[[ $sys_name != *Ubuntu* ]]\
+    &&[[ $sys_name != *Debian* ]]\
+    &&[[ $sys_version != *7* ]]\
+    &&[[ $sys_version != *8* ]]\
+    &&[[ $sys_version != *9* ]]\
+    &&[[ $sys_version != *16.04* ]]\
+    &&Echo_Info "$sys_name$sys_version is not supported temporarily"\
+    ||Echo_Info "Your system is $sys_name$sys_version"
+}
 
 # Name   : Get_Net_Info
 # Args   :
@@ -94,10 +97,12 @@ function Get_Net_Info(){
 }
 
 # Name   : Get_Hardware_Info
-# Args   :
+# Args   : cpu_num、memory_size
 # Return : 0|!0
 function Get_Hardware_Info(){
-
+    cpu_num=$(salt '*' grains.get num_cpus | tail -n 1)
+    memory_size=$()
+    
 }
 
 # Name   : Download_package
@@ -114,9 +119,6 @@ function Write_Config(){
 
 }
 
-Echo_Info "Checking system version ..."
-Check_System_Version && Echo_Ok || Echo_Error
-
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok || Echo_Error
 
@@ -128,6 +130,9 @@ Get_Rainbond_Install_Path  && Echo_Ok || Echo_Error
 
 Echo_Info "Installing salt ..."
 Install_Salt && Echo_Ok || Echo_Error
+
+Echo_Info "Checking system version ..."
+Check_System_Version && Echo_Ok || Echo_Error
 
 #ipaddr(inet pub) type .mark in .sls
 Echo_Info "Getting net information ..."
