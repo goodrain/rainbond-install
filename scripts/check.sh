@@ -31,7 +31,7 @@ function Get_Hostname(){
         echo $DEFAULT_HOSTNAME >> /etc/hosts
         Echo_Info "Hostname has changed to the default $DEFAULT_HOSTNAME"
     fi
-    echo "hostname: $DEFAULT_HOSTNAME" >> install/pillar/system_info.sls
+    echo "hostname: $DEFAULT_HOSTNAME" >> $PWD/install/pillar/system_info.sls
 }
 
 
@@ -58,7 +58,7 @@ function Get_Rainbond_Install_Path(){
       install_path=$DEFAULT_INSTALL_PATH
       Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
     fi
-    echo "install-dir: $install_path" >> install/pillar/system_info.sls
+    echo "install-dir: $install_path" >> $PWD/install/pillar/system_info.sls
 }
 
 # Name   : Install_Salt
@@ -90,25 +90,115 @@ function Check_System_Version(){
 }
 
 # Name   : Get_Net_Info
-# Args   :
+# Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
 function Get_Net_Info(){
+    public_ips=$(ip ad | grep 'inet ' | grep -vE '( 10.|172.|192.168|127.)' | awk '{print $2}' | cut -d '/' -f 1)
+    inet_ips=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1')
+    if [ -n $public_ips ];then
+      public_ip=$(echo $public_ips | awk '{print $1}')
+      echo "public-ip: $pubic_ip" >> $PWD/install/pillar/system_info.sls
+    elif [ -n $inet_ips ];then
+      inet_size=${#inet_ips}
+      if [ $inet_size -le 16 ];then
+        check_static $inet_ips 
+        if [ $? -ne 0 ];then
+          Echo_Info "Error, there is no static net card"
+          exit 1
+        fi
+        Echo_Info "Your inet ip $inet_ips will be used to rainbond"
+        echo "inet-ip: $inet_ips" >> $PWD/install/pillar/system_info.sls
+      elif [ $inet_size -gt 16 ];then
+        read -p $'\t\e[32mPlease choose a inet-ip to use\e[0m (y/n) ' inet_ip
+        check_static $inet_ips \ 
+        if [ $? -ne 0 ];then
+          Echo_Info "Error, there is no static net card"
+          exit 1
+        else
+          default_gateway=$(ip route | grep default | awk '{print $3}')
+          curl $default_gateway --connect-timeout 2 >/dev/null
+          if [ $? -eq 0 ];then
+            Echo_Info "Your inet ip $inet_ip will be used to rainbond"
+            echo "inet-ip: $inet_ip" >> $PWD/install/pillar/system_info.sls
+          else
+            Echo_Info "Can't connect gataway $default_gateway"
+            exit 1
+          fi
+        fi
+      fi
+    else
+      Echo_Info "No ip was found, exit ..."
+      exit 1
+    fi
+}
+##########################################################################################
+# for each in $(ls -1 /sys/class/net | grep -v lo) ;do
+#     result=$(ip addr show $each | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
+#     if [ ! -z "${result// }" ] && [ -d /sys/class/net/${each// } ] ;then
+#             echo "Device: $each IP: $result"
+#     fi
+# done
+##########################################################################################
 
+# Name   : check_static
+# Args   : ip、net_cards
+# Return : 0|!0
+function check_static(){
+    ip=$1
+    net_cards=$(cat /proc/net/dev | awk '{if($2>0 && NR > 2) print substr($1, 0, index($1, ":") - 1)}')
+    for net_card in $net_cards
+    do
+    cat /etc/sysconfig/network-scripts/ifcfg-$net_card | grep $ip
+    if [ $? -eq 0 ];then
+      cat /etc/sysconfig/network-scripts/ifcfg-$net_card | grep BOOTPROTO | awk -F '=' '{print$2}'
+      if [ $? -eq 0 ];then
+        return 0
+      fi
+    fi
+    done
 }
 
 # Name   : Get_Hardware_Info
-# Args   : cpu_num、memory_size
+# Args   : cpu_num、memory_size、disk
 # Return : 0|!0
 function Get_Hardware_Info(){
-    cpu_num=$(salt '*' grains.get num_cpus | tail -n 1)
-    memory_size=$()
-    
+    cpu_num=$(cat /proc/cpuinfo | grep "processor" | wc -l )
+    memory_size=$(free -h | grep Mem | awk '{print $2}')
+    if [ $cpu_num -lt 2 ];then
+      Echo_Info "There is $cpu_num cpus, you need more cpu, exit ..."
+      exit 1
+    else
+      Echo_Info "There is $cpu_num cpus"
+    fi
+
+    if [ $memory_size -lt 2 ];then
+      Echo_Info "There is $memory_size memories, you need more memories, exit ..."
+      exit 1
+    elif [ $memory_size -gt 2 -a $memory_size -lt 4 ];then
+      Echo_Info "There is $memory_size memories, It is less than the standard quantity(4 memories), It may affect system performance"
+    else
+      Echo_Info "There is $memory_size memories"
+    fi
+
 }
 
 # Name   : Download_package
 # Args   :
 # Return : 0|!0
 function Download_package(){
+  for pkg in $(cat $PWD/etc/package.ls)
+  do
+    pkg_name=$(echo $pkg | awk -F '/' '{print $1}')
+    [ -d $PWD/install/salt/$pkg_name ] \
+    && rm -rf $PWD/install/salt/$pkg_name/* \
+    || mkdir -p  $PWD/install/salt/$pkg_name/
+    if [ ! -f /tmp/$pkg_name.tgz ];then
+      curl -s $OSS_DOMAIN/$OSS_PATH/$pkg/$pkg_name.tgz -o /tmp/$pkg_name.tgz
+      tar xf /tmp/$pkg_name.tgz -C $PWD/install/salt/$pkg_name/ --strip-components=1
+    else
+      tar xf /tmp/$pkg_name.tgz -C $PWD/install/salt/$pkg_name/install/ --strip-components=1
+    fi
+  done
 
 }
 
@@ -116,7 +206,17 @@ function Download_package(){
 # Args   :
 # Return : 0|!0
 function Write_Config(){
-
+  install_dir=$(cat $PWD/install/pillar/system_info.sls | grep install-dir: | awk '{print $2}')
+  [ -d $install_dir/install/master.d ] \
+  || mkdir -p $install_dir/install/master.d/
+  \cp -r $PWD/install/pillar/system_info.sls $install_dir/install/pillar/system_info.sls
+cat > $install_dir/install/master.d/pillar.conf <<END
+pillar_roots:
+  base:
+    - __instll_dir__/install/pillar
+END
+  sed -i "s/__instll_dir__/$install_dir" $install_dir/install/master.d/pillar.conf
+  ln -s $install_dir/install/master.d/pillar.conf /etc/salt/master.d/pillar.conf
 }
 
 Echo_Info "Checking internet connect ..."
