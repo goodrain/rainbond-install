@@ -1,0 +1,1 @@
+LOCAL_IP={{ pillar['inet-ip'] }}
