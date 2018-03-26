@@ -5,7 +5,7 @@ docker-config:
     {% else %}
     - source: salt://docker/envs/docker.sh
     {% endif %}
-    - name: {{ pillar['rbd-path'] }}/goodrain/docker/envs/docker.sh
+    - name: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
     - template: jinja
     - makedirs: Ture
     - mode: 644
@@ -23,6 +23,12 @@ docker-sh:
     - makedirs: Ture
     - mode: 644
     - user: root
+
+docker-mirrors:
+  file.managed:
+    - source: salt://docker/envs/daemon.json
+    - name: /etc/docker/daemon.json
+    - makedirs: Ture
 
 docker-repo:
   pkgrepo.managed:
@@ -44,7 +50,7 @@ gr-docker-engine:
   pkg.installed:
     - refresh: True
     - require:
-      - file: {{ pillar['rbd-path'] }}/goodrain/docker/envs/docker.sh
+      - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
       - file: /etc/goodrain/envs/docker.sh
   service.running:
     - name: docker
@@ -52,6 +58,6 @@ gr-docker-engine:
     - require:
       - pkg: gr-docker-engine
     - watch:
-      - file: {{ pillar['rbd-path'] }}/goodrain/docker/envs/docker.sh
+      - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
       - file: /etc/goodrain/envs/docker.sh
       - pkg: gr-docker-engine

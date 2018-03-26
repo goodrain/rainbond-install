@@ -1,3 +1,3 @@
 include:
   - docker.install
-  # - docker.image
+  - docker.image

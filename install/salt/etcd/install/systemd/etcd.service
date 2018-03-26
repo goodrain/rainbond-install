@@ -1,0 +1,16 @@
+[Unit]
+Description=etcd service
+After=network.target
+
+[Service]
+User=root
+EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/etcd.sh
+PermissionsStartOnly=true
+ExecStartPre=-/usr/bin/docker rm -f etcd
+ExecStart={{ pillar['rbd-path'] }}/etcd/scripts/start.sh
+ExecStop=-/usr/bin/docker stop etcd
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
