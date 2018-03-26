@@ -1,2 +1,5 @@
 download
 logs
+install/salt/docker/deb/
+install/salt/docker/rpm/
+install/salt/key/
