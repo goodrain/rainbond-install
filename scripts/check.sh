@@ -23,15 +23,8 @@ function Check_Internet(){
 # Args   : hostname
 # Return : 0|!0
 function Get_Hostname(){
-    hostname=$(hostname)
-    Echo_Info "Your hostname is $hostname"
-    if [ "$hostname" != "$DEFAULT_HOSTNAME" ];then
-        hostname manage01
-        echo $DEFAULT_HOSTNAME > /etc/hostname
-        echo $DEFAULT_HOSTNAME >> /etc/hosts
-        Echo_Info "Hostname has changed to the default $DEFAULT_HOSTNAME"
-    fi
-    echo "hostname: $DEFAULT_HOSTNAME" >> $PWD/install/pillar/system_info.sls
+    # 检查 key 函数
+    echo "hostname: $DEFAULT_HOSTNAME" >> ./install/pillar/system_info.sls
 }
 
 
@@ -40,25 +33,23 @@ function Get_Hostname(){
 # Return : 0|!0
 function Get_Rainbond_Install_Path(){
 
-    read -p $'\t\e[32mDo you need assign a installation path (Default:/opt/rainbond) \e[0m (y/n) ' config_path
-    if [ "$config_path" == "Y" -o "$config_path" == "y" ];then
-    read -p $'\t\e[32mInput a installation path\e[0m (y/n) ' install_path
+  read -p $'\t\e[32m使用云帮默认安装路径 (Default:/opt/rainbond) \e[0m (y=yes/c=custom) ' config_path
+
+  if [ "$config_path" == "c" -o "$config_path" == "C" ];then
+    read -p $'\t\e[32mInput a installation path\e[0m :' install_path
     # 如果用户未指定，使用默认
-      if [ -z $install_path ];then
-          read -p $'\t\e[32mYou never assign a installation path ,use default?\e[0m (y/n)' config_path_again
-          if [ "$config_path" == "Y" -o "$config_path" == "y" ];then
-            install_path=$DEFAULT_INSTALL_PATH
-            Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
-          else
-            exit 1
-          fi
-      fi
-      Echo_Info "What you assign path is $install_path"
-    else
+    if [ -z $install_path ];then
       install_path=$DEFAULT_INSTALL_PATH
       Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
     fi
-    echo "install-dir: $install_path" >> $PWD/install/pillar/system_info.sls
+
+  else
+      install_path=$DEFAULT_INSTALL_PATH
+      Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
+  fi
+
+  # 检查 key 函数
+  echo "rbd-path: $install_path" >> ./install/pillar/system_info.sls
 }
 
 # Name   : Install_Salt
@@ -67,8 +58,8 @@ function Get_Rainbond_Install_Path(){
 function Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG}
 
- # echo interface: xx >> /etc/salt/master
- # echo master: xx >> /etc/salt/minion
+ # echo interface: xx >> /etc/salt/master.d/master.conf
+ # echo master: xx >> /etc/salt/minion.d/minion.conf
 }
 
 
@@ -162,6 +153,16 @@ function check_static(){
 # Args   : cpu_num、memory_size、disk
 # Return : 0|!0
 function Get_Hardware_Info(){
+
+#========================
+if ok;then
+  return 0
+else
+  write_log >> error.log
+  returen 1
+fi
+#========================
+
     cpu_num=$(cat /proc/cpuinfo | grep "processor" | wc -l )
     memory_size=$(free -h | grep Mem | awk '{print $2}')
     if [ $cpu_num -lt 2 ];then
@@ -179,7 +180,6 @@ function Get_Hardware_Info(){
     else
       Echo_Info "There is $memory_size memories"
     fi
-
 }
 
 # Name   : Download_package
@@ -206,24 +206,36 @@ function Download_package(){
 # Args   :
 # Return : 0|!0
 function Write_Config(){
-  install_dir=$(cat $PWD/install/pillar/system_info.sls | grep install-dir: | awk '{print $2}')
-  [ -d $install_dir/install/master.d ] \
-  || mkdir -p $install_dir/install/master.d/
-  \cp -r $PWD/install/pillar/system_info.sls $install_dir/install/pillar/system_info.sls
-cat > $install_dir/install/master.d/pillar.conf <<END
+
+cat > /etc/salt/master.d/pillar.conf << END
 pillar_roots:
   base:
-    - __instll_dir__/install/pillar
+    - /xxxx/rainbond/install/pillar
 END
-  sed -i "s/__instll_dir__/$install_dir" $install_dir/install/master.d/pillar.conf
-  ln -s $install_dir/install/master.d/pillar.conf /etc/salt/master.d/pillar.conf
+
+cat > /etc/salt/master.d/salt.conf << END
+file_roots:
+  base:
+    - /xxxx/rainbond/install/salt
+END
+
+# 取出hostname
+echo "master: $xxx" > /etc/salt/minion.d/minion.conf 
+
+cp -rp .install/pillar /xxxx/rainbond/install/
+cp -rp .install/ /xxxx/rainbond/install/
+
+
 }
+
+
+#=============== main ==============
 
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok || Echo_Error
 
-Echo_Info "Checking hostname or reconfig ..."
-Get_Hostname && Echo_Ok || Echo_Error
+Echo_Info "Setting [ manage01 ] for hostname ..."
+Set_Hostname && Echo_Ok || Echo_Error
 
 Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok || Echo_Error
