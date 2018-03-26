@@ -1,6 +1,6 @@
 docker-config:
   file.managed:
-    {% if grains['os_family']|lower == 'centos' and grains['osrelease_info'][1] == 4 %}
+    {% if grains['os_family']|lower == 'redhat' and grains['osrelease_info'][1] == 4 %}
     - source: salt://docker/envs/docker-patch.sh
     {% else %}
     - source: salt://docker/envs/docker.sh
@@ -13,7 +13,7 @@ docker-config:
 
 docker-sh:
   file.managed:
-    {% if grains['os_family']|lower == 'centos' and grains['osrelease_info'][1] == 4 %}
+    {% if grains['os_family']|lower == 'redhat' and grains['osrelease_info'][1] == 4 %}
     - source: salt://docker/envs/docker-patch.sh
     {% else %}
     - source: salt://docker/envs/docker.sh
