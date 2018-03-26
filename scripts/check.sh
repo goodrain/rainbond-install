@@ -24,7 +24,10 @@ function Check_Internet(){
 # Return : 0|!0
 function Get_Hostname(){
     # 检查 key 函数
-    echo "hostname: $DEFAULT_HOSTNAME" >> ./install/pillar/system_info.sls
+    if [ $(grep 'hostname' ./install/pillar/system_info.sls) -eq 0 ];then
+      sed -i -e '/hostname/d' ./install/pillar/system_info.sls
+    fi
+      echo "hostname: $DEFAULT_HOSTNAME" >> ./install/pillar/system_info.sls
 }
 
 
@@ -33,10 +36,10 @@ function Get_Hostname(){
 # Return : 0|!0
 function Get_Rainbond_Install_Path(){
 
-  read -p $'\t\e[32m使用云帮默认安装路径 (Default:/opt/rainbond) \e[0m (y=yes/c=custom) ' config_path
+  read -p $'\t\e[32mUse the default path:(/opt/rainbond) \e[0m (y=yes/c=custom) ' config_path
 
   if [ "$config_path" == "c" -o "$config_path" == "C" ];then
-    read -p $'\t\e[32mInput a installation path\e[0m :' install_path
+    read -p $'\t\e[32mInput a customize installation path\e[0m :' install_path
     # 如果用户未指定，使用默认
     if [ -z $install_path ];then
       install_path=$DEFAULT_INSTALL_PATH
@@ -47,8 +50,10 @@ function Get_Rainbond_Install_Path(){
       install_path=$DEFAULT_INSTALL_PATH
       Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
   fi
-
   # 检查 key 函数
+  if [ $(grep 'rbd-path' ./install/pillar/system_info.sls) -eq 0 ];then
+      sed -i -e '/rbd-path/d' ./install/pillar/system_info.sls
+  fi
   echo "rbd-path: $install_path" >> ./install/pillar/system_info.sls
 }
 
@@ -57,9 +62,6 @@ function Get_Rainbond_Install_Path(){
 # Return : 0|!0
 function Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG}
-
- # echo interface: xx >> /etc/salt/master.d/master.conf
- # echo master: xx >> /etc/salt/minion.d/minion.conf
 }
 
 
@@ -67,17 +69,21 @@ function Install_Salt(){
 # Args   : sys_name、sys_version
 # Return : 0|!0
 function Check_System_Version(){
-    sys_name=$(salt '*' grains.get os | tail -n 1)
-    sys_version=$(salt '*' grains.get osrelease | tail -n 1)
-      [[ $sys_name != *CentOS* ]]\
-    &&[[ $sys_name != *Ubuntu* ]]\
-    &&[[ $sys_name != *Debian* ]]\
-    &&[[ $sys_version != *7* ]]\
-    &&[[ $sys_version != *8* ]]\
-    &&[[ $sys_version != *9* ]]\
-    &&[[ $sys_version != *16.04* ]]\
-    &&Echo_Info "$sys_name$sys_version is not supported temporarily"\
-    ||Echo_Info "Your system is $sys_name$sys_version"
+    sys_name=$(cat /etc/os-release | grep NAME | head -1)
+    sys_version=$(cat /etc/os-release | grep VERSION | head -1)
+
+       [[ $sys_name != *CentOS* ]] \
+    || [[ $sys_name != *Ubuntu* ]] \
+    || [[ $sys_name != *Debian* ]] \
+    || echo "$DATA : $sys_name$sys_version is not supported temporarily" > ./logs/error.log \
+    && exit 1
+    
+       [[ $sys_version != *7* ]] \
+    || [[ $sys_version != *8* ]] \
+    || [[ $sys_version != *9* ]] \
+    || [[ $sys_version != *16.04* ] ]\
+    || echo "$DATA : $sys_name$sys_version is not supported temporarily" > ./logs/error.log \
+    && exit 1
 }
 
 # Name   : Get_Net_Info
@@ -175,7 +181,7 @@ fi
     if [ $memory_size -lt 2 ];then
       Echo_Info "There is $memory_size memories, you need more memories, exit ..."
       exit 1
-    elif [ $memory_size -gt 2 -a $memory_size -lt 4 ];then
+    elif [ $memory_size*100 -gt 2*100 -a $memory_size -lt 4 ];then
       Echo_Info "There is $memory_size memories, It is less than the standard quantity(4 memories), It may affect system performance"
     else
       Echo_Info "There is $memory_size memories"
