@@ -8,6 +8,15 @@
 
 . scripts/common.sh
 
+# Function : Init
+# Args     : 
+# Return   : 
+function Init(){
+  [ ! -f ./install/pillar/system_info.sls ] \
+  &&touch ./install/pillar/system_info.sls
+}
+
+
 # Function : Check internet
 # Args     : Check url
 # Return   : (0|!0)
@@ -21,7 +30,7 @@ function Check_Internet(){
 # Return : 0|!0
 function Set_Hostname(){
     echo "manage01" > /etc/hostname
-    Check_Sls_File hostname
+    Check_Sls_File hostname 
     echo "hostname: $DEFAULT_HOSTNAME" >> ./install/pillar/system_info.sls
 }
 
@@ -95,7 +104,7 @@ function Check_System_Version(){
     
        [[ $sys_version != *7* ]] \
     || [[ $sys_version != *9* ]] \
-    || [[ $sys_version != *16.04* ] ]\
+    || [[ $sys_version != *16.04* ]] \
     || ( Write_File err_log "$sys_name$sys_version is not supported temporarily" > ./logs/error.log
         exit 1)
 }
@@ -159,24 +168,24 @@ function Get_Hardware_Info(){
 # Return : 0|!0
 function Download_package(){
   if [ -f /tmp/ctl.tgz ];then
-  curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5 -o /tmp/ctl.md5
-  md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
-    if [ $? -eq 0 ];then
-      tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
-      return 0
-    else
-      curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o /tmp/ctl.tgz
-      md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
+    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5 -o /tmp/ctl.md5
+    md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
       if [ $? -eq 0 ];then
         tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
         return 0
       else
-        Write_File err_log "The packge is broken, please contact staff to repair."
-        exit 1
+        curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o /tmp/ctl.tgz
+        md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
+        if [ $? -eq 0 ];then
+          tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
+          return 0
+        else
+          Write_File err_log "The packge is broken, please contact staff to repair."
+          exit 1
+        fi
       fi
-    fi
-  
-  rm /tmp/ctl.* -rf
+    rm /tmp/ctl.* -rf
+  fi
 }
 
 # Name   : Write_Config
@@ -196,10 +205,10 @@ function Write_Config(){
 # Return : none
 function Check_Sls_File(){
   key=$1
-  grep $key ./install/pillar/system_info.sls
-  if [ $? -eq 0 ];then
-      sed -i -e "/$key/d" ./install/pillar/system_info.sls
-  fi 
+    grep $key ./install/pillar/system_info.sls 
+    if [ $? -eq 0 ];then
+        sed -i -e "/$key/d" ./install/pillar/system_info.sls
+    fi
 }
 
 # Name   : Write_File
@@ -217,6 +226,9 @@ function Write_File(){
 }
 
 #=============== main ==============
+
+Echo_Info "Initing ..."
+Init
 
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok || Echo_Error
