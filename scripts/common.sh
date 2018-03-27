@@ -14,6 +14,8 @@ SALT_LOG="install_salt.log"
 DEFAULT_HOSTNAME="manage01"
 OSS_DOMAIN="https://dl.repo.goodrain.com"
 OSS_PATH="repo"
+DATE="$(date +"%Y-%m-%d %H:%M:%S")"
+info_file="./install/pillar/system_info.sls"
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  __detect_color_support
