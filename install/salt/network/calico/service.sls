@@ -35,5 +35,20 @@ calico:
     - reload: True
     - watch:
       - file: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/calico/envs/etcd.sh
+      - file: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
       - cmd: pull-image
+
+{% if grains['host'] == 'manage01' %}
+/tmp/init.calico:
+  file.managed:
+    - source: salt://network/calico/install/run/init.calico
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+
+init_calico:
+  cmd.run: 
+    - name: bash /tmp/init.calico
+
+{% endif %}

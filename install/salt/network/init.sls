@@ -1,6 +1,6 @@
-{%- if pillar.network is defined %}
+{% if pillar.network is defined %}
 include:
-{%- if pillar.network.calico is defined %}
+{% if pillar.network.calico is defined %}
 - network.calico
-{%- endif %}
-{%- endif %}
+{% endif %}
+{% endif %}

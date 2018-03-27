@@ -5,7 +5,7 @@ Requires=docker.service
 
 [Service]
 User=root
-EnvironmentFile={{ pillar['rbd-path'] }}/calico/envs/etcd.sh
+EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/calico.sh
 PermissionsStartOnly=true
 ExecStartPre=-/usr/bin/docker rm -f calico
 ExecStart={{ pillar['rbd-path'] }}/calico/scripts/start.sh

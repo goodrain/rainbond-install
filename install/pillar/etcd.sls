@@ -7,5 +7,5 @@ etcd:
     token: $(uuidgen)
     members:
     - host: 172.16.0.129
-      name: etcd01
+      name: manage01
       port: 2379
