@@ -118,17 +118,17 @@ function Get_Net_Info(){
 function Get_Hardware_Info(){
 
     cpu_num=$(grep "processor" /proc/cpuinfo | wc -l )
-    memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1)
+    memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
     if [ $cpu_num -lt 2 ];then
       Write_File err_log "There is $cpu_num cpus, you need more cpu, exit ..."
       exit 1
     fi
-
-    if [ "$memory_size" < "2" ];then
-      Write_File err_log "There is $memory_size memories, you need more memories, exit ..."
+    
+    if [ $memory_size -lt 2 ];then
+      Write_File err_log "There is $memory_size G memories, you need more memories, exit ..."
       exit 1
-    elif [ "$memory_size" < "2" -a "$memory_size" < "4" ];then
-      Write_File err_log "There is $memory_size memories, It is less than the standard quantity(4 memories), It may affect system performance"
+    elif [ $memory_size -ge 2 -a $memory_size -lt 4 ];then
+      Write_File err_log "There is $memory_size G memories, It is less than the standard quantity(4 memories), It may affect system performance"
     fi
 }
 
@@ -165,7 +165,7 @@ function Write_Config(){
 function Write_File(){
   if [ "$1" == "add" ];then
     key=$2
-    grep $key $INFO_FILE
+    grep $key $INFO_FILE > /dev/null
     if [ $? -eq 0 ];then
         sed -i -e "/$key/d" $INFO_FILE
     fi
