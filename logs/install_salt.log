@@ -22,26 +22,26 @@
 [1;32m *  INFO[0m: Found function daemons_running
 [1;32m *  INFO[0m: Found function install_centos_check_services
 [1;32m *  INFO[0m: Running install_centos_stable_deps()
-Loaded plugins: fastestmirror
+已加载插件：fastestmirror
 Loading mirror speeds from cached hostfile
  * base: mirror.bit.edu.cn
  * epel: mirrors.aliyun.com
  * extras: mirrors.aliyun.com
- * updates: ftp.sjtu.edu.cn
-Package yum-utils-1.1.31-42.el7.noarch already installed and latest version
-Package chkconfig-1.7.4-1.el7.x86_64 already installed and latest version
-Package PyYAML-3.11-1.el7.x86_64 already installed and latest version
-Nothing to do
+ * updates: mirror.bit.edu.cn
+软件包 yum-utils-1.1.31-42.el7.noarch 已安装并且是最新版本
+软件包 chkconfig-1.7.4-1.el7.x86_64 已安装并且是最新版本
+软件包 PyYAML-3.11-1.el7.x86_64 已安装并且是最新版本
+无须任何处理
 [1;32m *  INFO[0m: Running install_centos_stable()
-Loaded plugins: fastestmirror
+已加载插件：fastestmirror
 Loading mirror speeds from cached hostfile
  * base: mirror.bit.edu.cn
  * epel: mirrors.aliyun.com
  * extras: mirrors.aliyun.com
- * updates: ftp.sjtu.edu.cn
-Package salt-master-2017.7.4-1.el7.noarch already installed and latest version
-Package salt-minion-2017.7.4-1.el7.noarch already installed and latest version
-Nothing to do
+ * updates: mirror.bit.edu.cn
+软件包 salt-master-2017.7.4-1.el7.noarch 已安装并且是最新版本
+软件包 salt-minion-2017.7.4-1.el7.noarch 已安装并且是最新版本
+无须任何处理
 [1;32m *  INFO[0m: Running install_centos_stable_post()
 [1;32m *  INFO[0m: Running install_centos_check_services()
 [1;32m *  INFO[0m: Salt installed!
