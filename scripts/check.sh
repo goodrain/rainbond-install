@@ -22,8 +22,7 @@ function Check_Internet(){
 function Set_Hostname(){
     hostname manage01
     echo "manage01" > /etc/hostname
-    Write_File check hostname 
-    Write_File "hostname: $DEFAULT_HOSTNAME" $INFO_FILE
+    Write_File add hostname "hostname: $DEFAULT_HOSTNAME"
 }
 
 
@@ -46,8 +45,7 @@ function Get_Rainbond_Install_Path(){
       install_path=$DEFAULT_INSTALL_PATH
       Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
   fi
-  Write_File check rbd-path
-  Write_File "rbd-path: $install_path" $INFO_FILE
+  Write_File add rbd-path "rbd-path: $install_path"
 }
 
 # Name   : Install_Salt
@@ -82,8 +80,8 @@ END
 # Args   : sys_name、sys_version
 # Return : 0|!0
 function Check_System_Version(){
-    sys_name=$(cat /etc/os-release | grep NAME | head -1)
-    sys_version=$(cat /etc/os-release | grep VERSION | head -1)
+    sys_name=$(grep NAME /etc/os-release | head -1)
+    sys_version=$(grep VERSION /etc/os-release |  head -1)
        [[ "$sys_version" =~ "7" ]] \
     || [[ "$sys_version" =~ "9" ]] \
     || [[ "$sys_version" =~ "16.04" ]] \
@@ -95,8 +93,6 @@ function Check_System_Version(){
 # Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
 function Get_Net_Info(){
-  Write_File check public-ip
-  Write_File check inet-ip
   inet_ip=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
   public_ip=$(ip ad | grep 'inet ' | grep -vE '( 10.|172.|192.168|127.)' | awk '{print $2}' | cut -d '/' -f 1 | head -1)
   net_cards=$(ls -1 /sys/class/net)
@@ -104,15 +100,14 @@ function Get_Net_Info(){
     for net_card in $net_cards
     do
       grep "inet_ip" /etc/sysconfig/network-scripts/ifcfg-$net_card \
-      &&( Write_File check inet-ip && Write_File add "inet-ip: $inet_ip" $INFO_FILE ) \
-      || Write_File err_log "There is no static ip config"
+      && Write_File add inet-ip "inet-ip: ${inet_ip}"
     done
   else
         Write_File err_log "There is no inet ip, exit ..."
     exit 1
   fi
   if [ ! -z "$public_ip" ];then
-    Write_File add "public-ip: $public_ip" $INFO_FILE
+    Write_File add public-ip "public-ip: ${public_ip}"
   fi
 }
 
@@ -122,7 +117,7 @@ function Get_Net_Info(){
 # Return : 0|!0
 function Get_Hardware_Info(){
 
-    cpu_num=$(cat /proc/cpuinfo | grep "processor" | wc -l )
+    cpu_num=$(grep "processor" /proc/cpuinfo | wc -l )
     memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1)
     if [ $cpu_num -lt 2 ];then
       Write_File err_log "There is $cpu_num cpus, you need more cpu, exit ..."
@@ -159,10 +154,8 @@ function Download_package(){
 # Args   : db_name、db_pass
 # Return : 0|!0
 function Write_Config(){
-    Write_File check db-Name \
-    && Write_File add "db-name : $db_name"  $INFO_FILE
-    Write_File check db-pass \
-    && Write_File add "db-pass : $db_pass"  $INFO_FILE
+    Write_File add db-user "db-user: ${DB-USER}"
+    Write_File add db-pass "db-pass: ${DB-PASS}"
 }
 
 
@@ -171,7 +164,12 @@ function Write_Config(){
 # Return : none
 function Write_File(){
   if [ "$1" == "add" ];then
-    echo $2 >> $3
+    key=$2
+    grep $key $INFO_FILE
+    if [ $? -eq 0 ];then
+        sed -i -e "/$key/d" $INFO_FILE
+    fi
+    echo $3 >> $INFO_FILE
   elif [ "$1" == "err_log" ];then
     echo "$DATE :$2" >> ./logs/error.log
     Echo_Info "There seems to be some wrong here, you can check out the error logs in you installation dir (logs/error.log)"
