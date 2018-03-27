@@ -2,11 +2,11 @@
 
 DOWNLOAD_URL=https://dl.repo.goodrain.com/repo/ctl
 
-REPO_VER=v3.5
+REPO_VER=3.5
 
 
 prepare(){
-    curl -L ${DOWNLOAD_URL}/{REPO_VER}/ctl.tgz -o /tmp/ctl.tgz
+    curl -L ${DOWNLOAD_URL}/${REPO_VER}/ctl.tgz -o /tmp/ctl.tgz
     tar xf /tmp/ctl.tgz -C /usr/local/bin --strip-components=1
     chmod a+x /usr/local/bin/*
 
