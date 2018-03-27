@@ -8,15 +8,6 @@
 
 . scripts/common.sh
 
-# Function : Init
-# Args     : 
-# Return   : 
-function Init(){
-  [ ! -f ./install/pillar/system_info.sls ] \
-  &&touch ./install/pillar/system_info.sls
-}
-
-
 # Function : Check internet
 # Args     : Check url
 # Return   : (0|!0)
@@ -29,9 +20,9 @@ function Check_Internet(){
 # Args   : hostname
 # Return : 0|!0
 function Set_Hostname(){
+    hostname manage01
     echo "manage01" > /etc/hostname
-    Check_Sls_File hostname 
-    echo "hostname: $DEFAULT_HOSTNAME" >> ./install/pillar/system_info.sls
+    Write_File add hostname "hostname: $DEFAULT_HOSTNAME"
 }
 
 
@@ -54,8 +45,7 @@ function Get_Rainbond_Install_Path(){
       install_path=$DEFAULT_INSTALL_PATH
       Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
   fi
-  Check_Sls_File rbd-path
-  echo "rbd-path: $install_path" >> ./install/pillar/system_info.sls
+  Write_File add rbd-path "rbd-path: $install_path"
 }
 
 # Name   : Install_Salt
@@ -64,10 +54,6 @@ function Get_Rainbond_Install_Path(){
 function Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG}
   # write salt config
-  [ -f /etc/salt/master.d/pillar.conf ] \
-  && rm /etc/salt/master.d/pillar.conf -rf 
-  [ -f /etc/salt/master.d/salt.conf ] \
-  && rm  /etc/salt/master.d/salt.conf -rf
 cat > /etc/salt/master.d/pillar.conf << END
 pillar_roots:
   base:
@@ -78,12 +64,13 @@ file_roots:
   base:
     - /_install_dir_/rainbond/install/salt
 END
-    rbd-path=$(cat ./install/pillar/system_info.sls | grep rbd-path | awk '{print $2}')
+
+    rbd_path=$( grep rbd-path $INFO_FILE | awk '{print $2}')
     sed "s/_install_dir_/${rbd-path}/g" /etc/salt/master.d/pillar.conf
     sed "s/_install_dir_/${rbd-path}/g" /etc/salt/master.d/salt.conf
     echo "master: $hostname" > /etc/salt/minion.d/minion.conf 
-    cp -rp .install/pillar /${rbd-path}/rainbond/install/
-    cp -rp .install/ /${rbd-path}/rainbond/install/
+    cp -rp ./install/pillar /${rbd-path}/rainbond/install/
+    cp -rp ./install/ /${rbd-path}/rainbond/install/
     systemctl start salt-master
     systemctl start salt-minion
 }
@@ -93,19 +80,12 @@ END
 # Args   : sys_name、sys_version
 # Return : 0|!0
 function Check_System_Version(){
-    sys_name=$(cat /etc/os-release | grep NAME | head -1)
-    sys_version=$(cat /etc/os-release | grep VERSION | head -1)
-
-       [[ $sys_name != *CentOS* ]] \
-    || [[ $sys_name != *Ubuntu* ]] \
-    || [[ $sys_name != *Debian* ]] \
-    || ( Write_File err_log "$sys_name$sys_version is not supported temporarily" > ./logs/error.log
-        exit 1 )
-    
-       [[ $sys_version != *7* ]] \
-    || [[ $sys_version != *9* ]] \
-    || [[ $sys_version != *16.04* ]] \
-    || ( Write_File err_log "$sys_name$sys_version is not supported temporarily" > ./logs/error.log
+    sys_name=$(grep NAME /etc/os-release | head -1)
+    sys_version=$(grep VERSION /etc/os-release |  head -1)
+       [[ "$sys_version" =~ "7" ]] \
+    || [[ "$sys_version" =~ "9" ]] \
+    || [[ "$sys_version" =~ "16.04" ]] \
+    || ( Write_File err_log "$sys_name$sys_version is not supported temporarily"
         exit 1)
 }
 
@@ -113,33 +93,22 @@ function Check_System_Version(){
 # Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
 function Get_Net_Info(){
-  Check_Sls_File public-ip
-  Check_Sls_File inet-ip
-  for net_card in $(ls -1 /sys/class/net) ;do 
-    ip=$(ip addr show $net_card | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
-    if [ ! -z "${ip// }" ] && [ -d /sys/class/net/${net_card// } ] ;then
-      public_ip=$(echo $ip | grep -vE '( 10.|172.|192.168|127.)')
-      inet_ip=$(echo $ip | egrep ' 10.|172.|192.168' | grep -v '172.30.42.1')
-      grep 'static' /etc/sysconfig/network-scripts/ifcfg-$net_card
-      if [ $? -eq 0 ];then
-        if [ ${#public_ip} -gt 7 ];then
-          grep 'public-ip' ./install/pillar/system_info.sls
-          if [ $? -ne 0 ];then
-            echo "public-ip: $pubic_ip" >> ./install/pillar/system_info.sls
-          fi
-        elif [ ${#inet_ip } -gt 7 ];then
-          grep 'public-ip' ./install/pillar/system_info.sls
-          if [ $? -ne 0 ];then
-            echo "inet-ip: $inet_ip" >> ./install/pillar/system_info.sls
-          fi
-        fi
-      else
-        Write_File err_log "there isn't a static net-card"
-        exit 1
-      fi
-      break;
-    fi
-done
+  inet_ip=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
+  public_ip=$(ip ad | grep 'inet ' | grep -vE '( 10.|172.|192.168|127.)' | awk '{print $2}' | cut -d '/' -f 1 | head -1)
+  net_cards=$(ls -1 /sys/class/net)
+  if [ ! -z "$inet_ip" ];then
+    for net_card in $net_cards
+    do
+      grep "inet_ip" /etc/sysconfig/network-scripts/ifcfg-$net_card \
+      && Write_File add inet-ip "inet-ip: ${inet_ip}"
+    done
+  else
+        Write_File err_log "There is no inet ip, exit ..."
+    exit 1
+  fi
+  if [ ! -z "$public_ip" ];then
+    Write_File add public-ip "public-ip: ${public_ip}"
+  fi
 }
 
 
@@ -148,18 +117,18 @@ done
 # Return : 0|!0
 function Get_Hardware_Info(){
 
-    cpu_num=$(cat /proc/cpuinfo | grep "processor" | wc -l )
-    memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1)
+    cpu_num=$(grep "processor" /proc/cpuinfo | wc -l )
+    memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
     if [ $cpu_num -lt 2 ];then
       Write_File err_log "There is $cpu_num cpus, you need more cpu, exit ..."
       exit 1
     fi
-
-    if [ "$memory_size" < "2" ];then
-      Write_File err_log "There is $memory_size memories, you need more memories, exit ..."
+    
+    if [ $memory_size -lt 2 ];then
+      Write_File err_log "There is $memory_size G memories, you need more memories, exit ..."
       exit 1
-    elif [ "$memory_size" < "2" -a "$memory_size" < "4" ];then
-      Write_File err_log "There is $memory_size memories, It is less than the standard quantity(4 memories), It may affect system performance"
+    elif [ $memory_size -ge 2 -a $memory_size -lt 4 ];then
+      Write_File err_log "There is $memory_size G memories, It is less than the standard quantity(4 memories), It may affect system performance"
     fi
 }
 
@@ -167,68 +136,43 @@ function Get_Hardware_Info(){
 # Args   :
 # Return : 0|!0
 function Download_package(){
-  if [ -f /tmp/ctl.tgz ];then
-    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5 -o /tmp/ctl.md5
-    md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
-      if [ $? -eq 0 ];then
-        tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
-        return 0
-      else
-        curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o /tmp/ctl.tgz
-        md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
-        if [ $? -eq 0 ];then
-          tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
-          return 0
-        else
-          Write_File err_log "The packge is broken, please contact staff to repair."
-          exit 1
-        fi
-      fi
+    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o /tmp/ctl.md5sum
+    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o /tmp/ctl.tgz
+    cd /tmp
+    md5sum -c /tmp/ctl.md5sum > /dev/null 2>&1
+    if [ $? -eq 0 ];then
+      tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
+      return 0
+    else
+      Write_File err_log "The packge is broken, please contact staff to repair."
+      exit 1
+    fi
     rm /tmp/ctl.* -rf
-  fi
 }
 
 # Name   : Write_Config
 # Args   : db_name、db_pass
 # Return : 0|!0
 function Write_Config(){
-    db_name=admin
-    db_pass=$(shuf -i 100000-999999 -n 1)
-    Check_Sls_File db-Name \
-    && Write_File add "db-name : $db_name"  ./install/pillar/system_info.sls
-    Check_Sls_File db-pass \
-    && Write_File add "db-pass : $db_pass"  ./install/pillar/system_info.sls
+    Write_File db-user "${DB-USER}"
+    Write_File db-pass "${DB-PASS}"
 }
 
-# Name   : Check_Sls_File
+
+# Name   : Write_Sls_File
 # Args   : key
-# Return : none
-function Check_Sls_File(){
+# Return : value
+function Write_Sls_File(){
   key=$1
-    grep $key ./install/pillar/system_info.sls 
-    if [ $? -eq 0 ];then
-        sed -i -e "/$key/d" ./install/pillar/system_info.sls
-    fi
-}
-
-# Name   : Write_File
-# Args   : none
-# Return : none
-function Write_File(){
-  if [ "$1" == "add" ];then
-    echo $2 >> $3
-  elif [ "$1" == "err_log" ];then
-    echo "$DATE :$2" > ./logs/error.log
-    Echo_Info "There seems to be some wrong here, you can check out the error logs in you installation dir (logs/error.log)"
+  value=$2
+  if grep $key $INFO_FILE ;then
+    sed -i -e "/$key/d" $INFO_FILE
   else
-    echo $2 > $3
+    echo "$key: $value" >> $INFO_FILE
   fi
 }
 
 #=============== main ==============
-
-Echo_Info "Initing ..."
-Init
 
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok || Echo_Error
@@ -238,9 +182,6 @@ Set_Hostname && Echo_Ok || Echo_Error
 
 Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok || Echo_Error
-
-Echo_Info "Installing salt ..."
-Install_Salt && Echo_Ok || Echo_Error
 
 Echo_Info "Checking system version ..."
 Check_System_Version && Echo_Ok || Echo_Error
@@ -258,3 +199,7 @@ Download_package && Echo_Ok || Echo_Error
 
 Echo_Info "Writing configuration ..."
 Write_Config && Echo_Ok || Echo_Error
+
+
+Echo_Info "Installing salt ..."
+Install_Salt && Echo_Ok || Echo_Error

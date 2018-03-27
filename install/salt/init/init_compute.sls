@@ -5,3 +5,4 @@ include:
   - init.config
   - init.service
   - init.key_cp
+  - init.router

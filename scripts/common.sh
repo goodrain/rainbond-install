@@ -13,7 +13,11 @@ CHECK_LOG="check.log"
 SALT_LOG="install_salt.log"
 DEFAULT_HOSTNAME="manage01"
 OSS_DOMAIN="https://dl.repo.goodrain.com"
-OSS_PATH="repo"
+OSS_PATH="repo/ctl/3.5"
+DATE="$(date +"%Y-%m-%d %H:%M:%S")"
+INFO_FILE="./install/pillar/system_info.sls"
+DB_USER="admin"
+DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  __detect_color_support

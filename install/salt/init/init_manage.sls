@@ -5,3 +5,4 @@ include:
   - init.create_dir
   - init.service
   - init.key_build
+  - init.router
