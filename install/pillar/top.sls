@@ -2,3 +2,4 @@ base:
   '*':
     - init
     - etcd
+    - network

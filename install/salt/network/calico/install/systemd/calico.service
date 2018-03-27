@@ -1,0 +1,17 @@
+[Unit]
+Description=calicoctl node
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+EnvironmentFile={{ pillar['rbd-path'] }}/calico/envs/etcd.sh
+PermissionsStartOnly=true
+ExecStartPre=-/usr/bin/docker rm -f calico
+ExecStart={{ pillar['rbd-path'] }}/calico/scripts/start.sh
+Restart=always
+ExecStop=-/usr/bin/docker stop calico
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
