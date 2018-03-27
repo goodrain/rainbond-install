@@ -6,9 +6,9 @@ base:
     - storage
     - network
     # - node
-  'node_type:tree':
-    - match: grain
-    - init.init_tree
-  'node_type:rain':
-    - match: grain
-    - init.init_rain
+  'role:compute':
+    - match: grains
+    - init.init_manage
+  'role:manage':
+    - match: grains
+    - init.init_compute
