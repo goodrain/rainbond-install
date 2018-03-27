@@ -1,5 +1,6 @@
 base:
   '*':
-    - init
+    - system_info
+    - db
     - etcd
     - network
