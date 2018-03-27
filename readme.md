@@ -56,5 +56,5 @@ salt "*" state.sls storage
 salt "*" state.sls network
 
 # install Kubernetes Manage node 
-salt "*" state.sls kubernetes.master
+salt "*" state.sls kubernetes
 ```
