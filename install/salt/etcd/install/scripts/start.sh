@@ -39,7 +39,7 @@ exec /usr/bin/docker \
   --restart=always \
   --net=host \
   --name etcd \
-  --volume=/data/etcd/:/data/etcd/ \
+  --volume={{ pillar['rbd-path'] }}/data/etcd/:/data/etcd/ \
   rainbond/etcd:v3.2.13 \
   /usr/local/bin/etcd \
   --name $LOCAL_NODE \

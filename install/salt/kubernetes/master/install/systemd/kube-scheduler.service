@@ -1,0 +1,15 @@
+[Unit]
+Description=Kubernetes Scheduler
+Requires=network.target
+
+[Service]
+User=root
+PermissionsStartOnly=true
+ExecStartPre=-/usr/bin/docker rm -f kube-scheduler
+ExecStart={{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-scheduler.sh
+ExecStop=-/usr/bin/docker stop kube-scheduler
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

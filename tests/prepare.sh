@@ -31,6 +31,8 @@ EOF
 master: $local_ip
 id: $(hostname -s)
 EOF
+  yum install -y salt-master
+  yum install -y salt-minion
   systemctl enable salt-master
   systemctl enable salt-minion
   systemctl start salt-master
