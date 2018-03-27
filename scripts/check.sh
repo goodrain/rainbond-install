@@ -66,7 +66,8 @@ file_roots:
   base:
     - /_install_dir_/rainbond/install/salt
 END
-    rbd-path=$(cat $INFO_FILE | grep rbd-path | awk '{print $2}')
+
+    rbd_path=$( grep rbd-path $INFO_FILE | awk '{print $2}')
     sed "s/_install_dir_/${rbd-path}/g" /etc/salt/master.d/pillar.conf
     sed "s/_install_dir_/${rbd-path}/g" /etc/salt/master.d/salt.conf
     echo "master: $hostname" > /etc/salt/minion.d/minion.conf 
@@ -140,17 +141,17 @@ function Get_Hardware_Info(){
 # Args   :
 # Return : 0|!0
 function Download_package(){
-    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5 -o /tmp/ctl.md5
-    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5 -o /tmp/ctl.tgz
-    md5sum -c /tmp/ctl.md5 > /dev/null 2>&1
-      if [ $? -eq 0 ];then
-        tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
-        return 0
-      else
-
-          Write_File err_log "The packge is broken, please contact staff to repair."
-          exit 1
-      fi
+    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o /tmp/ctl.md5sum
+    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o /tmp/ctl.tgz
+    cd /tmp
+    md5sum -c /tmp/ctl.md5sum > /dev/null 2>&1
+    if [ $? -eq 0 ];then
+      tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
+      return 0
+    else
+      Write_File err_log "The packge is broken, please contact staff to repair."
+      exit 1
+    fi
     rm /tmp/ctl.* -rf
 }
 
@@ -158,8 +159,6 @@ function Download_package(){
 # Args   : db_name、db_pass
 # Return : 0|!0
 function Write_Config(){
-    db_name=admin
-    db_pass=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
     Write_File check db-Name \
     && Write_File add "db-name : $db_name"  $INFO_FILE
     Write_File check db-pass \
@@ -196,9 +195,6 @@ Set_Hostname && Echo_Ok || Echo_Error
 Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok || Echo_Error
 
-Echo_Info "Installing salt ..."
-Install_Salt && Echo_Ok || Echo_Error
-
 Echo_Info "Checking system version ..."
 Check_System_Version && Echo_Ok || Echo_Error
 
@@ -215,3 +211,7 @@ Download_package && Echo_Ok || Echo_Error
 
 Echo_Info "Writing configuration ..."
 Write_Config && Echo_Ok || Echo_Error
+
+
+Echo_Info "Installing salt ..."
+Install_Salt && Echo_Ok || Echo_Error
