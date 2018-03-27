@@ -3,6 +3,9 @@ base:
     - deploy-salt
     - docker
     - etcd
+    - storage
+    - network
+    # - node
   'node_type:tree':
     - match: grain
     - init.init_tree
