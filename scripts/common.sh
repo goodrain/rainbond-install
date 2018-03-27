@@ -18,7 +18,7 @@ DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 INFO_FILE="./install/pillar/system_info.sls"
 DB_USER="admin"
 DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
-
+printf "\033[1;31m ERROR!!!\033[0m\n" 1>&2;
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  __detect_color_support
 #   DESCRIPTION:  Try to detect color support.
@@ -65,4 +65,3 @@ Echo_Info() {
 Echo_Ok() {
    printf "${GC} OK${EC}\n";
 }
-

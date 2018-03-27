@@ -14,6 +14,11 @@
 function Check_Internet(){
   check_url=$1
   curl -s --connect-timeout 3 $check_url -o /dev/null 2>/dev/null
+  if [ $? -eq 0 ];then
+    return 0
+  else
+    err_log "Check if the network is normal"
+  fi
 }
 
 # Name   : Get_Hostname
@@ -38,12 +43,12 @@ function Get_Rainbond_Install_Path(){
     # 如果用户未指定，使用默认
     if [ -z $install_path ];then
       install_path=$DEFAULT_INSTALL_PATH
-      Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
+      return 0
     fi
 
   else
       install_path=$DEFAULT_INSTALL_PATH
-      Echo_Info "Use default path:$DEFAULT_INSTALL_PATH"
+      return 0
   fi
   Write_Sls_File rbd-path "$install_path"
 }
@@ -57,8 +62,8 @@ function Check_System_Version(){
        [[ "$sys_version" =~ "7" ]] \
     || [[ "$sys_version" =~ "9" ]] \
     || [[ "$sys_version" =~ "16.04" ]] \
-    || #( Write_File err_log "$sys_name$sys_version is not supported temporarily"
-        exit 1
+    || err_log "$sys_name$sys_version is not supported temporarily" \
+    && return 0
 }
 
 # Name   : Get_Net_Info
@@ -75,8 +80,7 @@ function Get_Net_Info(){
       && Write_Sls_File inet-ip "${inet_ip}"
     done
   else
-        #Write_File err_log "There is no inet ip, exit ..."
-    exit 1
+    err_log "There is no inet ip"
   fi
   if [ ! -z "$public_ip" ];then
     Write_Sls_File public-ip "${public_ip}"
@@ -88,38 +92,31 @@ function Get_Net_Info(){
 # Args   : cpu_num、memory_size、disk
 # Return : 0|!0
 function Get_Hardware_Info(){
-
-    cpu_num=$(grep "processor" /proc/cpuinfo | wc -l )
-    memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
-    if [ $cpu_num -lt 2 ];then
-      #Write_File err_log "There is $cpu_num cpus, you need more cpu, exit ..."
-      exit 1
-    fi
-    
-    if [ $memory_size -lt 2 ];then
-      #Write_File err_log "There is $memory_size G memories, you need more memories, exit ..."
-      exit 1
-    elif [ $memory_size -ge 2 -a $memory_size -lt 4 ];then
-      Echo_Info "There is $memory_size G memories, It is less than the standard quantity(4 memories), It may affect system performance"
-      #Write_File err_log "There is $memory_size G memories, It is less than the standard quantity(4 memories), It may affect system performance"
-    fi
+  cpu_num=$(grep "processor" /proc/cpuinfo | wc -l )
+  memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
+  if [ $cpu_num -lt 2 ];then
+    err_log "There is $cpu_num cpus, you need 2 cpus at least"
+  fi
+  
+  if [ $memory_size -lt 4 ];then
+    err_log "There is $memory_size G memories, you need 4G at least"
+  fi
 }
 
 # Name   : Download_package
 # Args   :
 # Return : 0|!0
 function Download_package(){
-    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o /tmp/ctl.md5sum
-    curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o /tmp/ctl.tgz
-    md5sum -c /tmp/ctl.md5sum > /dev/null 2>&1
-    if [ $? -eq 0 ];then
-      tar xf /tmp/ctl.tgz -C /usr/local/bin/ --strip-components=1
-      return 0
-    else
-      # Write_File err_log "The packge is broken, please contact staff to repair."
-      exit 1
-    fi
-    rm /tmp/ctl.* -rf
+  curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o ./ctl.md5sum
+  curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o ./ctl.tgz
+  md5sum -c ./ctl.md5sum > /dev/null 2>&1
+  if [ $? -eq 0 ];then
+    tar xf .//ctl.tgz -C /usr/local/bin/ --strip-components=1
+    return 0
+  else
+    err_log "The packge is broken, please contact staff to repair"
+  fi
+  rm ./ctl.* -rf
 }
 
 # Name   : Write_Config
@@ -134,7 +131,9 @@ function Write_Config(){
 # Args   : Null
 # Return : 0|!0
 function Install_Salt(){
-  ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG}
+  ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
+  || err_log "Can't download the salt installation package"
+
   # write salt config
 cat > /etc/salt/master.d/pillar.conf << END
 pillar_roots:
@@ -153,8 +152,8 @@ END
     [ -d ${rbd_path}/rainbond/install/ ] || mkdir -p ${rbd_path}/rainbond/install/
     cp -rp ./install/pillar ${rbd_path}/rainbond/install/
     cp -rp ./install/ ${rbd_path}/rainbond/install/
-    systemctl start salt-master
-    systemctl start salt-minion
+    systemctl start salt-master || err_log "the service salt-master can't sart ,check the salt-master.service logs"
+    systemctl start salt-minion || err_log "the service salt-minion can't sart ,check the salt-minion.service logs"
 }
 
 
@@ -171,34 +170,44 @@ function Write_Sls_File(){
     echo "$key: $value" >> $INFO_FILE
 }
 
+function err_log(){
+  Echo_Error
+  Echo_Info "There seems to be some problem here, You can through the error log(./logs/error.log) to get the detail information"
+  echo "$DATE $1" >> ./$LOG_DIR/error.log
+  exit 1
+}
+
 #=============== main ==============
 
 Echo_Info "Checking internet connect ..."
-#Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok || Echo_Error
+Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
 Echo_Info "Setting [ manage01 ] for hostname ..."
-#Set_Hostname && Echo_Ok || Echo_Error
+Set_Hostname && Echo_Ok
 
-Echo_Info "Configing installation path ..."
-#Get_Rainbond_Install_Path  && Echo_Ok || Echo_Error
+if [[ "$@" =~ "force" ]];then
+  Echo_Info "Use the default installation path"
+else
+  Echo_Info "Configing installation path ..."
+  Get_Rainbond_Install_Path  && Echo_Ok
+fi
 
 Echo_Info "Checking system version ..."
-#Check_System_Version && Echo_Ok || Echo_Error
+Check_System_Version && Echo_Ok
 
 #ipaddr(inet pub) type .mark in .sls
 Echo_Info "Getting net information ..."
-Get_Net_Info && Echo_Ok || Echo_Error
+Get_Net_Info && Echo_Ok
 
 # disk cpu memory
 Echo_Info "Getting Hardware information ..."
-#Get_Hardware_Info && Echo_Ok || Echo_Error 
+Get_Hardware_Info && Echo_Ok
 
 Echo_Info "Downloading Components ..."
-#Download_package && Echo_Ok || Echo_Error
+Download_package && Echo_Ok
 
 Echo_Info "Writing configuration ..."
-#Write_Config && Echo_Ok || Echo_Error
-
+Write_Config && Echo_Ok
 
 Echo_Info "Installing salt ..."
-#Install_Salt && Echo_Ok || Echo_Error
+Install_Salt && Echo_Ok
