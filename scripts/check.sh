@@ -154,31 +154,21 @@ function Download_package(){
 # Args   : db_name、db_pass
 # Return : 0|!0
 function Write_Config(){
-    Write_File add db-user "db-user: ${DB-USER}"
-    Write_File add db-pass "db-pass: ${DB-PASS}"
+    Write_File db-user "${DB-USER}"
+    Write_File db-pass "${DB-PASS}"
 }
 
 
-# Name   : Write_File
-# Args   : none
-# Return : none
-function Write_File(){
-  if [ "$1" == "add" ];then
-    key=$2
-    grep $key $INFO_FILE > /dev/null
-    if [ $? -eq 0 ];then
-        sed -i -e "/$key/d" $INFO_FILE
-    fi
-    echo $3 >> $INFO_FILE
-  elif [ "$1" == "err_log" ];then
-    echo "$DATE :$2" >> ./logs/error.log
-    Echo_Info "There seems to be some wrong here, you can check out the error logs in you installation dir (logs/error.log)"
-  elif [ "$1" == "check" ];then
-    key=$2
-    grep $key $INFO_FILE
-    if [ $? -eq 0 ];then
-        sed -i -e "/$key/d" $INFO_FILE
-    fi
+# Name   : Write_Sls_File
+# Args   : key
+# Return : value
+function Write_Sls_File(){
+  key=$1
+  value=$2
+  if grep $key $INFO_FILE ;then
+    sed -i -e "/$key/d" $INFO_FILE
+  else
+    echo "$key: $value" >> $INFO_FILE
   fi
 }
 
