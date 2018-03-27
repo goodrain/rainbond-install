@@ -107,8 +107,8 @@ kube-scheduler:
 
 kube-local:
   file.managed:
-    source: {{ pillar['rbd-path'] }}/kubernetes/kubecfg/admin.kubeconfig
-    name: /root/.kube/config
+    - source: {{ pillar['rbd-path'] }}/kubernetes/kubecfg/admin.kubeconfig
+    - name: /root/.kube/config
     - makedirs: Ture
     - mode: 600
     - user: root
