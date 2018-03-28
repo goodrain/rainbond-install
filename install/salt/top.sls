@@ -8,6 +8,8 @@ base:
     - network
     - kubernetes.node
     - node
+    - db
+    - plugins
 
   "role:manage":
     - match: grains
