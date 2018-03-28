@@ -1,4 +1,4 @@
-{% set path = pillar['rbd-path'] %}
+{% set path = pillar['install-script-path'] %}
 key_cp :
   file.managed:
     - source: salt://init/files/id_rsa.pub
