@@ -11,5 +11,5 @@ compose_file:
      - group: root
      - mode: 600
      - makedirs: Ture
- 
+     - template: jinja
 
