@@ -4,3 +4,4 @@ role: manage
 dns: 114.114.114.114
 host-uuid: xxxxxxx
 rbd-version: 3.5
+rbd-tag: cloudbang
