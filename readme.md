@@ -43,6 +43,10 @@ ln -s /root/rainbond-install/install/pillar .
 
 # need update config (ip.) for pillar
 
+# init system 
+
+salt "*" state.sls init
+
 # install docker
 salt "*" state.sls docker
 
@@ -56,5 +60,8 @@ salt "*" state.sls storage
 salt "*" state.sls network
 
 # install Kubernetes Manage node 
-salt "*" state.sls kubernetes
+salt "*" state.sls kubernetes.server
+
+# install Kubernetes Node
+salt "*" state.sls kubernetes.node
 ```
