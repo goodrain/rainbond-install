@@ -8,6 +8,8 @@
 
 . scripts/common.sh
 
+OPT="$1"
+
 # Function : Check internet
 # Args     : Check url
 # Return   : (0|!0)
@@ -50,7 +52,11 @@ function Get_Rainbond_Install_Path(){
       install_path=$DEFAULT_INSTALL_PATH
       return 0
   fi
-  Write_Sls_File rbd-path "$install_path"
+  if [[ "$install_path" =~ "rainbond" ]];then
+    Write_Sls_File rbd-path "$install_path"
+  else
+    Write_Sls_File rbd-path "$install_path/rainbond"
+  fi
 }
 
 # Name   : Check_System_Version
@@ -85,6 +91,8 @@ function Get_Net_Info(){
   if [ ! -z "$public_ip" ];then
     Write_Sls_File public-ip "${public_ip}"
   fi
+  # 写入hosts
+  echo "$inet_ip $(hostname)" >> /etc/hosts
 }
 
 
@@ -107,8 +115,10 @@ function Get_Hardware_Info(){
 # Args   :
 # Return : 0|!0
 function Download_package(){
-  curl -s $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o ./ctl.md5sum
-  curl -s $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o ./ctl.tgz
+  curl -s --connect-timeout 3 $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o ./ctl.md5sum \
+  && curl -s --connect-timeout 3 $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o ./ctl.tgz \
+  || err_log "The packge is broken, please contact staff to repair"
+  
   md5sum -c ./ctl.md5sum > /dev/null 2>&1
   if [ $? -eq 0 ];then
     tar xf .//ctl.tgz -C /usr/local/bin/ --strip-components=1
@@ -123,28 +133,42 @@ function Download_package(){
 # Args   : db_name、db_pass
 # Return : 0|!0
 function Write_Config(){
-    Write_Sls_File db-user "${DB-USER}"
-    Write_Sls_File db-pass "${DB-PASS}"
+  rbd_version=$(cat ./VERSION)
+  Write_Sls_File db-user "${DB-USER}"
+  Write_Sls_File db-pass "${DB-PASS}"
+  Write_Sls_File rbd-version "${rbd_version}"
 }
 
 # Name   : Install_Salt
 # Args   : Null
 # Return : 0|!0
 function Install_Salt(){
+  # install salt without run
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || err_log "Can't download the salt installation package"
+
+  inet_ip=$(grep inet-ip $INFO_FILE | awk '{print $2}')
+  echo "master: $(hostname)" >> /etc/salt/minion
+  echo "interface: $inet_ip" >> /etc/salt/master
+
 
   # write salt config
 cat > /etc/salt/master.d/pillar.conf << END
 pillar_roots:
   base:
-    - _install_dir_/rainbond/install/pillar
+    - _install_dir_/install/pillar
 END
 cat > /etc/salt/master.d/salt.conf << END
 file_roots:
   base:
-    - _install_dir_/rainbond/install/salt
+    - _install_dir_/install/salt
 END
+    # auto accept
+cat >> /etc/salt/master <<END
+open_mode: True
+auto_accept: true
+END
+
     rbd_path=$(grep rbd-path $INFO_FILE | awk '{print $2}')
     sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/pillar.conf
     sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/salt.conf
@@ -188,8 +212,11 @@ Set_Hostname && Echo_Ok
 if [[ "$@" =~ "force" ]];then
   Echo_Info "Use the default installation path"
 else
-  Echo_Info "Configing installation path ..."
-  Get_Rainbond_Install_Path  && Echo_Ok
+  if [ -z "$OPT" ];then
+    Echo_Info "Configing installation path ..."
+    Get_Rainbond_Install_Path  && Echo_Ok
+  else
+    Write_Sls_File rbd-path "$install_path"
 fi
 
 Echo_Info "Checking system version ..."

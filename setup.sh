@@ -35,3 +35,17 @@ do
 done
 
 
+# for i in $(seq 1 10)
+# do
+# opt=$(echo $opts | awk '{print ($'$mark',$'$((mark+1))')}')
+# opt_key=$(echo $opt | awk '{prin $1}')
+# opt_value=$(echo $opt | awk '{prin $2}')
+# case $opt_key in
+#     -f) /bin/bash  ./scripts/check.sh force ;;
+#     -i) /bin/bash  ./scripts/check.sh $opt_value ;;
+# esac
+
+# mark=$((mark+2))
+# echo $mark
+# done
+
