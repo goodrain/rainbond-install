@@ -1,15 +1,19 @@
 base:
   "*":
     - deploy-salt
+    - init
     - docker
     - etcd
     - storage
     - network
-    - init
-    # - node
+    - kubernetes
+    - node
+
 #  'role:compute':
 #    - match: grains
+#    - kubernetes.master
 #    - init.init_manage
 #  'role:manage':
 #    - match: grains
-#    - init.init_compute
+#    - kubernetes.node
+#   - init.init_compute
