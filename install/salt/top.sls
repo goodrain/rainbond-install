@@ -6,8 +6,13 @@ base:
     - etcd
     - storage
     - network
-    - kubernetes
+    - kubernetes.node
     - node
+
+  "role:manage":
+    - match: grains
+    - kubernetes.server
+    
 
 #  'role:compute':
 #    - match: grains
