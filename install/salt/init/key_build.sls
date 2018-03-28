@@ -1,4 +1,4 @@
-{% set path = pillar['rbd_path'] %}
+{% set path = pillar['rbd-path'] %}
 key_rsa:
   cmd.run:
      - name: ssh-keygen -t rsa -f ~/.ssh/id_rsa -P "" ;cp -a ~/.ssh/id_rsa {{ path }}/install/salt//init/files
