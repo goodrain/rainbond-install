@@ -29,7 +29,7 @@ key_rsa_buider:
 key_pub_ssh:
   file.managed:
     - source: salt://init/files/id_rsa.pub
-    - name: {{ path }}/etc/rbd-chaos/ssh/id_rsa
+    - name: {{ path }}/etc/rbd-chaos/ssh/id_rsa.pub
     - user: root
     - group: root
     - mode: 600
