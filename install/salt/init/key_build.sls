@@ -1,9 +1,7 @@
-key:
+{% set path = pillar['rbd_path'] %}
+key_rsa:
   cmd.run:
-    - name: ssh-keygen -t rsa -f ~/.ssh/id_rsa -P "";mv ~/.ssh/id_rsa.pub /srv/salt/init/files/
-#  file.managed:
-#    - source: salt://files/id_rsa.pub
-#    - name: /root/.ssh/authorized_keys
-#    - user: root
-#    - group: root
-#    - mode: 600
+     - name: ssh-keygen -t rsa -f ~/.ssh/id_rsa -P "" ;cp -a ~/.ssh/id_rsa {{ path }}/install/salt//init/files
+key_pub:
+  cmd.run:
+     - name: cp -a ~/.ssh/id_rsa.pub {{ path }}/install/salt/init/files

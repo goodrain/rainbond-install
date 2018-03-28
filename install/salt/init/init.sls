@@ -1,12 +1,14 @@
 include:
 {% if "manage" in grains['host']%}
+  - init.key_build
   - init.user
   - init.config
   - init.swap
   - init.create_dir
   - init.service
-  - init.key_build
   - init.router
+  - init.key_cp
+  - init.compose
 {% else %}
   - init.user
   - init.create_dir
@@ -15,5 +17,6 @@ include:
   - init.service
   - init.key_cp
   - init.router
+  - init.compose
 {% endif %}
 
