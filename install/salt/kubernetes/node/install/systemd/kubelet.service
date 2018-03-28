@@ -1,0 +1,16 @@
+[Unit]
+Description=Kubernetes Agent
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/kubelet.sh
+PermissionsStartOnly=true
+ExecStart={{ pillar['rbd-path'] }}/kubernetes/scripts/start-kubelet.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

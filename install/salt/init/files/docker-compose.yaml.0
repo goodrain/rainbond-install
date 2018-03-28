@@ -1,0 +1,257 @@
+version: '2.1'
+services:
+  rbd-db:
+    image: rainbond/rbd-db:3.4
+    container_name: rbd-db
+    volumes:
+    - /data/db:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-dns:
+    image: rainbond/rbd-dns:3.4
+    container_name: rbd-dns
+    environment:
+    - KUBEURL=http://127.0.0.1:8181
+    - FORWARD=114.114.114.114
+    - SKYDNS_DOMAIN=goodrain.me
+    - RECORD_1=goodrain.me:172.30.42.1
+    - RECORD_2=lang.goodrain.me:172.30.42.1
+    - RECORD_3=maven.goodrain.me:172.30.42.1
+    - RECORD_4=config.goodrain.me:172.30.42.1
+    - RECORD_5=console.goodrain.me:172.30.42.1
+    - RECORD_6=region.goodrain.me:172.30.42.1
+    - RECORD_7=kubeapi.goodrain.me:172.30.42.1
+    - RECORD_8=download.goodrain.me:172.30.42.1
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-hub:
+    image: rainbond/rbd-registry:2.3.1
+    container_name: rbd-hub
+    volumes:
+    - /grdata/services/registry/:/var/lib/registry
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-repo:
+    image: rainbond/rbd-repo:3.4
+    container_name: rbd-repo
+    volumes:
+    - /grdata/services/artifactory5:/var/opt/jfrog/artifactory
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-worker:
+    image: rainbond/rbd-worker:3.5
+    container_name: rbd-worker
+    environment:
+      MYSQL_HOST: RBD_DB_HOST
+      MYSQL_PORT: RBD_DB_PORT
+      MYSQL_USER: RBD_DB_USER
+      MYSQL_PASSWORD: RBD_DB_PASSWORD
+      MYSQL_DATABASE: region
+      K8S_MASTER: http://127.0.0.1:8181
+      CUR_NET: calico
+      EX_DOMAIN: RBD_EX_DOMAIN
+    volumes:
+    - /etc/goodrain:/etc/goodrain
+    - /grdata:/grdata
+    command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
+      --mysql="RBD_DB_USER:RBD_DB_PASSWORD@tcp(RBD_DB_HOST:RBD_DB_PORT)/region"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-eventlog:
+    image: rainbond/rbd-eventlog:3.5
+    container_name: rbd-eventlog
+    environment:
+      MYSQL_HOST: RBD_DB_HOST
+      MYSQL_PORT: RBD_DB_PORT
+      MYSQL_USER: RBD_DB_USER
+      MYSQL_PASSWORD: RBD_DB_PASSWORD
+      MYSQL_DATABASE: region
+      K8S_MASTER: http://127.0.0.1:8181
+      CLUSTER_BIND_IP: RBD_HOSTIP
+    volumes:
+    - /var/log/event-log/:/var/log
+    - /etc/goodrain/:/etc/goodrain/
+    - /grdata/downloads/log:/grdata/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-entrance:
+    image: rainbond/rbd-entrance:3.5
+    container_name: rbd-entrance
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+    volumes:
+    - /etc/goodrain/kubernetes:/etc/goodrain/kubernetes
+    command:
+    - --plugin-name=nginx
+    - --plugin-opts=httpapi=http://127.0.0.1:10002
+    - --plugin-opts=streamapi=http://127.0.0.1:10002
+    - --kube-conf=/etc/goodrain/kubernetes/admin.kubeconfig
+    - --log-level=info
+  rbd-api:
+    image: rainbond/rbd-api:3.5
+    container_name: rbd-api
+    environment:
+      REGION_TAG: cloudbang
+      EX_DOMAIN: RBD_EX_DOMAIN
+      LicenseSwitch: 'off'
+    volumes:
+    - /etc/goodrain:/etc/goodrain
+    - /grdata:/grdata
+    - /data/docker_logs:/data/docker_logs
+    - /var/log/rainbond-api:/logs
+    command: --log-level=debug --mysql="RBD_DB_USER:RBD_DB_PASSWORD@tcp(RBD_DB_HOST:RBD_DB_PORT)/region"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-chaos:
+    image: rainbond/rbd-chaos:3.5
+    container_name: rbd-chaos
+    command: --log-level=debug --mysql="RBD_DB_USER:RBD_DB_PASSWORD@tcp(RBD_DB_HOST:RBD_DB_PORT)/region"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    volumes:
+    - /logs:/logs
+    - /grdata:/grdata
+    - /cache:/cache
+    - /var/run:/var/run
+    - /root/.docker/config.json:/root/.docker/config.json
+    - /etc/goodrain/ssh:/home/rain/.ssh
+    - /etc/goodrain/etc/chaos/config.json:/run/plugins/config.json
+    network_mode: host
+    restart: always
+  rbd-lb:
+    image: rainbond/rbd-lb:3.5
+    container_name: rbd-lb
+    environment:
+      NGINX_INIT_PORT: 80
+      MYSQL_HOST: RBD_DB_HOST
+      MYSQL_PORT: RBD_DB_PORT
+      MYSQL_USERNAME: RBD_DB_USER
+      MYSQL_PASSWORD: RBD_DB_PASSWORD
+      MYSQL_DATABASE: region
+      HTTP_SUFFIX_URL: RBD_EX_DOMAIN
+      NGINX_SSL_PORT: 10443
+    volumes:
+    - /etc/goodrain/openresty:/usr/local/openresty/nginx/conf
+    - /data/openrestry/logs:/usr/local/openresty/nginx/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-mq:
+    image: rainbond/rbd-mq:3.5
+    container_name: rbd-mq
+    command: --log-level=debug
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-webcli:
+    image: rainbond/rbd-webcli:3.5
+    container_name: rbd-webcli
+    volumes:
+    - /usr/bin/kubectl:/usr/bin/kubectl
+    - /root/.kube:/root/.kube
+    command: --hostIP=RBD_HOSTIP
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-proxy:
+    image: rainbond/rbd-proxy:3.4
+    container_name: rbd-proxy
+    volumes:
+    - /etc/goodrain/proxy/sites:/usr/local/tengine/conf/sites
+    - /etc/goodrain/proxy/ssl:/usr/local/tengine/conf/ssl
+    - /grdata:/grdata
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-app-ui:
+    image: rainbond/rbd-app-ui:3.5
+    container_name: rbd-app-ui
+    environment:
+      REGION_TAG: cloudbang
+      MYSQL_HOST: RBD_DB_HOST
+      MYSQL_PORT: RBD_DB_PORT
+      MYSQL_USER: RBD_DB_USER
+      MYSQL_PASS: RBD_DB_PASSWORD
+      MYSQL_DB: console
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+    volumes:
+    - /grdata/services/console:/data
+  prometheus:
+    image: rainbond/prometheus:v2.0.0
+    container_name: prometheus
+    volumes:
+    - /grdata/services/prometheus/data:/prometheusdata
+    - /etc/goodrain/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always

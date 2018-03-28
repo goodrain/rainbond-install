@@ -4,3 +4,5 @@ base:
     - etcd
     - network
     - kubernetes
+    - db
+    - plugins
