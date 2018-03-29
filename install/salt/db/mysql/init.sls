@@ -4,7 +4,7 @@ docker-pull-db-image:
 
 db-upstart:
   cmd.run:
-    - name: dc-compose up -d rbd-db
+    - name: dc-compose up -d rbd-db;sleep 10
     - unless: docker images | grep {{ pillar.database.mysql.get('image', 'rainbond/rbd-db:3.5') }}
 
 create_mysql_admin:
