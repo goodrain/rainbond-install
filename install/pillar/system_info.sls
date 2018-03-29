@@ -1,5 +1,5 @@
 rbd-path: /opt/rainbond
-inet-ip: 192.168.199.28
+inet-ip: 172.16.0.169
 role: manage
 dns: 8.8.8.8
 host-uuid: xxxxxxx
