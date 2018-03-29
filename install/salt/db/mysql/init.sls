@@ -1,4 +1,4 @@
-docker-pull-image:
+docker-pull-db-image:
   cmd.run:
     - name: docker pull {{ pillar.database.mysql.get('image', 'rainbond/rbd-db:3.5') }}
 
