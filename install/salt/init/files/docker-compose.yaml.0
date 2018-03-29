@@ -62,10 +62,10 @@ services:
     image: rainbond/rbd-worker:{{ pillar['rbd-version'] }}
     container_name: rbd-worker
     environment:
-      MYSQL_HOST: {{ pillar['database.mysql.host'] }}
-      MYSQL_PORT: {{ pillar['database.mysql.port'] }}
-      MYSQL_USER: {{ pillar['database.mysql.user'] }}
-      MYSQL_PASSWORD: {{ pillar['database.mysql.pass'] }}
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
       CUR_NET: calico
@@ -74,7 +74,7 @@ services:
     - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
     - /grdata:/grdata
     command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
-      --mysql="{{ pillar['database.mysql.user'] }}:{{ pillar['database.mysql.pass'] }}@tcp({{ pillar['database.mysql.host'] }}:{{ pillar['database.mysql.port'] }})/region"
+      --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
       options:
@@ -86,10 +86,10 @@ services:
     image: rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
     container_name: rbd-eventlog
     environment:
-      MYSQL_HOST: {{ pillar['database.mysql.host'] }}
-      MYSQL_PORT: {{ pillar['database.mysql.port'] }}
-      MYSQL_USER: {{ pillar['database.mysql.user'] }}
-      MYSQL_PASSWORD: {{ pillar['database.mysql.pass'] }}
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
       CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
@@ -133,7 +133,7 @@ services:
     - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     - {{ pillar['rbd-path'] }}/logs/rainbond-api:/logs
-    command: --log-level=debug --mysql="{{ pillar['database.mysql.user'] }}:{{ pillar['database.mysql.pass'] }}@tcp({{ pillar['database.mysql.host'] }}:{{ pillar['database.mysql.port'] }})/region"
+    command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
       options:
@@ -144,7 +144,7 @@ services:
   rbd-chaos:
     image: rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
     container_name: rbd-chaos
-    command: --log-level=debug --mysql="{{ pillar['database.mysql.user'] }}:{{ pillar['database.mysql.pass'] }}@tcp({{ pillar['database.mysql.host'] }}:{{ pillar['database.mysql.port'] }})/region"
+    command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
       options:
@@ -164,10 +164,10 @@ services:
     container_name: rbd-lb
     environment:
       NGINX_INIT_PORT: 80
-      MYSQL_HOST: {{ pillar['database.mysql.host'] }}
-      MYSQL_PORT: {{ pillar['database.mysql.port'] }}
-      MYSQL_USERNAME: {{ pillar['database.mysql.user'] }}
-      MYSQL_PASSWORD: {{ pillar['database.mysql.pass'] }}
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USERNAME: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DATABASE: region
       HTTP_SUFFIX_URL: RBD_EX_DOMAIN
       NGINX_SSL_PORT: 10443
@@ -225,10 +225,10 @@ services:
     container_name: rbd-app-ui
     environment:
       REGION_TAG: {{ pillar['rbd-tag'] }}
-      MYSQL_HOST: {{ pillar['database.mysql.host'] }}
-      MYSQL_PORT: {{ pillar['database.mysql.port'] }}
-      MYSQL_USER: {{ pillar['database.mysql.user'] }}
-      MYSQL_PASS: {{ pillar['database.mysql.pass'] }}
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASS: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DB: console
     logging:
       driver: json-file
