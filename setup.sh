@@ -7,45 +7,24 @@
 
 clear
 
-# check system
-opts=$@
-mark=1
-#循环十次
-
-for i in $(seq 1 10)
+while getopts "i:fh" arg #选项后面的冒号表示该选项需要参数
 do
-    if [ ${#opts} -gt 1 ];then
-        opt=$(echo $opts | awk -F '-' '{print$'$((i+1))'}')
-        opt_key=$(echo $opt | awk '{prin $1}')
-        opt_value=$(echo $opt | awk '{prin $2}')
-            if [ "$opt_key" == "i" ];then
-                opt_value=$(echo $opt | awk '{print $2}')
-                /bin/bash  ./scripts/check.sh $opt_value 
-            elif [ "$opt_key" == "f" ];then
-                /bin/bash  ./scripts/check.sh force
-            elif [ "$opt_key" == "h" ];then
-                Echo_Info "Input -h to get this help"
-                Echo_Info "Input -f to forced installation"
-                Echo_Info "Input -i to specify the installation path"
-            fi
-    else
-        /bin/bash  ./scripts/check.sh
-        break
-    fi
+        case $arg in
+             i)
+                export RBD_PATH="$OPTARG" #参数存在$OPTARG中
+                ;;
+             f)
+                export IS_FORCE="true"
+                ;;
+             h)
+                Echo_Info "-f,          Ignore the hardware limit, Force install"
+                Echo_Info "-i [PATH],   Specify a installation path"
+                ;;
+             ?) #未识别的arg
+            echo "unkonw argument"
+        exit 1
+        ;;
+        esac
 done
 
-
-# for i in $(seq 1 10)
-# do
-# opt=$(echo $opts | awk '{print ($'$mark',$'$((mark+1))')}')
-# opt_key=$(echo $opt | awk '{prin $1}')
-# opt_value=$(echo $opt | awk '{prin $2}')
-# case $opt_key in
-#     -f) /bin/bash  ./scripts/check.sh force ;;
-#     -i) /bin/bash  ./scripts/check.sh $opt_value ;;
-# esac
-
-# mark=$((mark+2))
-# echo $mark
-# done
-
+    /bin/bash ./scripts/check.sh

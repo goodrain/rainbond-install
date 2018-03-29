@@ -38,25 +38,17 @@ function Set_Hostname(){
 # Return : 0|!0
 function Get_Rainbond_Install_Path(){
 
-  read -p $'\t\e[32mUse the default path:(/opt/rainbond) \e[0m (y=yes/c=custom) ' config_path
-
-  if [ "$config_path" == "c" -o "$config_path" == "C" ];then
-    read -p $'\t\e[32mInput a customize installation path\e[0m :' install_path
-    # 如果用户未指定，使用默认
-    if [ -z $install_path ];then
-      install_path=$DEFAULT_INSTALL_PATH
-      return 0
+  if [ ! -z $RBD_PATH ];then
+    if [[ "$RBD_PATH" =~ "rainbond" ]];then
+      Echo_Info "[$RBD_PATH] is used to installation directory"
+    else
+      RBD_PATH=$RBD_PATH/rainbond
+      Echo_Info "We need a sign for rainbond, what you input is changed to [$RBD_PATH]"
     fi
-
   else
-      install_path=$DEFAULT_INSTALL_PATH
-      return 0
+    RBD_PATH=$DEFAULT_INSTALL_PATH 
   fi
-  if [[ "$install_path" =~ "rainbond" ]];then
-    Write_Sls_File rbd-path "$install_path"
-  else
-    Write_Sls_File rbd-path "$install_path/rainbond"
-  fi
+  Write_Sls_File rbd-path $RBD_PATH
 }
 
 # Name   : Check_System_Version
@@ -100,16 +92,18 @@ function Get_Net_Info(){
 # Args   : cpu_num、memory_size、disk
 # Return : 0|!0
 function Get_Hardware_Info(){
-  cpu_num=$(grep "processor" /proc/cpuinfo | wc -l )
-  memory_size=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
-  if [ $cpu_num -lt 2 ];then
-    err_log "There is $cpu_num cpus, you need 2 cpus at least"
-  fi
-  
-  if [ $memory_size -lt 4 ];then
-    err_log "There is $memory_size G memories, you need 4G at least"
+ if [ "$IS_FORCE" == "true" ];then
+    echo "[Force install] Ignore cpu and memory limit, It may affect image system performance "
+  else
+    if [ $CPU_NUM -lt $CPU_LIMIT ] [ $MEM_SIZE -lt $MEM_LIMIT ];then
+      err_log "We need $CPU_LIMIT CPUS,$MEM_LIMIT G Memories. You Have $CPU_NUM CPUS,$MEM_SIZE G Memories"
+    else
+      info ... ok
+    fi
   fi
 }
+
+
 
 # Name   : Download_package
 # Args   :
@@ -148,8 +142,10 @@ function Install_Salt(){
   || err_log "Can't download the salt installation package"
 
   inet_ip=$(grep inet-ip $INFO_FILE | awk '{print $2}')
-  echo "master: $(hostname)" >> /etc/salt/minion
-  echo "interface: $inet_ip" >> /etc/salt/master
+  echo "interface: $inet_ip" >> /etc/salt/master.conf
+  echo "master: $(hostname)" >> /etc/salt/minion.d/minion.conf
+  echo "id: $(hostname)" >> /etc/salt/minion.d/minion.conf
+
 
 
   # write salt config
@@ -164,7 +160,7 @@ file_roots:
     - _install_dir_/install/salt
 END
     # auto accept
-cat >> /etc/salt/master <<END
+cat >> /etc/salt/master.conf <<END
 open_mode: True
 auto_accept: true
 END
@@ -209,15 +205,8 @@ Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 Echo_Info "Setting [ manage01 ] for hostname ..."
 Set_Hostname && Echo_Ok
 
-if [[ "$@" =~ "force" ]];then
-  Echo_Info "Use the default installation path"
-else
-  if [ -z "$OPT" ];then
-    Echo_Info "Configing installation path ..."
-    Get_Rainbond_Install_Path  && Echo_Ok
-  else
-    Write_Sls_File rbd-path "$install_path"
-fi
+Echo_Info "Configing installation path ..."
+Get_Rainbond_Install_Path  && Echo_Ok
 
 Echo_Info "Checking system version ..."
 Check_System_Version && Echo_Ok
