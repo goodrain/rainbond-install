@@ -9,7 +9,7 @@ dns-upstart:
 
 update-resolv:
   file.managed:
-    - source: salt://base/file/resolv.conf
+    - source: salt://grbase/file/resolv.conf
     - name: /etc/resolv.conf
     - backup: minion
     - template: jinja
