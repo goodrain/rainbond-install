@@ -6,3 +6,7 @@ host-uuid: xxxxxxx
 rbd-version: 3.5
 install-script-path: /root
 rbd-tag: cloudbang
+manage:
+  - ip: 172.16.0.169
+  - ip: 172.16.0.170
+    

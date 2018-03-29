@@ -1,6 +1,6 @@
 docker-pull-worker-image:
   cmd.run:
-    - name: rainbond/rbd-worker:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-worker:{{ pillar['rbd-version'] }}
 
 worker-upstart:
   cmd.run:
@@ -9,7 +9,7 @@ worker-upstart:
 
 docker-pull-eventlog-image:
   cmd.run:
-    - name: rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
 
 eventlog-upstart:
   cmd.run:
@@ -18,7 +18,7 @@ eventlog-upstart:
 
 docker-pull-entrance-image:
   cmd.run:
-    - name: rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
 
 entrance-upstart:
   cmd.run:
@@ -27,7 +27,7 @@ entrance-upstart:
 
 docker-pull-api-image:
   cmd.run:
-    - name: rainbond/rbd-api:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-api:{{ pillar['rbd-version'] }}
 
 api-upstart:
   cmd.run:
@@ -36,7 +36,7 @@ api-upstart:
 
 docker-pull-chaos-image:
   cmd.run:
-    - name: rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
 
 chaos-upstart:
   cmd.run:
@@ -45,7 +45,7 @@ chaos-upstart:
 
 docker-pull-lb-image:
   cmd.run:
-    - name: rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
 lb-upstart:
   cmd.run:
@@ -54,7 +54,7 @@ lb-upstart:
 
 docker-pull-mq-image:
   cmd.run:
-    - name: rainbond/rbd-mq:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-mq:{{ pillar['rbd-version'] }}
 
 mq-upstart:
   cmd.run:
@@ -63,7 +63,7 @@ mq-upstart:
 
 docker-pull-webcli-image:
   cmd.run:
-    - name: rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
 
 webcli-upstart:
   cmd.run:
@@ -72,7 +72,7 @@ webcli-upstart:
 
 docker-pull-app-ui-image:
   cmd.run:
-    - name: rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
 
 app-ui-upstart:
   cmd.run:
@@ -83,6 +83,3 @@ update-app-ui:
   cmd.run:
     - name: docker exec rbd-app-ui python /app/ui/manage.py migrate
     - unless: dc-compose | grep rbd-app-ui
-
-
-

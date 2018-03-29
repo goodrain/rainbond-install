@@ -1,6 +1,7 @@
 include:
+- proxy.setup
 {% if pillar['role'] |lower == 'manage' %}
-- node.manage
+- proxy.manage
 {% else %}
-- node.compute
+- proxy.compute
 {% endif %}
