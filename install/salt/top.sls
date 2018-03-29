@@ -9,6 +9,7 @@ base:
     - kubernetes.node
     - node
     - db
+    - grbase
     - plugins
 
   "role:manage":
