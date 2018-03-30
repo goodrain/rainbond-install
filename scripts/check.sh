@@ -75,7 +75,7 @@ function Get_Net_Info(){
     for net_card in $net_cards
     do
       grep "$inet_ip" /etc/sysconfig/network-scripts/ifcfg-$net_card \
-      && Write_Sls_File inet-ip "${inet_ip}"
+      && Write_Sls_File inet-ip "${inet_ip}" || err_log "There is no static ip config"
     done
   else
     err_log "There is no inet ip"
