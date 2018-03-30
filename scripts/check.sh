@@ -75,8 +75,9 @@ function Get_Net_Info(){
     for net_card in $net_cards
     do
       grep "$inet_ip" /etc/sysconfig/network-scripts/ifcfg-$net_card \
-      && Write_Sls_File inet-ip "${inet_ip}" || err_log "There is no static ip config"
+      && Write_Sls_File inet-ip "${inet_ip}"
     done
+    [[ $(grep "$inet_ip" $PILLAR_DIR/system_info.sls) ]] || err_log "There is no static ip config"
   else
     err_log "There is no inet ip"
   fi
@@ -149,8 +150,6 @@ function Install_Salt(){
 
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
   echo "interface: $inet_ip" >> /etc/salt/master.d/master.conf
-  echo "master: $(hostname)" >> /etc/salt/minion.d/minion.conf
-  echo "id: $(hostname)" >> /etc/salt/minion.d/minion.conf
 
   # write salt config
 cat > /etc/salt/master.d/pillar.conf << END
@@ -169,15 +168,20 @@ open_mode: True
 auto_accept: true
 END
 
-    rbd_path=$(grep rbd-path $PILLAR_DIR/system_info.sls | awk '{print $2}')
-    sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/pillar.conf
-    sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/salt.conf
-    echo "master: $hostname" > /etc/salt/minion.d/minion.conf 
-    [ -d ${rbd_path}/rainbond/install/ ] || mkdir -p ${rbd_path}/rainbond/install/
-    cp -rp ./install/pillar ${rbd_path}/rainbond/install/
-    cp -rp ./install/ ${rbd_path}/rainbond/install/
-    systemctl start salt-master || err_log "the service salt-master can't sart ,check the salt-master.service logs"
-    systemctl start salt-minion || err_log "the service salt-minion can't sart ,check the salt-minion.service logs"
+cat >> /etc/salt/minion <<END
+master: _hostname_
+id: _hostname_
+END
+  
+  rbd_path=$(grep rbd-path $PILLAR_DIR/system_info.sls | awk '{print $2}')
+  sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/pillar.conf
+  sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/salt.conf
+  sed -i "s#_hostname_#$(hostname)#g" /etc/salt/minion
+  [ -d ${rbd_path}/rainbond/install/ ] || mkdir -p ${rbd_path}/rainbond/install/
+  cp -rp ./install/pillar ${rbd_path}/rainbond/install/
+  cp -rp ./install/ ${rbd_path}/rainbond/install/
+  systemctl start salt-master || err_log "the service salt-master can't sart ,check the salt-master.service logs"
+  systemctl start salt-minion || err_log "the service salt-minion can't sart ,check the salt-minion.service logs"
 }
 
 
@@ -203,31 +207,31 @@ function err_log(){
 
 #=============== main ==============
 
-Echo_Info "Checking internet connect ..."
-Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
+# Echo_Info "Checking internet connect ..."
+# Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-Echo_Info "Setting [ manage01 ] for hostname"
-Init_system && Echo_Ok
+# Echo_Info "Setting [ manage01 ] for hostname"
+# Init_system && Echo_Ok
 
-Echo_Info "Configing installation path ..."
-Get_Rainbond_Install_Path  && Echo_Ok
+# Echo_Info "Configing installation path ..."
+# Get_Rainbond_Install_Path  && Echo_Ok
 
-Echo_Info "Checking system version ..."
-Check_System_Version && Echo_Ok
+# Echo_Info "Checking system version ..."
+# Check_System_Version && Echo_Ok
 
-#ipaddr(inet pub) type .mark in .sls
-Echo_Info "Getting net information ..."
-Get_Net_Info && Echo_Ok
+# #ipaddr(inet pub) type .mark in .sls
+# Echo_Info "Getting net information ..."
+# Get_Net_Info && Echo_Ok
 
-# disk cpu memory
-Echo_Info "Getting Hardware information ..."
-Get_Hardware_Info && Echo_Ok
+# # disk cpu memory
+# Echo_Info "Getting Hardware information ..."
+# Get_Hardware_Info && Echo_Ok
 
-Echo_Info "Downloading Components ..."
-Download_package && Echo_Ok
+# Echo_Info "Downloading Components ..."
+# Download_package && Echo_Ok
 
-Echo_Info "Writing configuration ..."
-Write_Config && Echo_Ok
+# Echo_Info "Writing configuration ..."
+# Write_Config && Echo_Ok
 
 Echo_Info "Installing salt ..."
 Install_Salt && Echo_Ok
