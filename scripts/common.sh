@@ -19,6 +19,7 @@ PILLAR_DIR="./install/pillar"
 CPU_NUM=$(grep "processor" /proc/cpuinfo | wc -l )
 CPU_LIMIT=2
 MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
+DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 MEM_LIMIT=4
 DNS_SERVER="114.114.114.114"
 

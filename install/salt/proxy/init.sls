@@ -1,6 +1,6 @@
 include:
 - proxy.setup
-{% if pillar['role'] |lower == 'manage' %}
+{% if "manage" in grains['host'] %}
 - proxy.manage
 {% else %}
 - proxy.compute
