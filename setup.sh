@@ -4,6 +4,7 @@
 
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
 [ ! -f $INFO_FILE ] && touch $INFO_FILE
+[ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
 
 clear
 
@@ -15,6 +16,9 @@ do
                 ;;
              f)
                 export IS_FORCE="true"
+                ;;
+             r)
+                export RBD_ROLE="$OPTARG"
                 ;;
              h)
                 Echo_Info "-f,          Ignore the hardware limit, Force install"

@@ -26,10 +26,13 @@ function Check_Internet(){
 # Name   : Get_Hostname
 # Args   : hostname
 # Return : 0|!0
-function Set_Hostname(){
-    hostname manage01
-    echo "manage01" > /etc/hostname
-    Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
+function Init_system(){
+  Echo_Info "Setting [ manage01 ] for hostname"
+  hostname manage01
+  echo "manage01" > /etc/hostname
+  Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
+  Echo_Info "Setting [ Dns-Server ] to $DNS_SERVER"
+  echo "nameserver $DNS_SERVER" > /etc/resolv.conf
 }
 
 
@@ -95,7 +98,7 @@ function Get_Hardware_Info(){
  if [ "$IS_FORCE" == "true" ];then
     echo "[Force install] Ignore cpu and memory limit, It may affect image system performance "
   else
-    if [ $CPU_NUM -lt $CPU_LIMIT ] [ $MEM_SIZE -lt $MEM_LIMIT ];then
+    if [ $CPU_NUM -lt $CPU_LIMIT ] || [ $MEM_SIZE -lt $MEM_LIMIT ];then
       err_log "We need $CPU_LIMIT CPUS,$MEM_LIMIT G Memories. You Have $CPU_NUM CPUS,$MEM_SIZE G Memories"
     else
       info ... ok
@@ -128,9 +131,15 @@ function Download_package(){
 # Return : 0|!0
 function Write_Config(){
   rbd_version=$(cat ./VERSION)
-  Write_Sls_File db-user "${DB-USER}"
-  Write_Sls_File db-pass "${DB-PASS}"
+  # Init database info
+  Write_Sls_File db-user "${DB_USER}"
+  Write_Sls_File db-pass "${DB_PASS}"
+  # Config rbd-version
   Write_Sls_File rbd-version "${rbd_version}"
+  # Get current directory
+  Write_Sls_File install-script-path "$PWD"
+  # Config region info
+  Write_Sls_File rbd-tag "cloudbang"
 }
 
 # Name   : Install_Salt
@@ -141,8 +150,8 @@ function Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || err_log "Can't download the salt installation package"
 
-  inet_ip=$(grep inet-ip $INFO_FILE | awk '{print $2}')
-  echo "interface: $inet_ip" >> /etc/salt/master.conf
+  inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
+  echo "interface: $inet_ip" >> /etc/salt/master.d/master.conf
   echo "master: $(hostname)" >> /etc/salt/minion.d/minion.conf
   echo "id: $(hostname)" >> /etc/salt/minion.d/minion.conf
 
@@ -158,12 +167,12 @@ file_roots:
     - _install_dir_/install/salt
 END
     # auto accept
-cat >> /etc/salt/master.conf <<END
+cat >> /etc/salt/master.d/master.conf <<END
 open_mode: True
 auto_accept: true
 END
 
-    rbd_path=$(grep rbd-path $INFO_FILE | awk '{print $2}')
+    rbd_path=$(grep rbd-path $PILLAR_DIR/system_info.sls | awk '{print $2}')
     sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/pillar.conf
     sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/salt.conf
     echo "master: $hostname" > /etc/salt/minion.d/minion.conf 
@@ -181,11 +190,11 @@ END
 function Write_Sls_File(){
   key=$1
   value=$2
-  grep $key $INFO_FILE > /dev/null
+  grep $key $PILLAR_DIR/system_info.sls > /dev/null
   if [ $? -eq 0 ];then
-    sed -i -e "/$key/d" $INFO_FILE
+    sed -i -e "/$key/d" $PILLAR_DIR/system_info.sls
   fi
-    echo "$key: $value" >> $INFO_FILE
+    echo "$key: $value" >> $PILLAR_DIR/system_info.sls
 }
 
 function err_log(){
@@ -200,8 +209,8 @@ function err_log(){
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-Echo_Info "Setting [ manage01 ] for hostname ..."
-Set_Hostname && Echo_Ok
+Echo_Info "Initialize the system configuration ..."
+Init_system && Echo_Ok
 
 Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok

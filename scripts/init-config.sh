@@ -21,7 +21,7 @@ set -o nounset                              # Treat unset variables as an error
 PATH="$(pwd)"
 
 # make sure we have DEFAULT_LOCAL_IP
-[ -z "${DEFAULT_LOCAL_IP}" ] && DEFAULT_LOCAL_IP=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
+DEFAULT_LOCAL_IP=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
 
 # check pillar dir
 [ ! -d "$PATH/install/pillar" ] && mkdir -p "$PATH/install/pillar"
