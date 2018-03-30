@@ -3,8 +3,8 @@
 . scripts/common.sh
 
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
-[ ! -f $INFO_FILE ] && touch $INFO_FILE
 [ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
+[ ! -f $PILLAR_DIR/system_info.sls ] && touch $PILLAR_DIR/system_info.sls
 
 clear
 
