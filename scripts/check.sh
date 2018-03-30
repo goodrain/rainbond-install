@@ -146,8 +146,6 @@ function Install_Salt(){
   echo "master: $(hostname)" >> /etc/salt/minion.d/minion.conf
   echo "id: $(hostname)" >> /etc/salt/minion.d/minion.conf
 
-
-
   # write salt config
 cat > /etc/salt/master.d/pillar.conf << END
 pillar_roots:

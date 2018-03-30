@@ -26,5 +26,5 @@ do
         ;;
         esac
 done
-
     /bin/bash ./scripts/check.sh
+    /bin/bash ./scripts/init-config.sh
