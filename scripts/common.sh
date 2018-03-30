@@ -20,8 +20,6 @@ CPU_NUM=$(grep "processor" /proc/cpuinfo | wc -l )
 CPU_LIMIT=2
 MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
 MEM_LIMIT=4
-DB_USER="admin"
-DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
 DNS_SERVER="114.114.114.114"
 
 

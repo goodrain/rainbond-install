@@ -124,14 +124,11 @@ function Download_package(){
 }
 
 # Name   : Write_Config
-# Args   : db_name、db_pass
+# Args   : rbd_version、dns_value
 # Return : 0|!0
 function Write_Config(){
   rbd_version=$(cat ./VERSION)
-  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
-  # Init database info
-  Write_Sls_File db-user "${DB_USER}"
-  Write_Sls_File db-pass "${DB_PASS}"
+  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
   # Config rbd-version
   Write_Sls_File rbd-version "${rbd_version}"
   # Get current directory
