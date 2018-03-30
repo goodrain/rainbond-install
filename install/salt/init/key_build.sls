@@ -6,8 +6,6 @@ key_build:
 key_rsa:
   cmd.run:
      - name: cp -a ~/.ssh/id_rsa {{ path }}/rainbond-install/install/salt/init/files
-     - unless: test -f {{ path }}/rainbond-install/install/salt/init/files/id_rsa
 key_pub:
   cmd.run:
      - name: cp -a ~/.ssh/id_rsa.pub {{ path }}/rainbond-install/install/salt/init/files
-     - unless: test -f {{ path }}/rainbond-install/install/salt/init/files/id_rsa.pub
