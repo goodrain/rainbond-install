@@ -27,12 +27,9 @@ function Check_Internet(){
 # Args   : hostname
 # Return : 0|!0
 function Init_system(){
-  Echo_Info "Setting [ manage01 ] for hostname"
   hostname manage01
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
-  Echo_Info "Setting [ Dns-Server ] to $DNS_SERVER"
-  echo "nameserver $DNS_SERVER" > /etc/resolv.conf
 }
 
 
@@ -131,6 +128,7 @@ function Download_package(){
 # Return : 0|!0
 function Write_Config(){
   rbd_version=$(cat ./VERSION)
+  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
   # Init database info
   Write_Sls_File db-user "${DB_USER}"
   Write_Sls_File db-pass "${DB_PASS}"
@@ -140,6 +138,8 @@ function Write_Config(){
   Write_Sls_File install-script-path "$PWD"
   # Config region info
   Write_Sls_File rbd-tag "cloudbang"
+  # Get dns info
+  Write_Sls_File dns "$dns_value"
 }
 
 # Name   : Install_Salt
@@ -211,7 +211,7 @@ function err_log(){
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-Echo_Info "Initialize the system configuration ..."
+Echo_Info "Setting [ manage01 ] for hostname"
 Init_system && Echo_Ok
 
 Echo_Info "Configing installation path ..."
