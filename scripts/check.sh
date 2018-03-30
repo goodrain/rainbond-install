@@ -207,31 +207,31 @@ function err_log(){
 
 #=============== main ==============
 
-# Echo_Info "Checking internet connect ..."
-# Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
+Echo_Info "Checking internet connect ..."
+Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-# Echo_Info "Setting [ manage01 ] for hostname"
-# Init_system && Echo_Ok
+Echo_Info "Setting [ manage01 ] for hostname"
+Init_system && Echo_Ok
 
-# Echo_Info "Configing installation path ..."
-# Get_Rainbond_Install_Path  && Echo_Ok
+Echo_Info "Configing installation path ..."
+Get_Rainbond_Install_Path  && Echo_Ok
 
-# Echo_Info "Checking system version ..."
-# Check_System_Version && Echo_Ok
+Echo_Info "Checking system version ..."
+Check_System_Version && Echo_Ok
 
-# #ipaddr(inet pub) type .mark in .sls
-# Echo_Info "Getting net information ..."
-# Get_Net_Info && Echo_Ok
+#ipaddr(inet pub) type .mark in .sls
+Echo_Info "Getting net information ..."
+Get_Net_Info && Echo_Ok
 
-# # disk cpu memory
-# Echo_Info "Getting Hardware information ..."
-# Get_Hardware_Info && Echo_Ok
+# disk cpu memory
+Echo_Info "Getting Hardware information ..."
+Get_Hardware_Info && Echo_Ok
 
-# Echo_Info "Downloading Components ..."
-# Download_package && Echo_Ok
+Echo_Info "Downloading Components ..."
+Download_package && Echo_Ok
 
-# Echo_Info "Writing configuration ..."
-# Write_Config && Echo_Ok
+Echo_Info "Writing configuration ..."
+Write_Config && Echo_Ok
 
 Echo_Info "Installing salt ..."
 Install_Salt && Echo_Ok
