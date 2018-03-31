@@ -13,79 +13,44 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 
-. scripts/common.sh
+REPO_URL="https://github.com/goodrain/rainbond-install.git"
 
-[ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
-[ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
-[ ! -f $PILLAR_DIR/system_info.sls ] && touch $PILLAR_DIR/system_info.sls
-
-clear
-
-# -----------------------------------------------------------------------------
-# checking the availability of system
-
-check_func(){
-    echo "will run check func."
-    ./scripts/check_func.sh $@
+which_cmd() {
+    which "${1}" 2>/dev/null || \
+        command -v "${1}" 2>/dev/null
 }
 
-install_func(){
-    for ((i=1;i<=3;i++ )); do
-        sleep 5
-        echo "waiting salt start"
-        salt-key -L | grep "manage" && export _EXIT=0 && break
-    done
-    echo "will install manage node."
-    echo "start init"
-    salt "*" state.sls init
-    echo "start install storage"
-    salt "*" state.sls storage
-    echo "start install docker"
-    salt "*" state.sls docker
-    echo "start etcd"
-    salt "*" state.sls etcd
-    echo "start network plugin calico"
-    salt "*" state.sls network
-    echo "start k8s server"
-    salt "*" state.sls kubernetes.server
-    echo "start node"
-    salt "*" state.sls node
-    echo "start database mysql"
-    salt "*" state.sls db
-    echo "start plugins"
-    salt "*" state.sls grbase
-    salt "*" state.sls plugins
-    echo "start proxy"
-    salt "*" state.sls proxy
-    echo "start prom"
-    salt "*" state.sls prometheus
-    
-    echo "will install compute node."
-    echo "start kubelet"
-    salt "*" state.sls kubernetes.node
+check_cmd() {
+    which_cmd "${1}" >/dev/null 2>&1 && return 0
+    return 1
 }
 
-help_func(){
-    echo "help:"
-    echo "check   --- check cmd "
-    echo "install --- install cmd "
-    echo "dev     --- ignore check install cmd "
-    echo ""
+APT="$(which_cmd apt)"
+YUM="$(which_cmd yum)"
+
+pkg(){
+    if [ ! -z "$YUM" ];then
+        yum makecache
+        yum install -y ntpdate git tar git wget perl tree nload curl telnet bind-utils htop dstat net-tools  lsof iproute rsync lvm2 bash-completion 
+        echo "update localtime"
+        ntpdate 0.cn.pool.ntp.org
+    else
+        apt update
+        apt install -y git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd
+        ntpdate 0.cn.pool.ntp.org
+    fi
+}
+
+run(){
+    pkg
+    [ -d "$PWD/rainbond-install" ] && rm -rf $PWD/rainbond-install
+    git clone ${REPO_URL}
+    cd rainbond-install
+    ./setup.sh
 }
 
 case $1 in
-    check)
-        check_func
-    ;;
-    install)
-        check_func
-        install_func
-    ;;
-    dev)
-        check_func force
-        install_func ${@:2}
-    ;;
-    *)
-        help_func
+    * )
+        run
     ;;
 esac

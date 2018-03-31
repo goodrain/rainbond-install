@@ -8,7 +8,8 @@
 
 . scripts/common.sh
 
-OPT="$1"
+DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
+
 
 # Function : Check internet
 # Args     : Check url
@@ -23,13 +24,17 @@ function Check_Internet(){
   fi
 }
 
-# Name   : Get_Hostname
+# Name   : Get_Hostname and version
 # Args   : hostname
 # Return : 0|!0
 function Init_system(){
   hostname manage01
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
+
+  version=$(cat ./VERSION)
+
+  Write_Sls_File rbd-version "$version"
 }
 
 
@@ -70,16 +75,7 @@ function Check_System_Version(){
 function Get_Net_Info(){
   inet_ip=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
   public_ip=$(ip ad | grep 'inet ' | grep -vE '( 10.|172.|192.168|127.)' | awk '{print $2}' | cut -d '/' -f 1 | head -1)
-  net_cards=$(ls -1 /sys/class/net)
-  if [ ! -z "$inet_ip" ];then
-    for net_card in $net_cards
-    do
-      grep "$inet_ip" /etc/sysconfig/network-scripts/ifcfg-$net_card \
-      && Write_Sls_File inet-ip "${inet_ip}"
-    done
-  else
-    err_log "There is no inet ip"
-  fi
+  Write_Sls_File inet-ip "${inet_ip}"
   if [ ! -z "$public_ip" ];then
     Write_Sls_File public-ip "${public_ip}"
   fi
@@ -92,15 +88,10 @@ function Get_Net_Info(){
 # Args   : cpu_num、memory_size、disk
 # Return : 0|!0
 function Get_Hardware_Info(){
- if [ "$IS_FORCE" == "true" ];then
-    echo "[Force install] Ignore cpu and memory limit, It may affect image system performance "
-  else
+
     if [ $CPU_NUM -lt $CPU_LIMIT ] || [ $MEM_SIZE -lt $MEM_LIMIT ];then
-      err_log "We need $CPU_LIMIT CPUS,$MEM_LIMIT G Memories. You Have $CPU_NUM CPUS,$MEM_SIZE G Memories"
-    else
-      info ... ok
+      echo "We need $CPU_LIMIT CPUS,$MEM_LIMIT G Memories. You Have $CPU_NUM CPUS,$MEM_SIZE G Memories"
     fi
-  fi
 }
 
 
@@ -148,36 +139,28 @@ function Install_Salt(){
   || err_log "Can't download the salt installation package"
 
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
-  echo "interface: $inet_ip" >> /etc/salt/master.d/master.conf
-  echo "master: $(hostname)" >> /etc/salt/minion.d/minion.conf
-  echo "id: $(hostname)" >> /etc/salt/minion.d/minion.conf
 
-  # write salt config
-cat > /etc/salt/master.d/pillar.conf << END
-pillar_roots:
-  base:
-    - _install_dir_/install/pillar
-END
-cat > /etc/salt/master.d/salt.conf << END
-file_roots:
-  base:
-    - _install_dir_/install/salt
-END
     # auto accept
-cat >> /etc/salt/master.d/master.conf <<END
+cat > /etc/salt/master.d/master.conf <<END
+interface: ${inet_ip}
 open_mode: True
 auto_accept: true
 END
 
-    rbd_path=$(grep rbd-path $PILLAR_DIR/system_info.sls | awk '{print $2}')
-    sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/pillar.conf
-    sed -i "s#_install_dir_#${rbd_path}#g" /etc/salt/master.d/salt.conf
-    echo "master: $hostname" > /etc/salt/minion.d/minion.conf 
-    [ -d ${rbd_path}/rainbond/install/ ] || mkdir -p ${rbd_path}/rainbond/install/
-    cp -rp ./install/pillar ${rbd_path}/rainbond/install/
-    cp -rp ./install/ ${rbd_path}/rainbond/install/
-    systemctl start salt-master || err_log "the service salt-master can't sart ,check the salt-master.service logs"
-    systemctl start salt-minion || err_log "the service salt-minion can't sart ,check the salt-minion.service logs"
+cat > /etc/salt/minion.d/minion.conf <<EOF
+master: ${inet_ip}
+id: $(hostname)
+EOF
+
+    ln -s $PWD/install/salt /srv/
+    ln -s $PWD/install/pillar /srv/
+    systemctl enable salt-master
+    systemctl start salt-master
+    systemctl enable salt-minion
+    systemctl start salt-minion
+
+    echo "wating 10s for check salt"
+    salt-key -L
 }
 
 
@@ -194,6 +177,121 @@ function Write_Sls_File(){
     echo "$key: $value" >> $PILLAR_DIR/system_info.sls
 }
 
+# -----------------------------------------------------------------------------
+# init database configure
+
+db_init() {
+
+## Generate random user & password
+DB_USER=write
+DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
+
+    cat > ${PILLAR_DIR}/db.sls <<EOF
+database:
+  mysql:
+    image: rainbond/rbd-db:3.5
+    host: ${DEFAULT_LOCAL_IP}
+    port: 3306
+    user: ${DB_USER}
+    pass: ${DB_PASS}
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# init etcd configure
+
+etcd(){
+
+cat > ${PILLAR_DIR}/etcd.sls <<EOF
+etcd:
+  server:
+    image: rainbond/etcd:v3.2.13
+    enabled: true
+    bind:
+      host: ${DEFAULT_LOCAL_IP}
+    token: $(uuidgen)
+    members:
+    - host: ${DEFAULT_LOCAL_IP}
+      name: manage01
+      port: 2379
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# init kubernetes configure
+kubernetes(){
+cat > ${PILLAR_DIR}/kubernetes.sls <<EOF
+kubernetes:
+  server:
+    cfssl_image: rainbond/cfssl
+    kubecfg_image: rainbond/kubecfg
+    api_image: rainbond/kube-apiserver:v1.6.4
+    manager: rainbond/kube-controller-manager:v1.6.4
+    schedule: rainbond/kube-scheduler:v1.6.4
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# init network-calico configure
+calico(){
+
+    IP_INFO=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1')
+    IP_ITEMS=($IP_INFO)
+    INET_IP=${IP_ITEMS%%.*}
+    if [[ $INET_IP == '172' ]];then
+        CALICO_NET=10.0.0.0/16
+    elif [[ $INET_IP == '10' ]];then
+        CALICO_NET=172.16.0.0/16
+    else
+        CALICO_NET=172.16.0.0/16
+    fi
+
+
+cat > ${PILLAR_DIR}/network.sls <<EOF
+network:
+  calico:
+    image: rainbond/calico-node:v2.4.1
+    enabled: true
+    bind: ${DEFAULT_LOCAL_IP}
+    net: ${CALICO_NET}
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# init plugins configure
+plugins(){
+cat > ${PILLAR_DIR}/plugins.sls <<EOF
+plugins:
+  core:
+    api:
+      image: rainbond/rbd-api
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# init top configure
+write_top(){
+cat > ${PILLAR_DIR}/top.sls <<EOF
+base:
+  '*':
+    - system_info
+    - etcd
+    - network
+    - kubernetes
+    - db
+    - plugins
+EOF
+}
+
+run(){
+    db_init
+    etcd
+    kubernetes
+    calico
+    plugins
+    write_top
+}
+
 function err_log(){
   Echo_Error
   Echo_Info "There seems to be some problem here, You can through the error log(./logs/error.log) to get the detail information"
@@ -202,6 +300,18 @@ function err_log(){
 }
 
 #=============== main ==============
+
+[ ! -f "/usr/lib/python2.7/site-packages/sitecustomize.py" ] && (
+    cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
+    Echo_Info "Configure python defaultencoding"
+    Echo_Ok
+)
+
+if [ -z "$1" ];then
+  # disk cpu memory
+  Echo_Info "Getting Hardware information ..."
+  Get_Hardware_Info && Echo_Ok
+fi
 
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
@@ -216,18 +326,17 @@ Echo_Info "Checking system version ..."
 Check_System_Version && Echo_Ok
 
 #ipaddr(inet pub) type .mark in .sls
-Echo_Info "Getting net information ..."
+Echo_Info "Getting Network information ..."
 Get_Net_Info && Echo_Ok
 
-# disk cpu memory
-Echo_Info "Getting Hardware information ..."
-Get_Hardware_Info && Echo_Ok
-
-Echo_Info "Downloading Components ..."
-Download_package && Echo_Ok
+#Echo_Info "Downloading Components ..."
+#Download_package && Echo_Ok
 
 Echo_Info "Writing configuration ..."
 Write_Config && Echo_Ok
 
 Echo_Info "Installing salt ..."
 Install_Salt && Echo_Ok
+
+Echo_Info "Init config ..."
+run && Echo_Ok
