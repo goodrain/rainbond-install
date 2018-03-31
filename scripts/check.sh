@@ -139,13 +139,13 @@ function Install_Salt(){
   || err_log "Can't download the salt installation package"
 
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
-
     # auto accept
 cat > /etc/salt/master.d/master.conf <<END
 interface: ${inet_ip}
 open_mode: True
 auto_accept: true
 END
+
 
 cat > /etc/salt/minion.d/minion.conf <<EOF
 master: ${inet_ip}
@@ -161,6 +161,7 @@ EOF
 
     echo "wating 10s for check salt"
     salt-key -L
+
 }
 
 
