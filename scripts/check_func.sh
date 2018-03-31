@@ -326,12 +326,11 @@ Echo_Info "Checking system version ..."
 Check_System_Version && Echo_Ok
 
 #ipaddr(inet pub) type .mark in .sls
-Echo_Info "Getting net information ..."
+Echo_Info "Getting Network information ..."
 Get_Net_Info && Echo_Ok
 
-
-Echo_Info "Downloading Components ..."
-Download_package && Echo_Ok
+#Echo_Info "Downloading Components ..."
+#Download_package && Echo_Ok
 
 Echo_Info "Writing configuration ..."
 Write_Config && Echo_Ok

@@ -51,7 +51,7 @@ etcd:
     - watch:
       - file: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
-      - cmd: pull-image
+      - cmd: pull-etcd-image
 
 {% endif %}
 

@@ -40,5 +40,26 @@ update_systeminfo:
     - mode: 755
   cmd.run:
     - name: bash /tmp/domain.sh
+
+install_manage_compute_ctl:
+  cmd.run:
+    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-compute-all
+    - unless: which kubelet
 {% endif %}
+
+{% if "manage" in grains['host'] %}
+install_manage_ctl:
+  cmd.run:
+    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-ctl-all
+    - unless: which grctl
+
+{% endif %}
+
+{% if "compute" in grains['host'] %}
+install_compute_ctl:
+  cmd.run:
+    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-compute-all
+    - unless: which kubelet
+{% endif %}
+
 
