@@ -43,14 +43,14 @@ update_systeminfo:
 
 install_manage_compute_ctl:
   cmd.run:
-    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-compute-all
+    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/static gr-compute-all
     - unless: which kubelet
 {% endif %}
 
 {% if "manage" in grains['host'] %}
 install_manage_ctl:
   cmd.run:
-    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-ctl-all
+    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/static gr-ctl-all
     - unless: which grctl
 
 {% endif %}
@@ -58,7 +58,7 @@ install_manage_ctl:
 {% if "compute" in grains['host'] %}
 install_compute_ctl:
   cmd.run:
-    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-compute-all
+    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/static gr-compute-all
     - unless: which kubelet
 {% endif %}
 
