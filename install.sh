@@ -26,7 +26,7 @@ clear
 
 check_func(){
     echo "will run check func."
-    ./scripts/check_func.sh
+    ./scripts/check_func.sh $@
 }
 
 install_func(){

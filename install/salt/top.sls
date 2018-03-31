@@ -1,6 +1,5 @@
 base:
   "*":
-    - deploy-salt
     - init
     - docker
     - etcd

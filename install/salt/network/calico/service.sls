@@ -1,4 +1,4 @@
-pull-image:
+pull-calico-image:
   cmd.run:
     - name: docker pull {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
 

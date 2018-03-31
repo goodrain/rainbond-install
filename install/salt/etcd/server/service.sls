@@ -5,7 +5,7 @@
 #  docker.pulled:
 #    - name: {{ server.get('image', 'rainbond/etcd:v3.2.13') }}
 
-pull-image:
+pull-etcd-image:
   cmd.run:
     - name: docker pull {{ server.get('image', 'rainbond/etcd:v3.2.13') }}
 

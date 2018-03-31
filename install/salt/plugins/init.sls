@@ -85,10 +85,6 @@ update-app-ui:
     - unless: dc-compose | grep rbd-app-ui
 
 {% if grains['host'] == "manage01" %}
-make_domain:
-  cmd.run:
-    - name: docker run  --rm -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['inet-ip'] }}
-
 update_sql:
   file.managed:
     - source: salt://plugins/data/init.sql

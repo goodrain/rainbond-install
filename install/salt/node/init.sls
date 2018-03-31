@@ -1,5 +1,5 @@
 include:
-{% if pillar['role'] |lower == 'manage' %}
+{% if "manage" in grains['host'] %}
 - node.manage
 {% else %}
 - node.compute

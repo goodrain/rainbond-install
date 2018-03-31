@@ -301,6 +301,12 @@ function err_log(){
 
 #=============== main ==============
 
+[ ! -f "/usr/lib/python2.7/site-packages/sitecustomize.py" ] && (
+    cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
+    Echo_Info "Configure python defaultencoding"
+    Echo_Ok
+)
+
 if [ -z "$1" ];then
   # disk cpu memory
   Echo_Info "Getting Hardware information ..."
