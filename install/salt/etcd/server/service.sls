@@ -5,7 +5,7 @@
 #  docker.pulled:
 #    - name: {{ server.get('image', 'rainbond/etcd:v3.2.13') }}
 
-pull-image:
+pull-etcd-image:
   cmd.run:
     - name: docker pull {{ server.get('image', 'rainbond/etcd:v3.2.13') }}
 
@@ -51,7 +51,15 @@ etcd:
     - watch:
       - file: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
-      - cmd: pull-image
+      - cmd: pull-etcd-image
 
+{% endif %}
+{% if pillar.domain is defined %}
+compose_file:
+  file.managed:
+     - source: salt://init/files/docker-compose.yaml
+     - name: {{ pillar['rbd-path'] }}/docker-compose.yaml
+     - makedirs: Ture
+     - template: jinja
 {% endif %}
 

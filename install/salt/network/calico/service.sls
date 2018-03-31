@@ -1,4 +1,4 @@
-pull-image:
+pull-calico-image:
   cmd.run:
     - name: docker pull {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
 
@@ -36,7 +36,7 @@ calico:
     - watch:
       - file: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
-      - cmd: pull-image
+      - cmd: pull-calico-image
 
 {% if grains['host'] == 'manage01' %}
 /tmp/init.calico:

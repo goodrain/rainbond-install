@@ -83,3 +83,19 @@ update-app-ui:
   cmd.run:
     - name: docker exec rbd-app-ui python /app/ui/manage.py migrate
     - unless: dc-compose | grep rbd-app-ui
+
+{% if grains['host'] == "manage01" %}
+update_sql:
+  file.managed:
+    - source: salt://plugins/data/init.sql
+    - name: /tmp/init.sql
+    - template: jinja
+  
+update_sql_sh:
+  file.managed:
+    - source: salt://plugins/data/init.sh
+    - name: /tmp/init.sh
+    - template: jinja
+  cmd.run:
+    - name: bash /tmp/init.sh
+{% endif %}

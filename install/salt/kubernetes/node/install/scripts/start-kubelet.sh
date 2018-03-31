@@ -20,4 +20,4 @@ KUBELET_OPTS="--address=$HOST_IP \
 --maximum-dead-containers-per-container=0 \
 --v=2"
 
-exec /usr/bin/kubelet $KUBELET_OPTS
+exec /usr/local/bin/kubelet $KUBELET_OPTS

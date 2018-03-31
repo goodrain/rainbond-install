@@ -18,6 +18,13 @@ node-script:
     - user: root
     - group: root
 
+node-config-mapper.yaml:
+  file.managed:
+    - source: salt://node/install/config/mapper.yaml
+    - name: {{ pillar['rbd-path'] }}/node/config/mapper.yml
+    - makedirs: Ture
+    - template: jinja
+
 /etc/systemd/system/node.service:
   file.managed:
     - source: salt://node/install/systemd/node.service
@@ -31,4 +38,4 @@ node:
     - reload: True
     - watch:
       - file: {{ pillar['rbd-path'] }}/node/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/node/envs/node.sh
+      - file: {{ pillar['rbd-path'] }}/etc/envs/node.sh

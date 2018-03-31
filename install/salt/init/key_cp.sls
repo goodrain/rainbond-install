@@ -35,7 +35,6 @@ key_pub_ssh:
     - mode: 600
     - makedirs: Ture
 
-
 key_pub_builder:
   file.managed:
     - source: salt://init/files/id_rsa.pub

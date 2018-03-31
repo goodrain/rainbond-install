@@ -8,7 +8,6 @@ include:
   - init.service
   - init.router
   - init.key_cp
-  - init.compose
 {% else %}
   - init.user
   - init.create_dir
@@ -17,6 +16,5 @@ include:
   - init.service
   - init.key_cp
   - init.router
-  - init.compose
 {% endif %}
 

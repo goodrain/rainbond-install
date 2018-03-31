@@ -1,17 +1,5 @@
 version: '2.1'
 services:
-  rbd-db:
-    image: rainbond/rbd-db:{{ pillar['rbd-version'] }}
-    container_name: rbd-db
-    volumes:
-    - {{ pillar['rbd-path'] }}/data/rbd-db:/data
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
   rbd-dns:
     image: rainbond/rbd-dns:{{ pillar['rbd-version'] }}
     container_name: rbd-dns
@@ -39,42 +27,6 @@ services:
     container_name: rbd-hub
     volumes:
     - /grdata/services/registry/:/var/lib/registry
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-  rbd-repo:
-    image: rainbond/rbd-repo:{{ pillar['rbd-version'] }}
-    container_name: rbd-repo
-    volumes:
-    - /grdata/services/artifactory5:/var/opt/jfrog/artifactory
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-  rbd-worker:
-    image: rainbond/rbd-worker:{{ pillar['rbd-version'] }}
-    container_name: rbd-worker
-    environment:
-      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
-      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
-      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
-      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
-      MYSQL_DATABASE: region
-      K8S_MASTER: http://127.0.0.1:8181
-      CUR_NET: calico
-      EX_DOMAIN: {{ pillar['domain'] }}
-    volumes:
-    - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
-    - /grdata:/grdata
-    command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
-      --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
       options:
@@ -230,6 +182,8 @@ services:
       MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
       MYSQL_PASS: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DB: console
+    volumes:
+    - /grdata/services/console:/data
     logging:
       driver: json-file
       options:
@@ -237,8 +191,55 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+{% if grains['host'] == "manage01" %}
+  rbd-db:
+    image: rainbond/rbd-db:{{ pillar['rbd-version'] }}
+    container_name: rbd-db
     volumes:
-    - /grdata/services/console:/data
+    - {{ pillar['rbd-path'] }}/data/rbd-db:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-worker:
+    image: rainbond/rbd-worker:{{ pillar['rbd-version'] }}
+    container_name: rbd-worker
+    environment:
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
+      MYSQL_DATABASE: region
+      K8S_MASTER: http://127.0.0.1:8181
+      CUR_NET: calico
+      EX_DOMAIN: {{ pillar['domain'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
+    - /grdata:/grdata
+    command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
+      --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-repo:
+    image: rainbond/rbd-repo:{{ pillar['rbd-version'] }}
+    container_name: rbd-repo
+    volumes:
+    - /grdata/services/artifactory5:/var/opt/jfrog/artifactory
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
   prometheus:
     image: rainbond/prometheus:v2.0.0
     container_name: prometheus
@@ -253,3 +254,4 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+{% endif %}
