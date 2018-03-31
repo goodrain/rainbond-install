@@ -36,7 +36,7 @@ calico:
     - watch:
       - file: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
-      - cmd: pull-image
+      - cmd: pull-calico-image
 
 {% if grains['host'] == 'manage01' %}
 /tmp/init.calico:

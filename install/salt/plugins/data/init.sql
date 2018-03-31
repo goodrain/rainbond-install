@@ -1,3 +1,1 @@
-INSERT INTO `region_info` ( `region_id`, `region_name`, `region_alias`, `url`, `token`, `status`, `desc`, `wsurl`, `httpdomain`, `tcpdomain`) VALUES('asdasdasdasdasdasdasdasdas', 'cloudbang', '私有数据中心1', 'http://region.goodrain.me:8888', NULL, '1', '当前数据中心是默认安装添加的数据中心', 'ws://{{ pillar[inet-ip] }}:6060', '{{ pillar[domain] }}', '{{ pillar[inet-ip] }}');
-
 INSERT INTO `console_sys_config` (`ID`,`key`,`type`, `value`, `desc`, `enable`, `create_time`) VALUES(NULL, 'REGION_SERVICE_API', 'json', '  [{\"url\": \"http://region.goodrain.me:8888\", \"token\": null, \"enable\": true, \"region_name\": \"cloudbang\", \"region_alias\": \"cloudbang\"}]', '', 1, '2018-02-05 14:00:00.000000');

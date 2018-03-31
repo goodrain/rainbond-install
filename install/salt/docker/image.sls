@@ -26,11 +26,13 @@ install-docker-compose:
 {% if grains['host'] == "manage01" %}
 make_domain_prepare:
   cmd.run:
-    - name: touch {{ pillar['rbd-path'] }}/.domain.log
+    - name: echo "" > {{ pillar['rbd-path'] }}/.domain.log
+    - unless: grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
 
 make_domain:
   cmd.run:
     - name: docker run  --rm -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['inet-ip'] }}
+    - unless:  grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
 
 update_systeminfo:
   file.managed:

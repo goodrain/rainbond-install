@@ -30,12 +30,39 @@ check_func(){
 }
 
 install_func(){
-    echo "init config for salt."
-    #./scripts/init-config.sh
+    for ((i=1;i<=3;i++ )); do
+        sleep 5
+        echo "waiting salt start"
+        salt-key -L | grep "manage" && export _EXIT=0 && break
+    done
     echo "will install manage node."
-    #./scripts/install_manage.sh
+    echo "start init"
+    salt "*" state.sls init
+    echo "start install storage"
+    salt "*" state.sls storage
+    echo "start install docker"
+    salt "*" state.sls docker
+    echo "start etcd"
+    salt "*" state.sls etcd
+    echo "start network plugin calico"
+    salt "*" state.sls network
+    echo "start k8s server"
+    salt "*" state.sls kubernetes.server
+    echo "start node"
+    salt "*" state.sls node
+    echo "start database mysql"
+    salt "*" state.sls db
+    echo "start plugins"
+    salt "*" state.sls grbase
+    salt "*" state.sls plugins
+    echo "start proxy"
+    salt "*" state.sls proxy
+    echo "start prom"
+    salt "*" state.sls prometheus
+    
     echo "will install compute node."
-    #./scripts/install_compute.sh
+    echo "start kubelet"
+    salt "*" state.sls kubernetes.node
 }
 
 help_func(){
