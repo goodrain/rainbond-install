@@ -47,6 +47,7 @@ run(){
     git clone ${REPO_URL}
     cd rainbond-install
     ./setup.sh
+    echo "run $PWD/setup.sh <args>"
 }
 
 case $1 in

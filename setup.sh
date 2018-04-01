@@ -28,7 +28,7 @@ Echo_Banner "Rainbond Salt 1.0-rc"
 
 check_func(){
     Echo_Info "will run check func."
-    ./scripts/check_func.sh $@
+    ./scripts/check.sh $@
 }
 
 install_func(){
