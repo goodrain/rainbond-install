@@ -9,6 +9,11 @@ docker-pull-prom-image:
   cmd.run:
     - name: docker pull rainbond/prometheus:v2.0.0
 
+/grdata/services/prometheus/data:
+  file.directory:
+   - name: /grdata/services/prometheus/data
+   - mode: 777
+
 prom-upstart:
   cmd.run:
     - name: dc-compose up -d prometheus

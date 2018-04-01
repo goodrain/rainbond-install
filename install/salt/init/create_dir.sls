@@ -163,9 +163,4 @@
      - user
      - group
 
-/grdata/services/prometheus/data:
-  file.directory:
-   - name: /grdata/services/prometheus/data
-   - user: root
-   - group: root
-   - mode: 777
+
