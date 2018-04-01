@@ -10,7 +10,7 @@ kubelet-script:
 
 kubelet-env:
   file.managed:
-    - source: salt://kubernetes/node/install/env/kubelet.sh
+    - source: salt://kubernetes/node/install/envs/kubelet.sh
     - name: {{ pillar['rbd-path'] }}/etc/envs/kubelet.sh
     - makedirs: Ture
     - template: jinja

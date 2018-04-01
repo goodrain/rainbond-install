@@ -94,26 +94,6 @@ function Get_Hardware_Info(){
     fi
 }
 
-
-
-# Name   : Download_package
-# Args   :
-# Return : 0|!0
-function Download_package(){
-  curl -s --connect-timeout 3 $OSS_DOMAIN/$OSS_PATH/ctl.md5sum -o ./ctl.md5sum \
-  && curl -s --connect-timeout 3 $OSS_DOMAIN/$OSS_PATH/ctl.tgz -o ./ctl.tgz \
-  || err_log "The packge is broken, please contact staff to repair"
-  
-  md5sum -c ./ctl.md5sum > /dev/null 2>&1
-  if [ $? -eq 0 ];then
-    tar xf .//ctl.tgz -C /usr/local/bin/ --strip-components=1
-    return 0
-  else
-    err_log "The packge is broken, please contact staff to repair"
-  fi
-  rm ./ctl.* -rf
-}
-
 # Name   : Write_Config
 # Args   : rbd_version、dns_value
 # Return : 0|!0
@@ -329,9 +309,6 @@ Check_System_Version && Echo_Ok
 #ipaddr(inet pub) type .mark in .sls
 Echo_Info "Getting Network information ..."
 Get_Net_Info && Echo_Ok
-
-#Echo_Info "Downloading Components ..."
-#Download_package && Echo_Ok
 
 Echo_Info "Writing configuration ..."
 Write_Config && Echo_Ok
