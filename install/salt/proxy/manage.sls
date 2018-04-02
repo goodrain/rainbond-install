@@ -33,21 +33,35 @@ ssl-config:
     - makedirs: Ture
 
 runner-pull:
+  docker.pulled:
+    - name: rainbond/runner
   cmd.run:
-    - name: docker pull rainbond/runner; docker tag rainbond/runner goodrain.me/runner;docker push goodrain.me/runner
-    - unless: docker pull goodrain.me/runner
+    - name: docker tag rainbond/runner goodrain.me/runner
+  docker.pushed:
+    - name: goodrain.me/runner
 
 adapter-pull:
+    docker.pulled:
+      - name: rainbond/adapter
     cmd.run:
-    - name: docker pull rainbond/adapter; docker tag rainbond/adapter goodrain.me/adapter;docker push goodrain.me/adapter
-    - unless: docker pull goodrain.me/adapter
+      - name: docker tag rainbond/adapter goodrain.me/adapter
+    docker.pushed:
+      - name: docker push goodrain.me/adapter
 
 pause-pull:
+    docker.pulled:
+      - name: rainbond/pause-amd64
+      - tag: 3.0
     cmd.run:
-    - name: docker pull rainbond/pause-amd64:3.0; docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0;docker push goodrain.me/pause-amd64:3.0
-    - unless: docker pull goodrain.me/pause-amd64:3.0
+      - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
+    docker.pushed:
+      - name: goodrain.me/pause-amd64
+      - tag: 3.0
 
 builder-pull:
+    docker.pulled:
+      - name: rainbond/builder
     cmd.run:
-    - name: docker pull rainbond/builder; docker tag rainbond/builder goodrain.me/builder;docker push goodrain.me/builder
-    - unless: docker pull goodrain.me/builder
+      - name: docker tag rainbond/builder goodrain.me/builder
+    docker.pushed:
+      - name: oodrain.me/builder
