@@ -28,33 +28,15 @@ Check_Internet(){
 # Args   : hostname
 # Return : 0|!0
 Init_system(){
-  # 配置hostname
   hostname manage01
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
 
-  # 获取系统版本
   version=$(cat ./VERSION)
+  
   uuid=$(cat /proc/sys/kernel/random/uuid)
   Write_Sls_File host-uuid "$uuid"
   Write_Sls_File rbd-version "$version"
-
-  # 检查是否安装docker
-  docker  > /dev/null 2>&1 && err_log "There will install gr-docker, You need to uninstall docker which is installed"
-
-  # 检查端口是否被占用
-  need_ports="53 80 443 2379 2380 3306 4001 6060 6100 6443 7070 8181 9999"
-  for need_port in $need_ports
-  do
-    (netstat -tulnp | grep $need_port) && err_log "The port $need_port has been occupied"
-  done
-  # 清除防火墙规则
-  iptables -F
-  iptables -X
-  iptables -Z
-  # 检测SElinux是否关闭
-  [ "$(grep "CentOS" /etc/os-release && getenforce)" == "Disabled" ] && err_log "Please set the SElinux disabled"
-
 }
 
 
