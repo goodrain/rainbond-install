@@ -82,12 +82,10 @@ case $1 in
         check_func
     ;;
     install)
-        check_func
-        install_func ${@:2}
+        check_func && install_func ${@:2}
     ;;
     dev)
-        check_func force
-        install_func ${@:2}
+        check_func force && install_func ${@:2}
     ;;
     *)
         help_func
