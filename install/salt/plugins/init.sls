@@ -53,14 +53,12 @@ lb-upstart:
     - unless: docker images | grep rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
 check_forward:
-  file.exists:
-    - name: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
   file.managed:
     - source: salt://plugins/data/forward.conf
     - name: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
     - makedirs: Ture
   cmd.run:
-    - name: dc-composre restart rbd-lb
+    - name: dc-compose restart rbd-lb
     - watch:
       - file: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
 

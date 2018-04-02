@@ -32,36 +32,55 @@ ssl-config:
     - name: {{ pillar['rbd-path'] }}/proxy/ssl/goodrain.me
     - makedirs: Ture
 
-runner-pull:
-  docker.pulled:
-    - name: rainbond/runner
+reload-proxy:
+  cmd.run:
+    - name: docker exec rbd-proxy nginx -s reload
+    - onlyif: docker exec rbd-proxy nginx -t
+
+runner-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/runner
+
+runner-tag:
   cmd.run:
     - name: docker tag rainbond/runner goodrain.me/runner
-  docker.pushed:
-    - name: goodrain.me/runner
+  
+runner-push-image:
+  cmd.run:
+    - name: docker push goodrain.me/runner
 
-adapter-pull:
-    docker.pulled:
-      - name: rainbond/adapter
-    cmd.run:
-      - name: docker tag rainbond/adapter goodrain.me/adapter
-    docker.pushed:
-      - name: docker push goodrain.me/adapter
+adapter-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/adapter
 
-pause-pull:
-    docker.pulled:
-      - name: rainbond/pause-amd64
-      - tag: 3.0
-    cmd.run:
-      - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
-    docker.pushed:
-      - name: goodrain.me/pause-amd64
-      - tag: 3.0
+adapter-tag:
+  cmd.run:
+    - name: docker tag rainbond/adapter goodrain.me/adapter
 
-builder-pull:
-    docker.pulled:
-      - name: rainbond/builder
-    cmd.run:
-      - name: docker tag rainbond/builder goodrain.me/builder
-    docker.pushed:
-      - name: oodrain.me/builder
+adapter-push-image:    
+  cmd.run:
+    - name: docker push goodrain.me/adapter
+
+pause-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/pause-amd64:3.0
+
+pause-tag:
+  cmd.run:
+    - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
+  
+pause-push-image:
+  cmd.run:
+    - name: docker push goodrain.me/pause-amd64:3.0
+
+builder-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/builder
+
+builder-tag:  
+  cmd.run:
+    - name: docker tag rainbond/builder goodrain.me/builder
+
+builder-push-image:    
+  cmd.run:
+    - name: docker push goodrain.me/builder
