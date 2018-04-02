@@ -287,6 +287,7 @@ err_log(){
 check_rbd(){
   # Todo
   # Rbd_reg_notice 
+  echo ""
 }
 
 #=============== main ==============
