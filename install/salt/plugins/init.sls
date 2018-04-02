@@ -48,6 +48,10 @@ docker-pull-lb-image:
     - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
 lb-upstart:
+  file.managed:
+    - source: salt://plugins/data/forward.conf
+    - name: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
+    - makedirs: Ture
   cmd.run:
     - name: dc-compose up -d rbd-lb
     - unless: docker images | grep rainbond/rbd-lb:{{ pillar['rbd-version'] }}
@@ -73,6 +77,10 @@ webcli-upstart:
 docker-pull-app-ui-image:
   cmd.run:
     - name: docker pull rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
+
+app-ui-logs:
+  cmd.run:
+    - name: touch {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/{goodrain.log,request.log}
 
 app-ui-upstart:
   cmd.run:

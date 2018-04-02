@@ -184,6 +184,8 @@ services:
       MYSQL_DB: console
     volumes:
     - /grdata/services/console:/data
+    - {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/goodrain.log:/tmp/goodrain.log
+    - {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/request.log:/tmp/request.log
     logging:
       driver: json-file
       options:
