@@ -33,7 +33,9 @@ Init_system(){
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
 
   version=$(cat ./VERSION)
-
+  
+  uuid=$(cat /proc/sys/kernel/random/uuid)
+  Write_Sls_File host-uuid "$uuid"
   Write_Sls_File rbd-version "$version"
 }
 
@@ -148,7 +150,7 @@ EOF
 # Name   : Write_Sls_File
 # Args   : key
 # Return : value
-function Write_Sls_File(){
+Write_Sls_File(){
   key=$1
   value=$2
   grep $key $PILLAR_DIR/system_info.sls > /dev/null
