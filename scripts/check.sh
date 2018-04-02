@@ -14,7 +14,7 @@ DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{pri
 # Function : Check internet
 # Args     : Check url
 # Return   : (0|!0)
-function Check_Internet(){
+Check_Internet(){
   check_url=$1
   curl -s --connect-timeout 3 $check_url -o /dev/null 2>/dev/null
   if [ $? -eq 0 ];then
@@ -27,7 +27,7 @@ function Check_Internet(){
 # Name   : Get_Hostname and version
 # Args   : hostname
 # Return : 0|!0
-function Init_system(){
+Init_system(){
   hostname manage01
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
@@ -41,7 +41,7 @@ function Init_system(){
 # Name   : Get_Rainbond_Install_Path
 # Args   : config_path、config_path_again、install_path
 # Return : 0|!0
-function Get_Rainbond_Install_Path(){
+Get_Rainbond_Install_Path(){
 
   if [ ! -z $RBD_PATH ];then
     if [[ "$RBD_PATH" =~ "rainbond" ]];then
@@ -59,7 +59,7 @@ function Get_Rainbond_Install_Path(){
 # Name   : Check_System_Version
 # Args   : sys_name、sys_version
 # Return : 0|!0
-function Check_System_Version(){
+Check_System_Version(){
     sys_name=$(grep NAME /etc/os-release | head -1)
     sys_version=$(grep VERSION /etc/os-release |  head -1)
        [[ "$sys_version" =~ "7" ]] \
@@ -72,7 +72,7 @@ function Check_System_Version(){
 # Name   : Get_Net_Info
 # Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
-function Get_Net_Info(){
+Get_Net_Info(){
   inet_ip=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
   public_ip=$(ip ad | grep 'inet ' | grep -vE '( 10.|172.|192.168|127.)' | awk '{print $2}' | cut -d '/' -f 1 | head -1)
   Write_Sls_File inet-ip "${inet_ip}"
@@ -87,7 +87,7 @@ function Get_Net_Info(){
 # Name   : Get_Hardware_Info
 # Args   : cpu_num、memory_size、disk
 # Return : 0|!0
-function Get_Hardware_Info(){
+Get_Hardware_Info(){
 
     if [ $CPU_NUM -lt $CPU_LIMIT ] || [ $MEM_SIZE -lt $MEM_LIMIT ];then
       echo "We need $CPU_LIMIT CPUS,$MEM_LIMIT G Memories. You Have $CPU_NUM CPUS,$MEM_SIZE G Memories"
@@ -97,7 +97,7 @@ function Get_Hardware_Info(){
 # Name   : Write_Config
 # Args   : rbd_version、dns_value
 # Return : 0|!0
-function Write_Config(){
+Write_Config(){
   rbd_version=$(cat ./VERSION)
   dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
   # Config rbd-version
@@ -113,7 +113,7 @@ function Write_Config(){
 # Name   : Install_Salt
 # Args   : Null
 # Return : 0|!0
-function Install_Salt(){
+Install_Salt(){
   # install salt without run
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || err_log "Can't download the salt installation package"
@@ -273,8 +273,8 @@ run(){
     write_top
 }
 
-function err_log(){
-  Echo_Error
+err_log(){
+  Echo_Error 
   Echo_Info "There seems to be some problem here, You can through the error log(./logs/error.log) to get the detail information"
   echo "$DATE $1" >> ./$LOG_DIR/error.log
   exit 1

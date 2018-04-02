@@ -84,6 +84,10 @@ Echo_Failed() {
     printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
 }
 
+Echo_Error() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+}
+
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  Echo_Info
 #   DESCRIPTION:  Echo information to stdout.

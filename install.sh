@@ -46,10 +46,10 @@ run(){
     [ -d "$PWD/rainbond-install" ] && rm -rf $PWD/rainbond-install
     git clone ${REPO_URL}
     cd rainbond-install
-    if [ $1 == "help" ];then
+    if [[ $1 == "help" ]];then
         ./setup.sh
         echo "cd $PWD/rainbond-install;  ./setup.sh <args>"
-    elif [ $1 == "dev" ];then
+    elif [[ $1 == "dev" ]];then
         ./setup.sh dev
     else
         ./setup.sh install
