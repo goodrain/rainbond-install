@@ -48,13 +48,19 @@ docker-pull-lb-image:
     - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
 lb-upstart:
+  cmd.run:
+    - name: dc-compose up -d rbd-lb
+    - unless: docker images | grep rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+
+check_forward:
   file.managed:
     - source: salt://plugins/data/forward.conf
     - name: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
     - makedirs: Ture
   cmd.run:
-    - name: dc-compose up -d rbd-lb
-    - unless: docker images | grep rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+    - name: dc-compose restart rbd-lb
+    - watch:
+      - file: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
 
 docker-pull-mq-image:
   cmd.run:

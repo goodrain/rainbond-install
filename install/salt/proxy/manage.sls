@@ -32,22 +32,55 @@ ssl-config:
     - name: {{ pillar['rbd-path'] }}/proxy/ssl/goodrain.me
     - makedirs: Ture
 
-runner-pull:
+reload-proxy:
   cmd.run:
-    - name: docker pull rainbond/runner; docker tag rainbond/runner goodrain.me/runner;docker push goodrain.me/runner
-    - unless: docker pull goodrain.me/runner
+    - name: docker exec rbd-proxy nginx -s reload
+    - onlyif: docker exec rbd-proxy nginx -t
 
-adapter-pull:
-    cmd.run:
-    - name: docker pull rainbond/adapter; docker tag rainbond/adapter goodrain.me/adapter;docker push goodrain.me/adapter
-    - unless: docker pull goodrain.me/adapter
+runner-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/runner
 
-pause-pull:
-    cmd.run:
-    - name: docker pull rainbond/pause-amd64:3.0; docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0;docker push goodrain.me/pause-amd64:3.0
-    - unless: docker pull goodrain.me/pause-amd64:3.0
+runner-tag:
+  cmd.run:
+    - name: docker tag rainbond/runner goodrain.me/runner
+  
+runner-push-image:
+  cmd.run:
+    - name: docker push goodrain.me/runner
 
-builder-pull:
-    cmd.run:
-    - name: docker pull rainbond/builder; docker tag rainbond/builder goodrain.me/builder;docker push goodrain.me/builder
-    - unless: docker pull goodrain.me/builder
+adapter-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/adapter
+
+adapter-tag:
+  cmd.run:
+    - name: docker tag rainbond/adapter goodrain.me/adapter
+
+adapter-push-image:    
+  cmd.run:
+    - name: docker push goodrain.me/adapter
+
+pause-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/pause-amd64:3.0
+
+pause-tag:
+  cmd.run:
+    - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
+  
+pause-push-image:
+  cmd.run:
+    - name: docker push goodrain.me/pause-amd64:3.0
+
+builder-pull-image:
+  cmd.run:
+    - name: docker pull rainbond/builder
+
+builder-tag:  
+  cmd.run:
+    - name: docker tag rainbond/builder goodrain.me/builder
+
+builder-push-image:    
+  cmd.run:
+    - name: docker push goodrain.me/builder
