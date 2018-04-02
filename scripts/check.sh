@@ -58,8 +58,21 @@ Get_Rainbond_Install_Path(){
   Write_Sls_File rbd-path $RBD_PATH
 }
 
+# Name   : Check_System_Version
+# Args   : sys_name、sys_version
+# Return : 0|!0
+Check_System_Version(){
+    sys_name=$(grep NAME /etc/os-release | head -1)
+    sys_version=$(grep VERSION /etc/os-release |  head -1)
+       [[ "$sys_version" =~ "7" ]] \
+    || [[ "$sys_version" =~ "9" ]] \
+    || [[ "$sys_version" =~ "16.04" ]] \
+    || err_log "$sys_name$sys_version is not supported temporarily" \
+    && return 0
+}
+
 # Name   : Get_Net_Info
-# Args   : public_ip、inet_ip、sys_name、sys_version、net_file、net_type、dns
+# Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
 Get_Net_Info(){
   inet_ip=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)
@@ -70,29 +83,6 @@ Get_Net_Info(){
   fi
   # 写入hosts
   echo "$inet_ip $(hostname)" >> /etc/hosts
-
-  # 检查系统信息
-  Echo_Info "Checking system version ..."
-  sys_name=$(grep NAME /etc/os-release | head -1)
-  sys_version=$(grep VERSION /etc/os-release |  head -1)
-       [[ "$sys_version" =~ "7" ]] \
-    || [[ "$sys_version" =~ "9" ]] \
-    || [[ "$sys_version" =~ "16.04" ]] \
-    || err_log "$sys_name$sys_version is not supported temporarily" \
-    && Echo_Ok
-
-  # 检查网卡配置,是否为静态、是否配置固定DNS
-  if [[ "$sys_name" =~ "CentOS" ]];then
-    net_cards=$(ls -1 /sys/class/net | grep -v "lo")
-    net_file="/etc/sysconfig/network-scripts"
-    for net_card in $net_cards
-    do
-      Check_net_card $net_file/ifcfg-$net_card $inet_ip DNS
-    done
-  else
-    net_file="/etc/network/interfaces"
-    Check_net_card $net_file $inet_ip dns-nameservers
-  fi
 }
 
 
@@ -170,21 +160,6 @@ Write_Sls_File(){
     sed -i -e "/$key/d" $PILLAR_DIR/system_info.sls
   fi
     echo "$key: $value" >> $PILLAR_DIR/system_info.sls
-}
-
-# Name     : Check_net_card
-# Discribe : to check the static ip and dns
-# Return   : 
-function Check_net_card(){
-  isStatic=$(grep "static" $1 | grep -v "#")
-  isIPExist=$(grep "$2" $1 | grep -v "#")
-  isDNSExist=$(grep "$3" $1 | grep -v "#")
-  if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
-    err_log "There is no static ip in $1"
-  fi
-  if [ "$isDNSExist" != "" ];then
-    err_log "The DNS shouldn't config in $1"
-  fi
 }
 
 # -----------------------------------------------------------------------------
@@ -338,6 +313,9 @@ Init_system && Echo_Ok
 Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok
 
+Echo_Info "Checking system version ..."
+Check_System_Version && Echo_Ok
+
 #ipaddr(inet pub) type .mark in .sls
 Echo_Info "Getting Network information ..."
 Get_Net_Info && Echo_Ok
@@ -350,4 +328,3 @@ Install_Salt && Echo_Ok
 
 Echo_Info "Init config ..."
 run && Echo_Ok
-
