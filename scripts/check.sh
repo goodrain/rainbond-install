@@ -142,7 +142,8 @@ EOF
     systemctl enable salt-minion
     systemctl start salt-minion
 
-    echo "wating 10s for check salt"
+    echo "wating 30s for check salt"
+    sleep 30
     salt-key -L
 
 }
@@ -283,6 +284,11 @@ err_log(){
   exit 1
 }
 
+check_rbd(){
+  # Todo
+  # Rbd_reg_notice 
+}
+
 #=============== main ==============
 
 [ ! -f "/usr/lib/python2.7/site-packages/sitecustomize.py" ] && (
@@ -321,3 +327,4 @@ Install_Salt && Echo_Ok
 
 Echo_Info "Init config ..."
 run && Echo_Ok
+
