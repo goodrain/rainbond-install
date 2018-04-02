@@ -1,3 +1,11 @@
+
+[![GitHub issues](https://img.shields.io/github/issues/goodrain/rainbond-install.svg?style=plastic)](https://github.com/goodrain/rainbond-install/issues)
+
+[![GitHub license](https://img.shields.io/github/license/goodrain/rainbond-install.svg?style=plastic)](https://github.com/goodrain/rainbond-install)
+
+[![Docs](https://img.shields.io/badge/docs-v3.5-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)
+
+
 ## Description
 
 A collection of Salt states used to provision an application-centric platform [Rainbond](https://github.com/goodrain/rainbond).
