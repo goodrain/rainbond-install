@@ -1,12 +1,22 @@
 {% set path = pillar['rbd-path'] %}
-key_cp :
+
+{% if grains['host']  == 'manage01' %}
+key_echo:
+  cmd.run:
+    - name: cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+{% else %}
+key_cp:
   file.managed:
     - source: salt://init/files/id_rsa.pub
-    - name: /root/.ssh/authorized_keys
+    - name: /tmp/id_rsa.pub
     - user: root
     - group: root
     - mode: 600
     - makedirs: Ture
+    - unless: test -f /tmp/id_rsa.pub
+  cmd.run:
+    - name: cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys
+{% endif %}
 
 key_rsa_ssh:
   file.managed:

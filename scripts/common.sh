@@ -22,7 +22,7 @@ MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 MEM_LIMIT=4
 DNS_SERVER="114.114.114.114"
-
+RBD_DING="http://push.install.goodrain.org"
 
 if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
             # Enable colors
@@ -132,4 +132,10 @@ local l1=" ^" \
     echo >&2 "${chartcolor}${l6}${TPUT_RESET}"
     echo >&2 "${chartcolor}${l7}${TPUT_RESET}"
     echo >&2
+}
+
+Rbd_reg_notice(){
+    uid=$1
+    iip=$2
+    curl --connect-timeout 20 ${RBD_DING}/chk?uuid=$uid\&inet_ip=$iip
 }

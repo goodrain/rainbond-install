@@ -26,7 +26,7 @@ clear
 # -----------------------------------------------------------------------------
 # checking the availability of system
 
-Echo_Banner "Rainbond Salt 1.0-rc"
+Echo_Banner "Rainbond $(git describe --tag|sed 's/^v//')"
 
 check_func(){
     Echo_Info "will run check func."
@@ -83,7 +83,7 @@ case $1 in
     ;;
     install)
         check_func
-        install_func
+        install_func ${@:2}
     ;;
     dev)
         check_func force
