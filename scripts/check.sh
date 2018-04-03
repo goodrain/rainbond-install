@@ -28,6 +28,7 @@ Check_Internet(){
 # Args   : hostname
 # Return : 0|!0
 Init_system(){
+  grep "CentOS" /etc/os-release > /dev/null 2>/dev/null && yum install -y net-tools > /dev/null || apt-get install -y net-tools  > /dev/null
   hostname manage01
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
@@ -37,6 +38,24 @@ Init_system(){
   uuid=$(cat /proc/sys/kernel/random/uuid)
   Write_Sls_File host-uuid "$uuid"
   Write_Sls_File rbd-version "$version"
+
+  # 检查是否安装docker
+  docker  > /dev/null 2>&1 && err_log "There will install gr-docker, You need to uninstall docker which is installed"
+
+  # 检查端口是否被占用
+  need_ports="53 80 443 2379 2380 3306 4001 6060 6100 6443 7070 8181 9999"
+  for need_port in $need_ports
+  do
+    (netstat -tulnp | grep "\b$need_port\b") && err_log "The port $need_port has been occupied"
+  done
+  # 清除防火墙规则
+  iptables -F
+  iptables -X
+  iptables -Z
+  # 检测SElinux是否关闭
+  [ "$(grep "CentOS" /etc/os-release && getenforce)" == "Disabled" ] && err_log "Please set the SElinux disabled"
+
+  return 0
 }
 
 
@@ -58,19 +77,6 @@ Get_Rainbond_Install_Path(){
   Write_Sls_File rbd-path $RBD_PATH
 }
 
-# Name   : Check_System_Version
-# Args   : sys_name、sys_version
-# Return : 0|!0
-Check_System_Version(){
-    sys_name=$(grep NAME /etc/os-release | head -1)
-    sys_version=$(grep VERSION /etc/os-release |  head -1)
-       [[ "$sys_version" =~ "7" ]] \
-    || [[ "$sys_version" =~ "9" ]] \
-    || [[ "$sys_version" =~ "16.04" ]] \
-    || err_log "$sys_name$sys_version is not supported temporarily" \
-    && return 0
-}
-
 # Name   : Get_Net_Info
 # Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
@@ -83,6 +89,29 @@ Get_Net_Info(){
   fi
   # 写入hosts
   echo "$inet_ip $(hostname)" >> /etc/hosts
+  if [ -z "$1" ];then
+    # 检查系统信息
+    sys_name=$(grep NAME /etc/os-release | head -1)
+    sys_version=$(grep VERSION /etc/os-release |  head -1)
+        [[ "$sys_version" =~ "7" ]] \
+      || [[ "$sys_version" =~ "9" ]] \
+      || [[ "$sys_version" =~ "16.04" ]] \
+      || err_log "$sys_name$sys_version is not supported temporarily" 
+
+    # 检查网卡配置,是否为静态、是否配置固定DNS
+    if [[ "$sys_name" =~ "CentOS" ]];then
+      net_cards=$(ls -1 /sys/class/net | grep -v "lo")
+      net_file="/etc/sysconfig/network-scripts"
+      for net_card in $net_cards
+      do
+        Check_net_card $net_file/ifcfg-$net_card $inet_ip DNS
+      done
+    else
+      net_file="/etc/network/interfaces"
+      Check_net_card $net_file $inet_ip dns-nameservers
+    fi
+    return 0
+  fi
 }
 
 
@@ -134,19 +163,36 @@ cat > /etc/salt/minion.d/minion.conf <<EOF
 master: ${inet_ip}
 id: $(hostname)
 EOF
+  [ -d /srv/salt ] && rm /srv/salt -rf
+  [ -d /srv/pillar ] && rm /srv/pillar -rf
+  ln -s $PWD/install/salt /srv/
+  ln -s $PWD/install/pillar /srv/
+  systemctl enable salt-master
+  systemctl start salt-master
+  systemctl enable salt-minion
+  systemctl start salt-minion
 
-    ln -s $PWD/install/salt /srv/
-    ln -s $PWD/install/pillar /srv/
-    systemctl enable salt-master
-    systemctl start salt-master
-    systemctl enable salt-minion
-    systemctl start salt-minion
-
-    echo "wating 30s for check salt"
-    sleep 30
-    salt-key -L
+  echo "wating 30s for check salt"
+  sleep 30
+  salt-key -L
 
 }
+
+# Name     : Check_net_card
+# Discribe : to check the static ip and dns
+# Return   : 
+function Check_net_card(){
+  isStatic=$(grep "static" $1 | grep -v "#")
+  isIPExist=$(grep "$2" $1 | grep -v "#")
+  isDNSExist=$(grep "$3" $1 | grep -v "#")
+  if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
+    err_log "There is no static ip in $1"
+  fi
+  if [ "$isDNSExist" != "" ];then
+    err_log "The DNS shouldn't config in $1"
+  fi
+}
+
 
 
 # Name   : Write_Sls_File
@@ -307,14 +353,11 @@ fi
 Echo_Info "Checking internet connect ..."
 Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-Echo_Info "Setting [ manage01 ] for hostname"
+Echo_Info "Init system config ..."
 Init_system && Echo_Ok
 
 Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok
-
-Echo_Info "Checking system version ..."
-Check_System_Version && Echo_Ok
 
 #ipaddr(inet pub) type .mark in .sls
 Echo_Info "Getting Network information ..."
