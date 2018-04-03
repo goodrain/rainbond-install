@@ -66,7 +66,7 @@ services:
     network_mode: host
     restart: always
     volumes:
-    - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
     command:
     - --plugin-name=nginx
     - --plugin-opts=httpapi=http://127.0.0.1:10002
@@ -82,7 +82,7 @@ services:
       LicenseSwitch: 'off'
     volumes:
     - /grdata:/grdata
-    - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     - {{ pillar['rbd-path'] }}/logs/rainbond-api:/logs
     command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
@@ -219,7 +219,7 @@ services:
       CUR_NET: calico
       EX_DOMAIN: {{ pillar['domain'] }}
     volumes:
-    - {{ pillar['rbd-path'] }}/k8s:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - /grdata:/grdata
     command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
       --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
