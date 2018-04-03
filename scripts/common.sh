@@ -27,9 +27,14 @@ MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '
 MEM_LIMIT=4
 
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
+DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v '10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
 DNS_SERVER="114.114.114.114"
 
-
+if [ "$SYS_NAME" == "centos" ];then
+    DNS_INFO="DNS"
+else
+    DNS_INFO="dns-nameservers"
+fi
 
 if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
             # Enable colors
@@ -93,6 +98,7 @@ Echo_Failed() {
 
 Echo_Error() {
     printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+    exit 1
 }
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
@@ -145,4 +151,22 @@ Rbd_reg_notice(){
     uid=$1
     iip=$2
     curl --connect-timeout 20 ${RBD_DING}/chk?uuid=$uid\&inet_ip=$iip
+}
+
+# Name     : Check_net_card
+# Args     : $1=network config file,$2=ipaddress,$3=dnsinfo
+# Return   : 
+function Check_net_card(){
+  net_file=$1
+  ipaddr=$2
+  isStatic=$(grep "static" $net_file | grep -v "#")
+  isIPExist=$(grep "$ipaddr" $net_file | grep -v "#")
+  isDNSExist=$(grep "$DNS_INFO" $net_file | grep -v "#")
+
+  if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
+    Echo_Error "There is no static ip in $net_file"
+  fi
+  if [ "$isDNSExist" != "" ];then
+    Echo_Error "The DNS shouldn't config in $net_file"
+  fi
 }
