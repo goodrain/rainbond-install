@@ -19,19 +19,6 @@ console:
     - template: jinja
     - makedirs: Ture
 
-registry:
-  file.managed:
-    - source: salt://proxy/site/registry
-    - name: {{ pillar['rbd-path'] }}/proxy/sites/registry
-    - template: jinja
-    - makedirs: Ture
-
-ssl-config:
-  file.recurse:
-    - source: salt://proxy/ssl/goodrain.me
-    - name: {{ pillar['rbd-path'] }}/proxy/ssl/goodrain.me
-    - makedirs: Ture
-
 reload-proxy:
   cmd.run:
     - name: docker exec rbd-proxy nginx -s reload
