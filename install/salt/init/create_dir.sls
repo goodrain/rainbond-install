@@ -11,9 +11,9 @@
       - group
       - mode
 
-/rainbond/bin/cni:
+/rainbond/cni:
   file.directory:
-    - name: {{ DIR }}/bin/cni
+    - name: {{ DIR }}/cni
     - makedirs: True
 
 /rainbond/etc/etcd/envs:

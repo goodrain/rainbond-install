@@ -16,7 +16,7 @@ OSS_DOMAIN="https://dl.repo.goodrain.com"
 OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
-RBD_DING="http://push.install.goodrain.org"
+RBD_DING="https://build.rbd.goodrain.org"
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
@@ -147,10 +147,17 @@ local l1=" ^" \
     echo >&2
 }
 
-Rbd_reg_notice(){
-    uid=$1
-    iip=$2
-    curl --connect-timeout 20 ${RBD_DING}/chk?uuid=$uid\&inet_ip=$iip
+REG_Check(){
+    uid=$(cat /srv/pillar/system_info.sls | grep host-uuid | awk '{print $2}')
+    iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
+    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
+}
+
+REG_Status(){
+    uid=$(cat /srv/pillar/system_info.sls | grep host-uuid | awk '{print $2}')
+    iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
+    domain=$(cat /srv/pillar/system_info.sls | grep domain | awk '{print $2}')
+    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
 }
 
 # Name     : Check_net_card

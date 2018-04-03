@@ -29,8 +29,13 @@ clear
 Echo_Banner "Rainbond $(git describe --tag|sed 's/^v//')"
 
 check_func(){
-    Echo_Info "will run check func."
+    Echo_Info "Check func."
     ./scripts/check.sh $@
+}
+
+init_config(){
+    Echo_Info "Init rainbond configure."
+    ./scripts/init_sls.sh
 }
 
 install_func(){
@@ -67,6 +72,9 @@ install_func(){
     Echo_Info "will install compute node."
     echo "start kubelet"
     salt "*" state.sls kubernetes.node
+
+    REG_Status
+    Echo_Info "install successfully"
 }
 
 help_func(){
@@ -79,13 +87,13 @@ help_func(){
 
 case $1 in
     check)
-        check_func
+        check_func ${@:2} && init_config
     ;;
     install)
-        check_func && install_func ${@:2}
+        check_func && init_config && install_func ${@:2}
     ;;
     dev)
-        check_func force && install_func ${@:2}
+        check_func force && init_config && install_func ${@:2}
     ;;
     *)
         help_func

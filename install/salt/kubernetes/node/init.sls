@@ -25,13 +25,18 @@ k8s-conf:
     - makedirs: Ture
     - template: jinja
 
-node-rsync:
-  file.managed:
-    - source: salt://kubernetes/node/install/run/rsync.sh
-    - name: /tmp/node_rsync.sh
-    - template: jinja
-  cmd.run:
-    - name: bash /tmp/node_rsync.sh
+{% if "manage" in grains['host'] %}
+kubelet-ssl-rsync:
+  file.recurse:
+    - source: salt://kubernetes/server/install/ssl
+    - name: {{ pillar['rbd-path'] }}/kubernetes/ssl
+
+kubelet-cfg-rsync:
+  file.recurse:
+    - source: salt://kubernetes/server/install/kubecfg
+    - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg
+
+{% endif %}
 
 kubelet-cni:
   file.recurse:

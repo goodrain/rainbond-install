@@ -6,6 +6,7 @@
 # Version  :
 # 2018.03.22 first release
 
+. scripts/common.sh
 
 # Function : Check internet
 # Args     : Check url
@@ -93,6 +94,9 @@ Get_Hardware_Info(){
     cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
     Echo_Info "Configure python defaultencoding"
     Echo_Ok
+) || (
+  Echo_Info "Configure python defaultencoding"
+  Echo_Ok
 )
 
 Echo_Info "Checking internet connect ..."

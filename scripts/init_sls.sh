@@ -14,22 +14,13 @@ Init_system(){
   
   uuid=$(cat /proc/sys/kernel/random/uuid)
   Write_Sls_File host-uuid "$uuid"
-  Write_Sls_File rbd-version "$version"  
-  return 0
-}
-
-# Name   : config network address
-Config_Network(){
-
+  Write_Sls_File rbd-version "$version"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
-
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
   fi
-  
-  # 写入hosts
   echo "$inet_ip ${DEFAULT_HOSTNAME}" >> /etc/hosts
-
+  return 0
 }
 
 # Name   : Get_Rainbond_Install_Path
@@ -233,8 +224,11 @@ Get_Rainbond_Install_Path  && Echo_Ok
 Echo_Info "Writing configuration ..."
 Write_Config && Echo_Ok
 
+Echo_Info "Init config ..."
+run && Echo_Ok
+
 Echo_Info "Installing salt ..."
 Install_Salt && Echo_Ok
 
-Echo_Info "Init config ..."
-run && Echo_Ok
+Echo_Info "REG Check info ..."
+REG_Check && Echo_Ok
