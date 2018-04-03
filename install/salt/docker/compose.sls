@@ -2,7 +2,7 @@
 check_domain:
   cmd.run:
     - name:  echo "domain not found"
-    - unless: grep "domain" {{ pillar['install-script-path'] }}/install/pillar/system_info.sls
+    - unless: grep "domain" /srv/pillar/system_info.sls
 
 refresh_domain:
   cmd.run:

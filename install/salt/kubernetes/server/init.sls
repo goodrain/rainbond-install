@@ -1,20 +1,3 @@
-pull_cfssl_image:
-  cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl') }}
-
-check_or_create_certificates:
-  cmd.run:
-    - name: docker run --rm -v /grdata/kubernetes/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl') }}
-    - unless: ls /grdata/kubernetes/ssl
-
-pull_kubecfg_image:
-  cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg') }}
-
-check_or_create_kubeconfig:
-  cmd.run:
-    - name: docker run --rm -v /grdata/kubernetes/ssl:/etc/goodrain/kubernetes/ssl -v /grdata/kubernetes/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg') }}
-
 pull_api_image:
   cmd.run:
     - name: docker pull {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
@@ -29,22 +12,11 @@ pull_schedule_image:
 
 k8s_envs:
   file.managed:
-    - source:
-      - salt://kubernetes/server/install/envs/api.sh
+    - source: salt://kubernetes/server/install/envs/api.sh
     - name: {{ pillar['rbd-path'] }}/etc/envs/kube-apiserver.sh
     - template: jinja
     - user: root
     - group: root
-
-kube-config-rsync:
-  file.managed:
-    - source: salt://kubernetes/server/install/run/rsync.sh
-    - name: /tmp/rsync.sh
-    - mode: 755
-    - template: jinja
-  cmd.run:
-    - name: bash /tmp/rsync.sh
-    #- unless: ls {{ pillar['rbd-path'] }}/kubernetes/kubecfg/admin.kubeconfig
 
 k8s-api-script:
   file.managed:
@@ -85,11 +57,21 @@ k8s-conf:
 
 /etc/systemd/system:
   file.recurse:
-    - source:
-      - salt://kubernetes/server/install/systemd
+    - source: salt://kubernetes/server/install/systemd
     - template: jinja
     - user: root
     - group: root
+
+kube-ssl-rsync:
+  file.recurse:
+    - source: salt://kubernetes/server/install/ssl
+    - name: {{ pillar['rbd-path'] }}/kubernetes/ssl
+
+kube-cfg-rsync:
+  file.recurse:
+    - source: salt://kubernetes/server/install/kubecfg
+    - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg
+
 
 kube-apiserver:
   service.running:
