@@ -74,8 +74,6 @@ Get_Rainbond_Install_Path(){
   Write_Sls_File rbd-path $RBD_PATH
 }
 
-<<<<<<< Updated upstream
-=======
 # Name   : Check_System_Version
 # Args   : NULL
 # Return : 0|!0
@@ -102,7 +100,6 @@ Check_System_Version(){
   esac
 }
 
->>>>>>> Stashed changes
 # Name   : Get_Net_Info
 # Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0
