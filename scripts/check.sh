@@ -8,9 +8,6 @@
 
 . scripts/common.sh
 
-DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
-
-
 # Function : Check internet
 # Args     : Check url
 # Return   : (0|!0)
@@ -77,6 +74,35 @@ Get_Rainbond_Install_Path(){
   Write_Sls_File rbd-path $RBD_PATH
 }
 
+<<<<<<< Updated upstream
+=======
+# Name   : Check_System_Version
+# Args   : NULL
+# Return : 0|!0
+Check_System_Version(){
+  case $SYS_NAME in
+  "centos")
+    [ "$SYS_VER" == "7" ] \
+    && return 0 \
+    || err_log "$SYS_NAME:$SYS_VER is not supported temporarily."
+    ;;
+  "ubuntu")
+    [ "$SYS_VER" == "16.04" ] \
+    && return 0 \
+    || err_log "$SYS_NAME:$SYS_VER is not supported temporarily."
+    ;;
+  "debian")
+    [ "$SYS_VER" == "8" -o "$SYS_VER" == "9" ] \
+    && return 0 \
+    || err_log "$SYS_NAME:$SYS_VER is not supported temporarily."
+    ;;
+  *)
+    err_log "$SYS_NAME:$SYS_VER is not supported temporarily."
+    ;;
+  esac
+}
+
+>>>>>>> Stashed changes
 # Name   : Get_Net_Info
 # Args   : public_ips、public_ip、inet_ips、inet_ip、inet_size、
 # Return : 0|!0

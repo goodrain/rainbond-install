@@ -16,13 +16,20 @@ OSS_DOMAIN="https://dl.repo.goodrain.com"
 OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
+RBD_DING="http://push.install.goodrain.org"
+
+SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}')
+SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
+
 CPU_NUM=$(grep "processor" /proc/cpuinfo | wc -l )
 CPU_LIMIT=2
 MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
-DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 MEM_LIMIT=4
+
+DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 DNS_SERVER="114.114.114.114"
-RBD_DING="http://push.install.goodrain.org"
+
+
 
 if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
             # Enable colors
