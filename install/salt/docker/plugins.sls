@@ -10,7 +10,6 @@ pull_cfssl_image:
 check_or_create_certificates:
   cmd.run:
     - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl') }}
-    - unless: ls /grdata/kubernetes/ssl
 
 pull_kubecfg_image:
   cmd.run:
@@ -19,5 +18,9 @@ pull_kubecfg_image:
 check_or_create_kubeconfig:
   cmd.run:
     - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg') }}
+
+rsync_kube-proxy_kubeconfig:
+  cmd.run:
+    - name: cp -a /srv/salt/kubernetes/server/install/kubecfg/kube-proxy.kubeconfig /grdata/kubernetes/kube-proxy.kubeconfig
 
 {% endif %}

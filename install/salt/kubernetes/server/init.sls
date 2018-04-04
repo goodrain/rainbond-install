@@ -67,11 +67,23 @@ kube-ssl-rsync:
     - source: salt://kubernetes/server/install/ssl
     - name: {{ pillar['rbd-path'] }}/kubernetes/ssl
 
+kube-cfg-rsync-grdata:
+  file.recurse:
+    - source: salt://kubernetes/server/install/kubecfg
+    - name: /grdata/services/k8s/kubecfg
+    - makedirs: Ture
+
+kube-ssl-rsync-grdata:
+  file.recurse:
+    - source: salt://kubernetes/server/install/ssl
+    - name: /grdata/services/k8s/ssl
+    - makedirs: Ture
+
+
 kube-cfg-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
-    - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg
-
+    - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg 
 
 kube-apiserver:
   service.running:
