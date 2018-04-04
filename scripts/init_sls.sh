@@ -197,7 +197,11 @@ Install_Salt(){
 cat > /etc/salt/master.d/master.conf <<END
 interface: ${inet_ip}
 open_mode: True
-auto_accept: true
+auto_accept: True
+# 简介输出,当失败全部输出
+state_output: mixed
+# 当单个的状态执行失败后，将会通知所有的状态停止运行状态
+failhard: True
 END
 
 
