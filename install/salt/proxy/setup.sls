@@ -23,4 +23,3 @@ proxy-upstart:
 docker-plugins:
   cmd.run:
     - name: docker pull rainbond/plugins:tcm;docker tag rainbond/plugins:tcm goodrain.me/tcm;docker push goodrain.me/tcm
-    - unless: docker pull goodrain.me/tcm
