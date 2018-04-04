@@ -102,6 +102,9 @@ etcd:
     - host: ${DEFAULT_LOCAL_IP}
       name: manage01
       port: 2379
+  proxy:
+    image: rainbond/etcd:v3.2.13
+    enabled: true
 EOF
 }
 

@@ -108,7 +108,6 @@ services:
     - {{ pillar['rbd-path'] }}/cache:/cache
     - /var/run:/var/run
     - {{ pillar['rbd-path'] }}/etc/rbd-chaos/ssh:/root/.ssh
-    - {{ pillar['rbd-path'] }}/etc/rbd-chaos/config.json:/run/plugins/config.json
     network_mode: host
     restart: always
   rbd-lb:
@@ -148,7 +147,7 @@ services:
     image: rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
     container_name: rbd-webcli
     volumes:
-    - /usr/bin/kubectl:/usr/bin/kubectl
+    - /usr/local/bin/kubectl:/usr/bin/kubectl
     - /root/.kube:/root/.kube
     command: --hostIP={{ pillar['inet-ip'] }}
     logging:

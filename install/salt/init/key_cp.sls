@@ -53,3 +53,13 @@ key_pub_builder:
     - group: root
     - mode: 600
     - makedirs: Ture
+
+key_config:
+  file.managed:
+    - source: salt://init/files/config
+    - name: {{ path }}/etc/rbd-chaos/ssh/config
+    - user: root
+    - group: root
+    - mode: 600
+    - makedirs: Ture
+    

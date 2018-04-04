@@ -1,0 +1,1 @@
+MASTER_IP=[{% for etcdmem in pillar.etcd.server.members %}{{ etcdmem.ip|join(':2379,')}}{% endfor%}]

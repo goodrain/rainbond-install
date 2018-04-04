@@ -1,13 +1,8 @@
-{%- from "etcd/map.jinja" import server with context %}
-{%- if server.enabled %}
-
-#pull-image:
-#  docker.pulled:
-#    - name: {{ server.get('image', 'rainbond/etcd:v3.2.13') }}
+{% if pillar.etcd.server.enabled %}
 
 pull-etcd-image:
   cmd.run:
-    - name: docker pull {{ server.get('image', 'rainbond/etcd:v3.2.13') }}
+    - name: docker pull {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
 
 etcd-env:
   file.managed:
@@ -28,14 +23,6 @@ etcd-script:
     - mode: 755
     - user: root
     - group: root
-
-#/usr/local/bin/etcdctl:
-#  file.managed:
-#    - source: salt://etcd/install/systemd/etcd.service
-#    - mode: 755
-#    - makedirs: Ture
-
-
 
 /etc/systemd/system/etcd.service:
   file.managed:

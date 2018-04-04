@@ -1,5 +1,5 @@
 #!/bin/sh
-LOCAL_NODE=$(cat {{ pillar['rbd-path'] }}/etc/envs/etcd.sh | awk -F '=' '{print $2}')
+LOCAL_NODE={{ grains['nodename'] }}
 
 INITIAL_CLUSTER_STATE=""
 
@@ -8,11 +8,11 @@ if [ -z $LOCAL_IP ];then
 	echo "need define LOCAL_IP" >/dev/stderr
 	exit 1
 fi
-
 NODES="
-$LOCAL_NODE:$LOCAL_IP
+{% for etcdmem in pillar.etcd.server.members  %}
+{{ etcdmem.name }}:{{ etcdmem.host }}
+{% endfor %}
 "
-
 INITIAL_CLUSTER=""
 
 LOCAL_NODE_COUNT=$(echo $NODES | tr " " "\n" | sort -u | grep $LOCAL_NODE | wc -l)
@@ -49,6 +49,6 @@ exec /usr/bin/docker \
   --listen-peer-urls http://$LOCAL_IP:2380 \
   --initial-advertise-peer-urls http://$LOCAL_IP:2380 \
   --initial-cluster $INITIAL_CLUSTER \
-  --initial-cluster-token etcd-cluster \
+  --initial-cluster-token {{ pillar.etcd.server.token }} \
   --initial-cluster-state ${INITIAL_CLUSTER_STATE:-new} \
   --auto-compaction-retention 1

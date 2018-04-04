@@ -1,6 +1,6 @@
-{%- if pillar.etcd is defined %}
 include:
-{%- if pillar.etcd.server is defined %}
+{% if "manage" in grains['host'] %}
 - etcd.server
-{%- endif %}
-{%- endif %}
+{% else %}
+- etcd.proxy
+{% endif %}

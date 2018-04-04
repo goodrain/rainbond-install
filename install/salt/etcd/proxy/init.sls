@@ -1,0 +1,2 @@
+include:
+  - etcd.proxy.service
