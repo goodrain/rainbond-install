@@ -166,14 +166,19 @@ REG_Status(){
 function Check_net_card(){
   net_file=$1
   ipaddr=$2
-  isStatic=$(grep "static" $net_file | grep -v "#")
-  isIPExist=$(grep "$ipaddr" $net_file | grep -v "#")
-  isDNSExist=$(grep "$DNS_INFO" $net_file | grep -v "#")
-
-  if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
-    Echo_Error "There is no static ip in $net_file"
-  fi
-  if [ "$isDNSExist" != "" ];then
-    Echo_Error "The DNS shouldn't config in $net_file"
+  
+  if [ -f $net_file ];then
+    isStatic=$(grep "static" $net_file | grep -v "#")
+    isIPExist=$(grep "$ipaddr" $net_file | grep -v "#")
+    isDNSExist=$(grep "$DNS_INFO" $net_file | grep -v "#")
+    
+    if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
+      Echo_Error "There is no static ip in $net_file"
+    fi
+    if [ "$isDNSExist" != "" ];then
+      Echo_Error "The DNS shouldn't config in $net_file"
+    fi
+  else
+    Echo_Error "There is no network config file."
   fi
 }
