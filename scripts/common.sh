@@ -31,7 +31,7 @@ DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v '10.|172.|192.168|127.' | a
 DNS_SERVER="114.114.114.114"
 
 if [ "$SYS_NAME" == "centos" ];then
-    DNS_INFO="DNS"
+    DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
 else
     DNS_INFO="dns-nameservers"
