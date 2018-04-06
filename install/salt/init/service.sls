@@ -3,6 +3,11 @@ firewalld:
     - name: firewalld
     - enable: False 
 
+dnsmasq:
+  service.dead:
+    - name: dnsmasq
+    - enable: False 
+
 nscd:
   pkg.removed:
     - pkgs:
