@@ -32,8 +32,10 @@ DNS_SERVER="114.114.114.114"
 
 if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="DNS"
+    NET_FILE="/etc/sysconfig/network-scripts"
 else
     DNS_INFO="dns-nameservers"
+    NET_FILE="/etc/network/interfaces"
 fi
 
 if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
