@@ -67,7 +67,7 @@ Check_Net(){
 
   for eth in $(ls -1 /sys/class/net|grep -v lo) ;do 
       ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
-      if [ "$SYS_NAME" == "centos"];then
+      if [ "$SYS_NAME" == "centos" ];then
         Check_net_card $NET_FILE/ifcfg-$eth $ipaddr
       else
         Check_net_card $NET_FILE $ipaddr
