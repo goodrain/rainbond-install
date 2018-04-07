@@ -19,7 +19,7 @@ Init_system(){
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
   fi
-  echo "$inet_ip ${DEFAULT_HOSTNAME}" >> /etc/hosts
+  echo "$DEFAULT_LOCAL_IP ${DEFAULT_HOSTNAME}" >> /etc/hosts
   return 0
 }
 
