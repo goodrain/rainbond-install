@@ -17,5 +17,20 @@ update-resolv:
     - backup: minion
     - template: jinja
 
+restart-docker:
+  cmd.run:
+    - name: systemctl restart docker
+    - onlyif: dc-compose stop
+
+{% if "manage" in grains['host'] %}
+
+dns-restart:
+  cmd.run:
+    - name: dc-compose up -d rbd-dns
+    - unless: dps | grep rbd-dns
+
+{% endif %}
+
+
 
 

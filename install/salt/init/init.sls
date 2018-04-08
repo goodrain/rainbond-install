@@ -8,6 +8,7 @@ include:
   - init.service
   - init.router
   - init.key_cp
+  - init.plugins
 {% else %}
   - init.user
   - init.create_dir

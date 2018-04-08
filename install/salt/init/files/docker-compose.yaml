@@ -82,6 +82,7 @@ services:
       LicenseSwitch: 'off'
     volumes:
     - /grdata:/grdata
+    - {{ pillar['rbd-path'] }}/etc/api:/etc/goodrain
     - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     - {{ pillar['rbd-path'] }}/logs/rainbond-api:/logs
