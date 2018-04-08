@@ -192,6 +192,15 @@ Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || Echo_Error "Failed to install salt!"
 
+  APT="$(which_cmd apt)"
+  YUM="$(which_cmd yum)"
+
+  if [ ! -z "$APT" ];then
+      apt install -y salt-ssh
+  else
+      yum install -y salt-ssh
+  fi
+
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
     # auto accept
 cat > /etc/salt/master.d/master.conf <<END

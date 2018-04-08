@@ -38,6 +38,16 @@ else
     NET_FILE="/etc/network/interfaces"
 fi
 
+which_cmd() {
+    which "${1}" 2>/dev/null || \
+        command -v "${1}" 2>/dev/null
+}
+
+check_cmd() {
+    which_cmd "${1}" >/dev/null 2>&1 && return 0
+    return 1
+}
+
 if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
             # Enable colors
             TPUT_RESET="$(tput sgr 0)"
