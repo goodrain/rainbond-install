@@ -105,7 +105,7 @@ services:
     volumes:
     - /logs:/logs
     - /grdata:/grdata
-    - {{ pillar['rbd-path'] }}/cache:/cache
+    - /cache:/cache
     - /var/run:/var/run
     - {{ pillar['rbd-path'] }}/etc/rbd-chaos/ssh:/root/.ssh
     network_mode: host
