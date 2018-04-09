@@ -231,7 +231,7 @@ EOF
   systemctl enable salt-minion
   systemctl start salt-minion
 
-  uuid=(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+  uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
   Write_Sls_File reg-uuid "$uuid"
 }
 
