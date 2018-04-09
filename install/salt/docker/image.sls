@@ -21,12 +21,8 @@ update_systeminfo:
 
 check_domain:
   cmd.run:
-<<<<<<< HEAD
     - name:  echo "domain not found"
     - unless: grep "domain" /srv/pillar/system_info.sls
-=======
-    - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/static gr-ctl-all
->>>>>>> master
 
 refresh_domain:
   cmd.run:
