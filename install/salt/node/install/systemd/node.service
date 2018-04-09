@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=root
-EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/node.sh
+EnvironmentFile=-{{ pillar['rbd-path'] }}/etc/envs/node.sh
 PermissionsStartOnly=true
 ExecStart={{ pillar['rbd-path'] }}/node/scripts/start.sh
 Restart=always
