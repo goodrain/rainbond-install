@@ -3,6 +3,10 @@ firewalld:
     - name: firewalld
     - enable: False 
 
+clear_firewall_rules:
+  cmd.run:
+    - name: iptables -F && iptables -X && iptables -Z
+
 dnsmasq:
   service.dead:
     - name: dnsmasq

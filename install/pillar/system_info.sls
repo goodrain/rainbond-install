@@ -10,3 +10,10 @@ manage:
   - ip: 172.16.0.169
   - ip: 172.16.0.170
     
+
+check_system:
+  cmd.run:
+    - name: /root/rainbond-install/scripts/check.sh
+minion_install:
+  cmd.run:
+    - name: bash /root/rainbond-install/scripts/check.sh
