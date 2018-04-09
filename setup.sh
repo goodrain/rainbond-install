@@ -45,33 +45,11 @@ install_func(){
         salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
     done
     Echo_Info "will install manage node."
-    echo "start init"
-    salt "*" state.sls init
-    echo "start install storage"
-    salt "*" state.sls storage
-    echo "start install docker"
-    salt "*" state.sls docker
-    echo "start etcd"
-    salt "*" state.sls etcd
-    echo "start network plugin calico"
-    salt "*" state.sls network
-    echo "start k8s server"
-    salt "*" state.sls kubernetes.server
-    echo "start node"
-    salt "*" state.sls node
-    echo "start database mysql"
-    salt "*" state.sls db
-    echo "start plugins"
-    salt "*" state.sls grbase
-    salt "*" state.sls plugins
-    echo "start proxy"
-    salt "*" state.sls proxy
-    echo "start prom"
-    salt "*" state.sls prometheus
-    
-    Echo_Info "will install compute node."
-    echo "start kubelet"
-    salt "*" state.sls kubernetes.node
+    for step in ${MANAGE_MODULES}
+    do
+    echo "Start install $step ..."
+        salt "*" state.sls $step || break
+    done
 
     REG_Status
     Echo_Info "install successfully"

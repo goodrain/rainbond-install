@@ -17,6 +17,19 @@ OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
 RBD_DING="https://build.rbd.goodrain.org"
+MANAGE_MODULES="init \
+storage \
+docker \
+etcd \
+network \
+kubernetes.server \
+node \
+db \
+grbase \
+plugins \
+proxy \
+prometheus \
+kubernetes.node"
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
