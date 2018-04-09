@@ -38,11 +38,11 @@ calico:
       - file: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
       - cmd: pull-calico-image
-    - unless:
-      - /etc/systemd/system/calico.service
-      - calico-script
-      - calico-env
-      - pull-calico-image
+    - require:
+      - file: /etc/systemd/system/calico.service
+      - file: calico-script
+      - file: calico-env
+      - cmd: pull-calico-image
 
 {% if grains['host'] == 'manage01' %}
 /tmp/init.calico:
