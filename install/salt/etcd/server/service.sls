@@ -34,7 +34,8 @@ etcd-script:
 etcd:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart etcd
     - watch:
       - file: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
