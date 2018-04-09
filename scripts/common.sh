@@ -20,6 +20,7 @@ RBD_DING="https://build.rbd.goodrain.org"
 MANAGE_MODULES="init \
 storage \
 docker \
+misc \
 etcd \
 network \
 kubernetes.server \

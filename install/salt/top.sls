@@ -2,6 +2,7 @@ base:
   "*":
     - init
     - docker
+    - misc
     - etcd
     - storage
     - network

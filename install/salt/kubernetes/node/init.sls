@@ -45,6 +45,12 @@ kubelet-cni:
     - template: jinja
     - makedirs: Ture
 
+kubelet-cni-bin:
+  file.recurse:
+    - source: salt://misc/file/cni/bin
+    - name: {{ pillar['rbd-path'] }}/cni/bin
+    - makedirs: Ture
+
 /etc/systemd/system/kubelet.service:
   file.managed:
     - source: salt://kubernetes/node/install/systemd/kubelet.service

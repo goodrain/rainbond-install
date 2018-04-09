@@ -47,6 +47,8 @@ Write_Config(){
   Write_Sls_File rbd-tag "rainbond"
   # Get dns info
   Write_Sls_File dns "$dns_value"
+  # Get cli info
+  Write_Sls_File cli-image "rainbond/static:allcli_v3.5"
 }
 
 
