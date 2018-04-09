@@ -56,6 +56,12 @@ kubelet-cni-bin:
     - source: salt://kubernetes/node/install/systemd/kubelet.service
     - template: jinja
 
+cp-bin-kubelet:
+  file.managed:
+    - source: salt://misc/file/bin/compute/kubelet
+    - name: /usr/local/bin/kubelet
+    - mode: 755
+
 /usr/bin/kubelet:
   file.managed:
     - source: /usr/local/bin/kubelet
