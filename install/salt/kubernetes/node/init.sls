@@ -70,9 +70,15 @@ image-pull:
 kubelet:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart kubelet
     - watch:
       - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kubelet.sh
       - file: {{ pillar['rbd-path'] }}/cni/net.d
       - cmd: image-pull
+    - require:
+      - file: kubelet-env
+      - file: kubelet-cni
+      - cmd: image-pull
+  
 

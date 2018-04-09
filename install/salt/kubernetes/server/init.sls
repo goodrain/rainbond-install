@@ -80,25 +80,38 @@ kube-cfg-rsync:
 kube-apiserver:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart kube-apiserver
     - watch:
       - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-apiserver.sh
+      - cmd: pull_api_image
+    - require:
+      - file: k8s-api-script
       - cmd: pull_api_image
 
 kube-controller-manager:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart kube-controller-manager
     - watch:
       - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-controller-manager.sh
       - cmd: pull_manager_image
+    - require:
+      - file: k8s-manager-script
+      - cmd: pull_manager_image
+
 
 kube-scheduler:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart kube-scheduler
     - watch:
       - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-scheduler.sh
+      - cmd: pull_schedule_image
+    - require:
+      - file: k8s-scheduler-script
       - cmd: pull_schedule_image
 
 kube-local:
