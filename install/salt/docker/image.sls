@@ -44,7 +44,6 @@ install_manage_compute_ctl:
 install_manage_ctl:
   cmd.run:
     - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/static gr-ctl-all
-    - unless: ls /opt/cni/bin/
 
 {% endif %}
 
