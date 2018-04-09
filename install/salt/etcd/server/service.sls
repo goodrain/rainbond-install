@@ -39,6 +39,12 @@ etcd:
       - file: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
       - cmd: pull-etcd-image
+    - unless:
+      - /etc/systemd/system/etcd.service
+      - etcd-script
+      - etcd-env
+      - pull-etcd-image
+  
 
 {% endif %}
 {% if pillar.domain is defined %}
