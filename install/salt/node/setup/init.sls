@@ -25,6 +25,7 @@ node-config-mapper.yaml:
 node:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart node
     - watch:
       - file: {{ pillar['rbd-path'] }}/node/scripts/start.sh

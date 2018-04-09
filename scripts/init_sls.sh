@@ -13,7 +13,7 @@ Init_system(){
   version=$(cat ./VERSION)
   
   uuid=$(cat /proc/sys/kernel/random/uuid)
-  Write_Sls_File host-uuid "$uuid"
+  # Write_Sls_File host-uuid "$uuid"
   Write_Sls_File rbd-version "$version"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then

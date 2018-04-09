@@ -61,19 +61,9 @@
     - name: {{ DIR }}/etc/prometheus
     - makedirs: Ture
 
-/rainbond/etc/rbd-slogger:
+/rainbond/etc/node/scripts:
   file.directory:
-    - name: {{ DIR }}/etc/rbd-slogger
-    - makedirs: Ture
-
-/rainbond/etc/goodrain_node/scripts:
-  file.directory:
-    - name: {{ DIR }}/etc/goodrain_node/scripts
-    - makedirs: Ture
-
-/rainbond/etc/goodrain_node/envs:
-  file.directory:
-    - name: {{ DIR }}/etc/goodrain_node/envs
+    - name: {{ DIR }}/etc/node/scripts
     - makedirs: Ture
 
 /rainbond/etc/calico/scripts:
