@@ -28,4 +28,3 @@ node:
     - reload: True
     - watch:
       - file: {{ pillar['rbd-path'] }}/node/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/etc/envs/node.sh
