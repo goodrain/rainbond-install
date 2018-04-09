@@ -174,13 +174,13 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$(cat /srv/pillar/system_info.sls | grep host-uuid | awk '{print $2}')
+    uid=$(cat /srv/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
     iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$(cat /srv/pillar/system_info.sls | grep host-uuid | awk '{print $2}')
+    uid=$(cat /srv/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
     iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
     domain=$(cat /srv/pillar/system_info.sls | grep domain | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
