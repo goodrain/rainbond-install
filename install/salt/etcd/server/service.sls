@@ -34,11 +34,18 @@ etcd-script:
 etcd:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart etcd
     - watch:
       - file: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
       - cmd: pull-etcd-image
+    - require:
+      - file: /etc/systemd/system/etcd.service
+      - file: etcd-script
+      - file: etcd-env
+      - cmd: pull-etcd-image
+  
 
 {% endif %}
 {% if pillar.domain is defined %}

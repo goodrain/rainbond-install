@@ -2,6 +2,8 @@
 network_calico_cni:
   cmd.run:
     - name: cp -a /opt/cni/bin {{ pillar['rbd-path'] }}/cni/
+    - require:
+      - cmd: install_manage_ctl
 
 pull_cfssl_image:
   cmd.run:

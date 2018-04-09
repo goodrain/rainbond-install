@@ -32,10 +32,16 @@ calico-script:
 calico:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart calico
     - watch:
       - file: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
+      - cmd: pull-calico-image
+    - require:
+      - file: /etc/systemd/system/calico.service
+      - file: calico-script
+      - file: calico-env
       - cmd: pull-calico-image
 
 {% if grains['host'] == 'manage01' %}

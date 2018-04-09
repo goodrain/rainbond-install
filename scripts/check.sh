@@ -99,13 +99,19 @@ Get_Hardware_Info(){
   Echo_Ok
 )
 
-Echo_Info "Checking internet connect ..."
-Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-Echo_Info "Check system environment..."
-Check_Docker && Echo_Ok
 
 if [ "$1" != "force" ];then
+
+  Echo_Info "Checking internet connect ..."
+  Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
+
+  Echo_Info "Check system environment..."
+  Check_Docker && Echo_Ok
+
+  Echo_Info "Check OS version..."
+  Check_System_Version && Echo_Ok
+
   # disk cpu memory
   Echo_Info "Getting Hardware information ..."
   Get_Hardware_Info && Echo_Ok
@@ -113,5 +119,7 @@ if [ "$1" != "force" ];then
   #ipaddr(inet pub) type .mark in .sls
   Echo_Info "Getting Network information ..."
   Check_Net && Echo_Ok
+else
+  Echo_Info "Skip check."
 fi
 
