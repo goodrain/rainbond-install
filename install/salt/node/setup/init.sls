@@ -22,6 +22,13 @@ node-config-mapper.yaml:
     - user: root
     - group: root
 
+node-uuid-conf:
+  file.managed:
+    - source: salt://node/install/envs/node_host_uuid.conf
+    - name: {{ pillar['rbd-path'] }}/etc/node/node_host_uuid.conf
+    - makedirs: Ture
+    - template: jinja
+
 node:
   service.running:
     - enable: True
@@ -29,3 +36,4 @@ node:
     - name: systemctl restart node
     - watch:
       - file: {{ pillar['rbd-path'] }}/node/scripts/start.sh
+      - file: {{ pillar['rbd-path'] }}/etc/node/node_host_uuid.conf
