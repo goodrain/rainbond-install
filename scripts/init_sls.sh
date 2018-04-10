@@ -12,8 +12,6 @@ Init_system(){
 
   version=$(cat ./VERSION)
   
-  uuid=$(cat /proc/sys/kernel/random/uuid)
-
   Write_Sls_File rbd-version "$version"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
@@ -21,6 +19,7 @@ Init_system(){
   fi
   
   Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
+
   return 0
 }
 
@@ -226,9 +225,9 @@ EOF
   cp -rp $PWD/install/pillar /srv/
 
   systemctl enable salt-master
-  systemctl start salt-master
+  systemctl restart salt-master
   systemctl enable salt-minion
-  systemctl start salt-minion
+  systemctl restart salt-minion
 
   for ((i=1;i<=3;i++ )); do
     sleep 5
@@ -238,6 +237,7 @@ EOF
   uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
   Echo_Info "Waiting to start salt. $uuid"
   Write_Sls_File reg-uuid "$uuid" /srv/pillar
+  Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
 }
 
 
