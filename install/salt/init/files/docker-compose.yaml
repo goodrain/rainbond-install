@@ -66,6 +66,7 @@ services:
     network_mode: host
     restart: always
     volumes:
+    - {{ pillar['rbd-path'] }}/etc/node/node_host_uuid.conf:/etc/goodrain/host_uuid.conf
     - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
     command:
     - --plugin-name=nginx
@@ -82,6 +83,7 @@ services:
       LicenseSwitch: 'off'
     volumes:
     - /grdata:/grdata
+    - {{ pillar['rbd-path'] }}/etc/api:/etc/goodrain
     - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     - {{ pillar['rbd-path'] }}/logs/rainbond-api:/logs

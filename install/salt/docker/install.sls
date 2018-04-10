@@ -51,3 +51,18 @@ gr-docker-engine:
       - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
       - file: /usr/lib/systemd/system/docker.service
       - pkg: gr-docker-engine
+
+dps:
+    cmd.run:
+      - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-docker-utils
+      - unless: which dps
+
+install-docker-compose:
+  file.managed:
+    - name: /usr/local/bin/dc-compose
+    - source: salt://docker/envs/dc-compose
+    - makedirs: Ture
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root

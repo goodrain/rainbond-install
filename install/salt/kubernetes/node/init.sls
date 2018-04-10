@@ -45,10 +45,22 @@ kubelet-cni:
     - template: jinja
     - makedirs: Ture
 
+kubelet-cni-bin:
+  file.recurse:
+    - source: salt://misc/file/cni/bin
+    - name: {{ pillar['rbd-path'] }}/cni/bin
+    - makedirs: Ture
+
 /etc/systemd/system/kubelet.service:
   file.managed:
     - source: salt://kubernetes/node/install/systemd/kubelet.service
     - template: jinja
+
+cp-bin-kubelet:
+  file.managed:
+    - source: salt://misc/file/bin/compute/kubelet
+    - name: /usr/local/bin/kubelet
+    - mode: 755
 
 /usr/bin/kubelet:
   file.managed:
@@ -64,9 +76,15 @@ image-pull:
 kubelet:
   service.running:
     - enable: True
-    - reload: True
+  cmd.run:
+    - name: systemctl restart kubelet
     - watch:
       - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kubelet.sh
       - file: {{ pillar['rbd-path'] }}/cni/net.d
       - cmd: image-pull
+    - require:
+      - file: kubelet-env
+      - file: kubelet-cni
+      - cmd: image-pull
+  
 

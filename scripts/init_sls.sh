@@ -13,13 +13,13 @@ Init_system(){
   version=$(cat ./VERSION)
   
   uuid=$(cat /proc/sys/kernel/random/uuid)
-  Write_Sls_File host-uuid "$uuid"
+
   Write_Sls_File rbd-version "$version"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
   fi
-  echo "$inet_ip ${DEFAULT_HOSTNAME}" >> /etc/hosts
+  echo "$DEFAULT_LOCAL_IP ${DEFAULT_HOSTNAME}" >> /etc/hosts
   return 0
 }
 
@@ -47,6 +47,8 @@ Write_Config(){
   Write_Sls_File rbd-tag "rainbond"
   # Get dns info
   Write_Sls_File dns "$dns_value"
+  # Get cli info
+  Write_Sls_File cli-image "rainbond/static:allcli_v3.5"
 }
 
 
@@ -57,12 +59,13 @@ Write_Config(){
 Write_Sls_File(){
   key=$1
   value=$2
-  hasKey=$(grep $key $PILLAR_DIR/system_info.sls)
+  path=${3:-PILLAR_DIR}
+  hasKey=$(grep $key $path/system_info.sls)
   if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $PILLAR_DIR/system_info.sls
+    sed -i -e "/$key/d" $path/system_info.sls
   fi
   
-  echo "$key: $value" >> $PILLAR_DIR/system_info.sls
+  echo "$key: $value" >> $path/system_info.sls
 }
 
 # -----------------------------------------------------------------------------
@@ -192,6 +195,15 @@ Install_Salt(){
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || Echo_Error "Failed to install salt!"
 
+  APT="$(which_cmd apt)"
+  YUM="$(which_cmd yum)"
+
+  if [ ! -z "$APT" ];then
+      apt install -y salt-ssh
+  else
+      yum install -y salt-ssh
+  fi
+
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
     # auto accept
 cat > /etc/salt/master.d/master.conf <<END
@@ -219,6 +231,15 @@ EOF
   systemctl start salt-master
   systemctl enable salt-minion
   systemctl start salt-minion
+
+  for ((i=1;i<=3;i++ )); do
+    sleep 5
+    echo "..."
+    salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
+  done
+  uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+  Echo_Info "Waiting to start salt. $uuid"
+  Write_Sls_File reg-uuid "$uuid" /srv/pillar
 }
 
 

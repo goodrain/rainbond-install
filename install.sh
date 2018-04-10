@@ -48,7 +48,7 @@ run(){
     cd rainbond-install
     if [[ $1 == "help" ]];then
         ./setup.sh
-        echo "cd $PWD/rainbond-install;  ./setup.sh <args>"
+        echo "cd $PWD;  ./setup.sh <args>"
     elif [[ $1 == "dev" ]];then
         ./setup.sh dev
     else

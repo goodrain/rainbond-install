@@ -40,11 +40,6 @@ init_config(){
 
 install_func(){
     fail_num=0
-    for ((i=1;i<=3;i++ )); do
-        sleep 5
-        echo "waiting salt start"
-        salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
-    done
     Echo_Info "will install manage node."
 
     for module in ${MANAGE_MODULES}
