@@ -59,7 +59,7 @@ Write_Config(){
 Write_Sls_File(){
   key=$1
   value=$2
-  path=${3:-PILLAR_DIR}
+  path=${3:-$PILLAR_DIR}
   hasKey=$(grep $key $path/system_info.sls)
   if [ "$hasKey" != "" ];then
     sed -i -e "/$key/d" $path/system_info.sls
