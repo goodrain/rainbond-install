@@ -16,7 +16,7 @@ OSS_DOMAIN="https://dl.repo.goodrain.com"
 OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
-RBD_DING="https://build.rbd.goodrain.org"
+RBD_DING="http://v2.reg.rbd.goodrain.org"
 MANAGE_MODULES="init \
 storage \
 docker \
