@@ -1,5 +1,5 @@
 include:
-{% if "manage" in grains['host']%}
+{% if "manage" in grains['id']%}
   - init.key_build
   - init.user
   - init.config

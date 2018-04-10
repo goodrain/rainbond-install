@@ -17,7 +17,11 @@ Init_system(){
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
   fi
-  
+
+  # reset /etc/hosts
+  echo -en "127.0.0.1\tlocalhost" > /etc/hosts
+
+  # config hostname to hosts
   Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
 
   return 0
@@ -229,8 +233,8 @@ EOF
   systemctl enable salt-minion
   systemctl restart salt-minion
 
-  for ((i=1;i<=3;i++ )); do
-    sleep 5
+  for ((i=1;i<=30;i++ )); do
+    sleep 1
     echo -e -n "."
     salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
   done
