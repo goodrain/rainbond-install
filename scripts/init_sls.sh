@@ -19,7 +19,8 @@ Init_system(){
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
   fi
-  echo "$DEFAULT_LOCAL_IP ${DEFAULT_HOSTNAME}" >> /etc/hosts
+  
+  Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
   return 0
 }
 
@@ -191,18 +192,15 @@ run(){
 # Args   : Null
 # Return : 0|!0
 Install_Salt(){
+  # check salt service
+  [ $(systemctl  is-active salt-master) == "active" ] && systemctl  stop salt-master
+  [ $(systemctl  is-active salt-minion) == "active" ] && systemctl  stop salt-minion
+
   # install salt without run
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || Echo_Error "Failed to install salt!"
 
-  APT="$(which_cmd apt)"
-  YUM="$(which_cmd yum)"
-
-  if [ ! -z "$APT" ];then
-      apt install -y salt-ssh
-  else
-      yum install -y salt-ssh
-  fi
+  Install_PKG "salt-ssh"
 
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
     # auto accept
@@ -234,7 +232,7 @@ EOF
 
   for ((i=1;i<=3;i++ )); do
     sleep 5
-    echo "..."
+    echo -e -n "."
     salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
   done
   uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')

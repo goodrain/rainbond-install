@@ -47,10 +47,13 @@ DNS_SERVER="114.114.114.114"
 if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
+    INSTALL_BIN="yum"
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
+    INSTALL_BIN="apt"
 fi
+
 
 which_cmd() {
     which "${1}" 2>/dev/null || \
@@ -207,4 +210,18 @@ function Check_net_card(){
   else
     Echo_Error "There is no network config file."
   fi
+}
+
+function Write_Host(){
+    ipaddr=$1
+    name=${2:-null}
+    if (grep $name /etc/hosts);then
+        sed -i "/$name/d" /etc/hosts
+    fi
+    echo -e "$ipaddr\t$name" >> /etc/hosts
+}
+
+function Install_PKG(){
+    pkg_name=$1
+    INSTALL_BIN install -y $pkg_name
 }
