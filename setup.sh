@@ -53,6 +53,8 @@ install_func(){
 
     if [ "$fail_num" -eq 0 ];then
         REG_Status
+        uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
+        grctl node up $uuid
         Echo_Info "install successfully"
     fi
 }
