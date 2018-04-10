@@ -19,7 +19,7 @@ Init_system(){
   fi
 
   # reset /etc/hosts
-  echo -en "127.0.0.1\tlocalhost" > /etc/hosts
+  echo -e "127.0.0.1\tlocalhost" > /etc/hosts
 
   # config hostname to hosts
   Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
