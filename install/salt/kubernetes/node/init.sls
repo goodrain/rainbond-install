@@ -58,7 +58,7 @@ kubelet-cni-bin:
 
 cp-bin-kubelet:
   file.managed:
-    - source: salt://misc/file/bin/compute/kubelet
+    - source: salt://misc/file/bin/kubelet
     - name: /usr/local/bin/kubelet
     - mode: 755
 
