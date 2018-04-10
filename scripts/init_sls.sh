@@ -59,12 +59,13 @@ Write_Config(){
 Write_Sls_File(){
   key=$1
   value=$2
-  hasKey=$(grep $key $PILLAR_DIR/system_info.sls)
+  path=${3:-PILLAR_DIR}
+  hasKey=$(grep $key $path/system_info.sls)
   if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $PILLAR_DIR/system_info.sls
+    sed -i -e "/$key/d" $path/system_info.sls
   fi
   
-  echo "$key: $value" >> $PILLAR_DIR/system_info.sls
+  echo "$key: $value" >> $path/system_info.sls
 }
 
 # -----------------------------------------------------------------------------
@@ -231,8 +232,14 @@ EOF
   systemctl enable salt-minion
   systemctl start salt-minion
 
+  for ((i=1;i<=3;i++ )); do
+    sleep 5
+    echo "..."
+    salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
+  done
   uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
-  Write_Sls_File reg-uuid "$uuid"
+  Echo_Info "Waiting to start salt. $uuid"
+  Write_Sls_File reg-uuid "$uuid" /srv/pillar
 }
 
 
