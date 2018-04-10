@@ -12,7 +12,7 @@ Init_system(){
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
 
-  LOCAL_IP=$(cat ./LOCAL_IP > /dev/null 2>&1)
+  LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   
   Write_Sls_File rbd-version "$RBD_VERSION"

@@ -3,7 +3,7 @@
 [[ $DEBUG ]] && set -x
 
 # set env
-RBD_VERSION=$(cat ./VERSION > /dev/null 2>&1)
+RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_VER="stable 2017.7.4"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
