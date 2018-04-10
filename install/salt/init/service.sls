@@ -6,12 +6,16 @@ firewalld:
 dnsmasq:
   service.dead:
     - name: dnsmasq
-    - enable: False 
+    - enable: False
+  cmd.run:
+    - name: killall -9  dnsmasq
+    - onlyif: pgrep  dnsmasq
 
-nscd:
+remove_pkgs:
   pkg.removed:
     - pkgs:
       - nscd
+      - dnsmasq
 
 NetworkManager:
   service.dead:
