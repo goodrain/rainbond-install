@@ -28,6 +28,8 @@ dns-restart:
   cmd.run:
     - name: dc-compose up -d rbd-dns
     - unless: dps | grep rbd-dns
+    - require:
+      - cmd: restart-docker
 
 {% endif %}
 

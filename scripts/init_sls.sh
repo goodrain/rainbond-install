@@ -222,15 +222,19 @@ EOF
   systemctl enable salt-minion
   systemctl restart salt-minion
 
-  for ((i=1;i<=30;i++ )); do
-    sleep 1
+  Echo_Info "Waiting to start salt."
+  for ((i=1;i<=10;i++ )); do
+    sleep 3
     echo -e -n "."
-    salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
+    uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+    [ ! -z $uuid ] && (
+      Write_Sls_File reg-uuid "$uuid" /srv/pillar
+      Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
+    ) && break
   done
-  uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
-  Echo_Info "Waiting to start salt. $uuid"
-  Write_Sls_File reg-uuid "$uuid" /srv/pillar
-  Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
+  
+  
+  
 }
 
 
