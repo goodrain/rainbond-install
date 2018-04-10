@@ -223,5 +223,5 @@ function Write_Host(){
 
 function Install_PKG(){
     pkg_name=$1
-    INSTALL_BIN install -y $pkg_name
+    $INSTALL_BIN install -y $pkg_name
 }
