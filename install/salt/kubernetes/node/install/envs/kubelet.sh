@@ -1,4 +1,4 @@
 HOST_UUID={{ grains['uuid'] }}
 DNS_SERVERS={{ pillar['inet-ip'] }}
-HOST_IP={{ grains['fqdn_ip4'] }}
+HOST_IP={{ grains['fqdn_ip4'][0] }}
 REG="false"
