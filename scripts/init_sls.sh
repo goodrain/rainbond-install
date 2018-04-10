@@ -12,9 +12,10 @@ Init_system(){
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
 
-  version=$(cat ./VERSION)
+  LOCAL_IP=$(cat ./LOCAL_IP > /dev/null 2>&1)
+  DEFAULT_LOCAL_IP=${LOCAL_IP:-DEFAULT_LOCAL_IP}
   
-  Write_Sls_File rbd-version "$version"
+  Write_Sls_File rbd-version "$RBD_VERSION"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
@@ -40,13 +41,13 @@ Get_Rainbond_Install_Path(){
 }
 
 # Name   : Write_Config
-# Args   : rbd_version、dns_value
+# Args   : null
 # Return : 0|!0
 Write_Config(){
-  rbd_version=$(cat ./VERSION)
+  
   dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
   # Config rbd-version
-  Write_Sls_File rbd-version "${rbd_version}"
+  Write_Sls_File rbd-version "${RBD_VERSION}"
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
   # Config region info
