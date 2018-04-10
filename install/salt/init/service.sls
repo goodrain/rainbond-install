@@ -17,3 +17,7 @@ NetworkManager:
   service.dead:
     - name: NetworkManager
     - enable: False
+
+iptables:
+  cmd.run:
+    - name: iptables -F;iptables -X;iptables -Z
