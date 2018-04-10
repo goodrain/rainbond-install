@@ -19,3 +19,5 @@ prom-upstart:
   cmd.run:
     - name: dc-compose up -d prometheus
     - unless: docker images | grep rainbond/prometheus:v2.0.0
+    - require:
+      - file: create-prom-data
