@@ -1,0 +1,16 @@
+{% from "etcd/map.jinja" import etcd_settings with context -%}
+
+{% set node_ip = grains['fqdn_ip4'][0] -%}
+{% set peer_port = etcd_settings.cluster.peer_port|string -%}
+{% set client_port = etcd_settings.cluster.client_port|string -%}
+{% set peer_string = [] -%}
+
+{% for hostname,cfg in etcd_settings.cluster.peers.items() -%}
+{% if peer_string.append( hostname + "=http://" + cfg.ip + ":" + peer_port ) -%}
+{% endif -%}
+{% endfor %}
+
+env ETCD_INITIAL_CLUSTER="{{ peer_string|join(',') }}"
+env ETCD_DATA_DIR="{{ etcd_settings.data_directory }}"
+env ETCD_LISTEN_CLIENT_URLS="http://{{ node_ip }}:{{ client_port }},http://127.0.0.1:{{ client_port }}"
+env ETCD_PROXY="ON"

@@ -1,0 +1,15 @@
+{% from "etcd/map.jinja" import etcd_settings with context -%}
+
+description "etcd {{ etcd_settings.install.version }} distributed key-value store"
+author "Robert Fach <robert.fach@gmx.net>"
+
+start on (net-device-up
+          and local-filesystems
+          and runlevel [2345])
+stop on runlevel [016]
+
+respawn
+respawn limit 10 5
+
+chdir {{ etcd_settings.data_directory }}
+exec {{ etcd_settings.binary_directory }}/etcd >>/var/log/etcd.log 2>&1

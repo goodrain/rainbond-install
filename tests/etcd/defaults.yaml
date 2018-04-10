@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+
+etcd:
+  binary_directory: /opt/etcd
+  data_directory: /opt/etcd/data
+
+  cluster:
+    token: my-etcd-cluster
+    peer_port: 2380
+    client_port: 2379
+  
+  install:
+    base_url: http://github.com/coreos/etcd/releases/download
+    version: 2.1.2
+

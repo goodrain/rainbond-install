@@ -1,0 +1,24 @@
+{% from "etcd/map.jinja" import etcd_settings with context -%}
+[Unit]
+Description=etcd {{ etcd_settings.install.version }} - highly-available key value store
+Documentation=https://github.com/coreos/etcd
+Documentation=man:etcd
+After=network.target
+Wants=network-online.target
+
+[Service]
+Environment=DAEMON_ARGS=
+Environment=ETCD_NAME=%H
+Environment=ETCD_DATA_DIR={{ etcd_settings.data_directory }}
+EnvironmentFile=-/etc/default/%p
+StandardOutput=syslog
+WorkingDirectory={{ etcd_settings.data_directory }}
+#ExecStart=/bin/sh -c "GOMAXPROCS=$(nproc) /usr/bin/etcd $DAEMON_ARGS"
+ExecStart={{ etcd_settings.binary_directory }}/etcd $DAEMON_ARGS
+Restart=on-abnormal
+#RestartSec=10s
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+Alias=etcd2.service
