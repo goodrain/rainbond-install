@@ -2,6 +2,8 @@
 
 . scripts/common.sh
 
+[[ $DEBUG ]] && set -x
+
 # Name   : Get_Hostname and version
 # Args   : hostname
 # Return : 0|!0
