@@ -59,20 +59,7 @@ Write_Config(){
 
 
 
-# Name   : Write_Sls_File
-# Args   : key
-# Return : value
-Write_Sls_File(){
-  key=$1
-  value=$2
-  path=${3:-$PILLAR_DIR}
-  hasKey=$(grep $key $path/system_info.sls)
-  if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $path/system_info.sls
-  fi
-  
-  echo "$key: $value" >> $path/system_info.sls
-}
+
 
 # -----------------------------------------------------------------------------
 # init database configure
