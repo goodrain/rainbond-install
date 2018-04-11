@@ -54,6 +54,7 @@ install_func(){
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
         grctl node up $uuid
         Echo_Info "install successfully"
+        grctl show
     fi
 }
 
