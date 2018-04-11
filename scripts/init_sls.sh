@@ -12,9 +12,10 @@ Init_system(){
   echo "manage01" > /etc/hostname
   Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
 
-  version=$(cat ./VERSION)
+  LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
+  DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   
-  Write_Sls_File rbd-version "$version"
+  Write_Sls_File rbd-version "$RBD_VERSION"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
@@ -40,13 +41,13 @@ Get_Rainbond_Install_Path(){
 }
 
 # Name   : Write_Config
-# Args   : rbd_version、dns_value
+# Args   : null
 # Return : 0|!0
 Write_Config(){
-  rbd_version=$(cat ./VERSION)
+  
   dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
   # Config rbd-version
-  Write_Sls_File rbd-version "${rbd_version}"
+  Write_Sls_File rbd-version "${RBD_VERSION}"
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
   # Config region info
@@ -222,15 +223,19 @@ EOF
   systemctl enable salt-minion
   systemctl restart salt-minion
 
-  for ((i=1;i<=30;i++ )); do
-    sleep 1
+  Echo_Info "Waiting to start salt."
+  for ((i=1;i<=10;i++ )); do
+    sleep 3
     echo -e -n "."
-    salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
+    uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+    [ ! -z $uuid ] && (
+      Write_Sls_File reg-uuid "$uuid" /srv/pillar
+      Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
+    ) && break
   done
-  uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
-  Echo_Info "Waiting to start salt. $uuid"
-  Write_Sls_File reg-uuid "$uuid" /srv/pillar
-  Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
+  
+  
+  
 }
 
 

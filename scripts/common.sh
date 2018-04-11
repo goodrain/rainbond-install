@@ -3,6 +3,7 @@
 [[ $DEBUG ]] && set -x
 
 # set env
+RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_VER="stable 2017.7.4"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
@@ -223,7 +224,7 @@ function Write_Host(){
 
 function Install_PKG(){
     pkg_name=$1
-    $INSTALL_BIN install -y $pkg_name
+    $INSTALL_BIN install -y -q $pkg_name
 }
 
 

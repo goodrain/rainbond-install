@@ -15,8 +15,6 @@
 [[ $DEBUG ]] && set -x
 . scripts/common.sh
 
-echo "$LOG_DIR $PILLAR_DIR"
-
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
 [ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
 [ ! -f $PILLAR_DIR/system_info.sls ] && touch $PILLAR_DIR/system_info.sls
@@ -26,7 +24,7 @@ clear
 # -----------------------------------------------------------------------------
 # checking the availability of system
 
-Echo_Banner "Rainbond $(git describe --tag|sed 's/^v//')"
+Echo_Banner "Rainbond v$RBD_VERSION"
 
 check_func(){
     Echo_Info "Check func."
@@ -56,6 +54,7 @@ install_func(){
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
         grctl node up $uuid
         Echo_Info "install successfully"
+        grctl show
     fi
 }
 

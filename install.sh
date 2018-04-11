@@ -32,15 +32,16 @@ YUM="$(which_cmd yum)"
 
 pkg(){
     if [ ! -z "$YUM" ];then
-        yum makecache
-        yum install -y ntpdate tar git wget perl tree nload curl telnet bind-utils htop dstat net-tools  lsof iproute rsync lvm2 bash-completion 
-        echo "update localtime"
-        ntpdate 0.cn.pool.ntp.org
+        yum makecache -q
+        yum install -y -q ntpdate tar git wget perl tree nload curl telnet bind-utils htop dstat net-tools  lsof iproute rsync lvm2 bash-completion 
+
     else
-        apt update
-        apt install -y git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd
-        ntpdate 0.cn.pool.ntp.org
+        apt update -q
+        apt install -y -q git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd
+
     fi
+    echo "update localtime"
+    ntpdate 0.cn.pool.ntp.org
 }
 
 run(){
