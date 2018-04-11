@@ -20,8 +20,12 @@ remove_pkgs:
 NetworkManager:
   service.dead:
     - name: NetworkManager
+<<<<<<< HEAD
     - enable: False
 
 iptables:
   cmd.run:
     - name: iptables -F;iptables -X;iptables -Z
+=======
+    - enable: False
+>>>>>>> a0e5b0ca4965023e91c128b03e5f57c5eb8c5063
