@@ -20,6 +20,35 @@
 
 init_func(){
     Echo_Info "Init compute node config."
+    if [ "$1" = "single" ];then
+        echo $@
+        if [ "$#" -ne 4 ];then
+            Echo_Error "need 4 args\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd>"
+        fi
+        grep "$2" /etc/salt/roster > /dev/null
+        if [ "$?" -ne 0 ];then
+            cat >> /etc/salt/roster <<EOF
+$2:
+  host: $3 
+  user: root         
+  passwd: $4  
+  sudo: True
+  port: 22         
+EOF
+        grep "$3" /etc/hosts > /dev/null
+        [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
+        else
+            Echo_EXIST $2["$3"]
+        fi
+    elif [ "$1" = "multi" ];then
+        if [ "$#" -ne 3 ];then
+            Echo_Error "need 3 args\n like: [$PWD] ./scripts/compute.sh init multi <ip.txt path> <passwd>"
+        fi
+    else
+        Echo_Error "not support ${1:-null}"
+    fi
+    Echo_Info "change hostname"
+    salt-ssh -i -E "compute" state.sls init.compute
 }
 
 check_func(){
@@ -49,7 +78,7 @@ install_compute_func(){
 help_func(){
     Echo_Info "help"
     Echo_Info "init"
-    echo "args: single <ip> <hostname> <password/key-path>"
+    echo "args: single <hostname> <ip>  <password/key-path>"
     echo "args: multi <ip.txt path> <password/key-path>"
     Echo_Info "check"
     Echo_Info "install"
@@ -57,7 +86,7 @@ help_func(){
 
 case $1 in
     init)
-        init ${@:2}
+        init_func ${@:2}
     ;;
     check)
         check_func ${@:2}

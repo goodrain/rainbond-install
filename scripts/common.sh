@@ -140,6 +140,10 @@ Echo_Error() {
     exit 1
 }
 
+Echo_EXIST() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} EXIST ${TPUT_RESET} ${*} \n\n"
+}
+
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  Echo_Info
 #   DESCRIPTION:  Echo information to stdout.

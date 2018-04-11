@@ -213,6 +213,8 @@ master: ${inet_ip}
 id: $(hostname)
 EOF
 
+echo "" > /etc/salt/roster
+
   [ -d /srv/salt ] && rm /srv/salt -rf
   [ -d /srv/pillar ] && rm /srv/pillar -rf
   cp -rp $PWD/install/salt /srv/
