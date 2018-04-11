@@ -20,11 +20,12 @@
 
 init_func(){
     Echo_Info "Init compute node config."
-
 }
 
 check_func(){
     Echo_Info "Check Compute func."
+    # Todo
+    # ./scripts/check.sh $@
 }
 
 install_compute_func(){
@@ -46,23 +47,26 @@ install_compute_func(){
 }
 
 help_func(){
-    Echo_Info "help func"
-    Echo_Info "check   --- check cpu&mem&network "
-    Echo_Info "init --- init compute node config "
+    Echo_Info "help"
+    Echo_Info "init"
     echo "args: single <ip> <hostname> <password/key-path>"
     echo "args: multi <ip.txt path> <password/key-path>"
-    Echo_Info "install --- install compute node "
+    Echo_Info "check"
+    Echo_Info "install"
 }
 
 case $1 in
-    check)
-        check_func ${@:2}
-    ;;
     init)
         init ${@:2}
     ;;
+    check)
+        check_func ${@:2}
+    ;;
     install)
-        install_compute_func
+        check_func && install_compute_func
+    ;;
+    dev)
+        check_func force && install_compute_func
     ;;
     *)
         help_func
