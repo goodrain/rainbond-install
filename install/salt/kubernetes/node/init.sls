@@ -49,7 +49,7 @@ kubelet-cni-bin:
   file.recurse:
     - source: salt://misc/file/cni/bin
     - name: {{ pillar['rbd-path'] }}/cni/bin
-    - mode: 755
+    - file_mode: '0755'
     - user: root
     - group: root
     - makedirs: Ture
