@@ -1,13 +1,3 @@
-node-env:
-  file.managed:
-    - source: salt://node/install/envs/node.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/node.sh
-    - template: jinja
-    - makedirs: Ture
-    - mode: 644
-    - user: root
-    - group: root
-
 node-script:
   file.managed:
     - source: salt://node/install/scripts/start.sh

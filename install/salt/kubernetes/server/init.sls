@@ -10,14 +10,6 @@ pull_schedule_image:
   cmd.run:
     - name: docker pull {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
 
-k8s_envs:
-  file.managed:
-    - source: salt://kubernetes/server/install/envs/api.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/kube-apiserver.sh
-    - template: jinja
-    - user: root
-    - group: root
-
 k8s-api-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-apiserver.sh
