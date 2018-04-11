@@ -33,6 +33,15 @@ proxy \
 prometheus \
 kubernetes.node"
 
+COMPUTE_MODULES="init \
+storage \
+grbase.dns \
+docker \
+etcd \
+network \
+node \
+kubernetes.node"
+
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 

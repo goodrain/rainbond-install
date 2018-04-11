@@ -1,21 +1,73 @@
 #!/bin/bash
+#======================================================================================================================
+#
+#          FILE: compute.sh
+#
+#   DESCRIPTION: Install Compute Node
+#
+#          BUGS: https://github.com/goodrain/rainbond-install/issues
+#
+#     COPYRIGHT: (c) 2018 by the Goodrain Delivery Team.
+#
+#       LICENSE: Apache 2.0
+#       CREATED: 07/04/2018 10:49:37 AM
+#======================================================================================================================
 
+# debug
+[[ $DEBUG ]] && set -x
 
-salt-ssh -i "*" state.sls minions.install
+. scripts/common.sh
 
-salt -E "compute" state.sls init
+init_func(){
+    Echo_Info "Init compute node config."
 
-salt -E "compute" state.sls storage
+}
 
-salt -E "compute" state.sls grbase.dns
+check_func(){
+    Echo_Info "Check Compute func."
+}
 
-salt -E "compute" state.sls docker
+install_compute_func(){
+    fail_num=0
+    Echo_Info "will install compute node."
 
-salt -E "compute" state.sls network
+    for module in ${COMPUTE_MODULES}
+    do
+        echo "Start install $module ..."
+        if ! (salt -E "compute" state.sls $module);then
+            ((fail_num+=1))
+            break
+        fi
+    done
 
-salt -E "compute" state.sls node
+    if [ "$fail_num" -eq 0 ];then
+        Echo_Info "install compute node successfully"
+    fi
+}
 
-salt -E "compute" state.sls kubernetes.node
+help_func(){
+    Echo_Info "help:"
+    Echo_Info "check   --- check cmd "
+    Echo_Info "init --- init compute node config "
+    echo "args: single <ip> <hostname> <password/key-path>"
+    echo "args: multi <ip.txt path> <password/key-path>"
+    Echo_Info "install --- install compute node "
+    Echo_Info ""
+}
 
+case $1 in
+    check)
+        check_func ${@:2}
+    ;;
+    init)
+        init ${@:2}
+    ;;
+    install)
+        install_compute_func
+    ;;
+    *)
+        help_func
+    ;;
+esac
 
 
