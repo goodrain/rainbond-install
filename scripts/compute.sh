@@ -46,13 +46,12 @@ install_compute_func(){
 }
 
 help_func(){
-    Echo_Info "help:"
-    Echo_Info "check   --- check cmd "
+    Echo_Info "help func"
+    Echo_Info "check   --- check cpu&mem&network "
     Echo_Info "init --- init compute node config "
     echo "args: single <ip> <hostname> <password/key-path>"
     echo "args: multi <ip.txt path> <password/key-path>"
     Echo_Info "install --- install compute node "
-    Echo_Info ""
 }
 
 case $1 in
