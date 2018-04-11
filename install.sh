@@ -13,6 +13,8 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 
+[[ $DEBUG ]] && set -x
+
 REPO_URL="https://github.com/goodrain/rainbond-install.git"
 
 which_cmd() {
@@ -44,11 +46,11 @@ pkg(){
 run(){
     pkg
     [ -d "$PWD/rainbond-install" ] && rm -rf $PWD/rainbond-install
-    git clone ${REPO_URL}
+    git clone --depth 1 ${REPO_URL}
     cd rainbond-install
     if [[ $1 == "help" ]];then
         ./setup.sh
-        echo "cd $PWD/rainbond-install;  ./setup.sh <args>"
+        echo "cd $PWD;  ./setup.sh <args>"
     elif [[ $1 == "dev" ]];then
         ./setup.sh dev
     else

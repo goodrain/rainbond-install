@@ -16,10 +16,11 @@ OSS_DOMAIN="https://dl.repo.goodrain.com"
 OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
-RBD_DING="https://build.rbd.goodrain.org"
+RBD_DING="http://v2.reg.rbd.goodrain.org"
 MANAGE_MODULES="init \
 storage \
 docker \
+misc \
 etcd \
 network \
 kubernetes.server \
@@ -46,10 +47,23 @@ DNS_SERVER="114.114.114.114"
 if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
+    INSTALL_BIN="yum"
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
+    INSTALL_BIN="apt"
 fi
+
+
+which_cmd() {
+    which "${1}" 2>/dev/null || \
+        command -v "${1}" 2>/dev/null
+}
+
+check_cmd() {
+    which_cmd "${1}" >/dev/null 2>&1 && return 0
+    return 1
+}
 
 if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
             # Enable colors
@@ -163,13 +177,13 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$(cat /srv/pillar/system_info.sls | grep host-uuid | awk '{print $2}')
+    uid=$(cat /srv/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
     iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$(cat /srv/pillar/system_info.sls | grep host-uuid | awk '{print $2}')
+    uid=$(cat /srv/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
     iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
     domain=$(cat /srv/pillar/system_info.sls | grep domain | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
@@ -196,4 +210,34 @@ function Check_net_card(){
   else
     Echo_Error "There is no network config file."
   fi
+}
+
+function Write_Host(){
+    ipaddr=$1
+    name=${2:-null}
+    if (grep $name /etc/hosts);then
+        sed -i "/$name/d" /etc/hosts
+    fi
+    echo -e "$ipaddr\t$name" >> /etc/hosts
+}
+
+function Install_PKG(){
+    pkg_name=$1
+    $INSTALL_BIN install -y $pkg_name
+}
+
+
+# Name   : Write_Sls_File
+# Args   : key
+# Return : value
+Write_Sls_File(){
+  key=$1
+  value=$2
+  path=${3:-$PILLAR_DIR}
+  hasKey=$(grep $key $path/system_info.sls)
+  if [ "$hasKey" != "" ];then
+    sed -i -e "/$key/d" $path/system_info.sls
+  fi
+  
+  echo "$key: $value" >> $path/system_info.sls
 }

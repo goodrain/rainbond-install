@@ -1,5 +1,5 @@
 include:
-{% if "manage" in grains['host']%}
+{% if "manage" in grains['id']%}
   - init.key_build
   - init.user
   - init.config
@@ -8,6 +8,7 @@ include:
   - init.service
   - init.router
   - init.key_cp
+  - init.plugins
 {% else %}
   - init.user
   - init.create_dir

@@ -2,6 +2,8 @@
 
 . scripts/common.sh
 
+[[ $DEBUG ]] && set -x
+
 # Name   : Get_Hostname and version
 # Args   : hostname
 # Return : 0|!0
@@ -12,14 +14,18 @@ Init_system(){
 
   version=$(cat ./VERSION)
   
-  uuid=$(cat /proc/sys/kernel/random/uuid)
-  Write_Sls_File host-uuid "$uuid"
   Write_Sls_File rbd-version "$version"
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
   fi
-  echo "$inet_ip ${DEFAULT_HOSTNAME}" >> /etc/hosts
+
+  # reset /etc/hosts
+  echo -e "127.0.0.1\tlocalhost" > /etc/hosts
+
+  # config hostname to hosts
+  Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
+
   return 0
 }
 
@@ -47,23 +53,13 @@ Write_Config(){
   Write_Sls_File rbd-tag "rainbond"
   # Get dns info
   Write_Sls_File dns "$dns_value"
+  # Get cli info
+  Write_Sls_File cli-image "rainbond/static:allcli_v3.5"
 }
 
 
 
-# Name   : Write_Sls_File
-# Args   : key
-# Return : value
-Write_Sls_File(){
-  key=$1
-  value=$2
-  hasKey=$(grep $key $PILLAR_DIR/system_info.sls)
-  if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $PILLAR_DIR/system_info.sls
-  fi
-  
-  echo "$key: $value" >> $PILLAR_DIR/system_info.sls
-}
+
 
 # -----------------------------------------------------------------------------
 # init database configure
@@ -188,9 +184,15 @@ run(){
 # Args   : Null
 # Return : 0|!0
 Install_Salt(){
+  # check salt service
+  [ $(systemctl  is-active salt-master) == "active" ] && systemctl  stop salt-master
+  [ $(systemctl  is-active salt-minion) == "active" ] && systemctl  stop salt-minion
+
   # install salt without run
   ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
   || Echo_Error "Failed to install salt!"
+
+  Install_PKG "salt-ssh"
 
   inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
     # auto accept
@@ -216,9 +218,19 @@ EOF
   cp -rp $PWD/install/pillar /srv/
 
   systemctl enable salt-master
-  systemctl start salt-master
+  systemctl restart salt-master
   systemctl enable salt-minion
-  systemctl start salt-minion
+  systemctl restart salt-minion
+
+  for ((i=1;i<=30;i++ )); do
+    sleep 1
+    echo -e -n "."
+    salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
+  done
+  uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+  Echo_Info "Waiting to start salt. $uuid"
+  Write_Sls_File reg-uuid "$uuid" /srv/pillar
+  Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
 }
 
 

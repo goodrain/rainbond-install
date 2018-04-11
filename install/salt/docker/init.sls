@@ -1,5 +1,5 @@
 include:
   - docker.install
   - docker.image
-  - docker.compose
-  - docker.plugins
+#  - docker.compose
+#  - docker.plugins

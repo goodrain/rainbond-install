@@ -12,7 +12,7 @@
 #       LICENSE: Apache 2.0
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
-
+[[ $DEBUG ]] && set -x
 . scripts/common.sh
 
 echo "$LOG_DIR $PILLAR_DIR"
@@ -40,11 +40,6 @@ init_config(){
 
 install_func(){
     fail_num=0
-    for ((i=1;i<=3;i++ )); do
-        sleep 5
-        echo "waiting salt start"
-        salt-key -L | grep "manage" >/dev/null && export _EXIT=0 && break
-    done
     Echo_Info "will install manage node."
 
     for module in ${MANAGE_MODULES}
@@ -58,6 +53,8 @@ install_func(){
 
     if [ "$fail_num" -eq 0 ];then
         REG_Status
+        uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
+        grctl node up $uuid
         Echo_Info "install successfully"
     fi
 }

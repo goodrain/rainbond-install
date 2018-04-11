@@ -48,12 +48,4 @@ etcd:
   
 
 {% endif %}
-{% if pillar.domain is defined %}
-compose_file:
-  file.managed:
-     - source: salt://init/files/docker-compose.yaml
-     - name: {{ pillar['rbd-path'] }}/docker-compose.yaml
-     - makedirs: Ture
-     - template: jinja
-{% endif %}
 

@@ -1,0 +1,10 @@
+{% from "etcd/map.jinja" import etcd_settings with context -%}
+
+{% set client_port = etcd_settings.cluster.client_port|string -%}
+{% set client_string = [] -%}
+
+etcd_config:
+{%- for hostname,cfg in etcd_settings.cluster.peers.items()|batch(1)|first %}
+  etcd.host: {{ cfg.ip }}
+{%- endfor %}
+  etcd.port: {{ client_port }}
