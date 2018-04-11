@@ -52,6 +52,9 @@ prepare_cli_tools:
       - test -f /srv/salt/misc/file/bin/kubectl
       - test -f /srv/salt/misc/file/bin/kubelet
       - test -f /srv/salt/misc/file/bin/node
+      - test -f /srv/salt/misc/file/cni/bin/calico
+      - test -f /srv/salt/misc/file/cni/bin/calico-ipam
+      - test -f /srv/salt/misc/file/cni/bin/loopback
 
 
 {% if pillar.domain is defined %}

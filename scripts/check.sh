@@ -65,14 +65,43 @@ Check_System_Version(){
 # Return : 0|!0
 Check_Net(){
 
-  for eth in $(ls -1 /sys/class/net|grep -v lo) ;do 
+  eths=($(ls -1 /sys/class/net|grep -v lo))
+  if [ ${#eths[@]} -gt 1 ];then
+    echo "The system has multiple network cards, please select the device to use:"
+    for eth in ${eths[@]}
+    do
       ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
-      if [ "$SYS_NAME" == "centos" ];then
-        Check_net_card $NET_FILE/ifcfg-$eth $ipaddr
+      isinternal=$(echo $ipaddr | egrep '10.|172.|192.168' | grep -v '172.30.42.1')
+      if [ ! -z "$isinternal" ] && [ -z $DEFAULT_LOCAL_IP ];then
+        echo "$eth: $ipaddr (default)"
+        DEFAULT_LOCAL_IP=$ipaddr
       else
-        Check_net_card $NET_FILE $ipaddr
+        echo "$eth: $ipaddr"
       fi
-  done
+    done
+
+    old_ifs=$IFS
+    IFS=","
+    read -p  "Press Enter to use the default device or input device name ( ${eths[*]} ):" selectip
+    IFS=$old_ifs
+
+    if [ "$selectip" != "" ];then
+      ipaddr=$(ip addr show $selectip | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
+      if [ "$ipaddr" != "" ];then
+        export DEFAULT_LOCAL_IP=$ipaddr
+      else
+        echo "Select network device error."
+      fi
+    else
+      export DEFAULT_LOCAL_IP
+    fi
+  else
+    DEFAULT_LOCAL_IP=$(ip addr show ${eths[*]} | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
+  fi
+
+  # write sls file
+  echo $DEFAULT_LOCAL_IP > ./LOCAL_IP
+
 }
 
 
@@ -82,7 +111,7 @@ Check_Net(){
 Get_Hardware_Info(){
 
     if [ $CPU_NUM -lt $CPU_LIMIT ] || [ $MEM_SIZE -lt $MEM_LIMIT ];then
-      Echo_Error "We need $CPU_LIMIT CPUS,$MEM_LIMIT G Memories. You Have $CPU_NUM CPUS,$MEM_SIZE G Memories"
+      Echo_Error "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
     fi
 }
 
