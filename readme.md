@@ -40,7 +40,7 @@ chmod +x install.sh
 ./install.sh
 
 # dev
-wget https://raw.githubusercontent.com/goodrain/rainbond-install/dev/install.sh
+curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/dev/install.sh
 chmod +x install.sh
 ./install.sh dev
 ```
