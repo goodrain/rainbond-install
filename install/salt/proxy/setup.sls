@@ -1,6 +1,7 @@
 docker-pull-proxy-image:
   cmd.run:
     - name: docker pull rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
+    - unless: docker inspect rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
 
 registry:
   file.managed:
@@ -20,6 +21,20 @@ proxy-upstart:
     - name: dc-compose up -d rbd-proxy
     - unless: docker images | grep rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
 
-docker-plugins:
+docker-pull-plugins:
   cmd.run:
-    - name: docker pull rainbond/plugins:tcm;docker tag rainbond/plugins:tcm goodrain.me/tcm;docker push goodrain.me/tcm
+    - name: docker pull rainbond/plugins:tcm
+    - unless: docker inspect rainbond/plugins:tcm
+    
+plugins-tag:
+  cmd.run:
+    - name: docker tag rainbond/plugins:tcm goodrain.me/tcm
+    - unless: docker inspect goodrain.me/tcm
+    - require:
+      - cmd: docker-pull-plugins
+
+plugins-push:
+  cmd.run:
+    - name: docker push goodrain.me/tcm
+    - require:
+      - cmd: plugins-tag
