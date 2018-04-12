@@ -8,6 +8,7 @@ prometheus-yml:
 docker-pull-prom-image:
   cmd.run:
     - name: docker pull rainbond/prometheus:v2.0.0
+    - unless: docker inspect rainbond/prometheus:v2.0.0
 
 create-prom-data:
   file.directory:
@@ -18,6 +19,6 @@ create-prom-data:
 prom-upstart:
   cmd.run:
     - name: dc-compose up -d prometheus
-    - unless: docker images | grep rainbond/prometheus:v2.0.0
+    - unless: check_compose prometheus
     - require:
       - file: create-prom-data
