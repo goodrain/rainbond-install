@@ -47,3 +47,10 @@
     - user: root
     - group: root
     - mode: 755
+
+/usr/bin/check_compose:
+  file.managed:
+    - source: salt://init/files/bin/check_compose
+    - user: root
+    - group: root
+    - mode: 755

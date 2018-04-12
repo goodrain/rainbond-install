@@ -9,7 +9,7 @@ dns-upstart:
     - name: dc-compose up -d rbd-dns
     - require:
       - cmd: docker-pull-dns-image
-    - watch:
+    - onchanges:
       - cmd: docker-pull-dns-image
 
 {% endif %}
@@ -26,19 +26,23 @@ update-resolv:
 restart-docker:
   cmd.run:
     - name: systemctl restart docker
-    - watch:
+    - onchanges:
       - file: update-resolv
     - onlyif: dc-compose stop
 
+<<<<<<< HEAD
 dns-restart:
+=======
+{% if "manage" in grains['host'] %}
+
+waiting_for_dns:
+>>>>>>> 1f7ce53cddcd6fa644d38bd4eef0cc589a452030
   cmd.run:
-    - name: dc-compose up -d rbd-dns
-    - unless: checkdns lang.goodrain.me
-    - require:
-      - cmd: restart-docker
+    - name: checkdns lang.goodrain.me
+    - retry:
+        attempts: 20
+        until: True
+        interval: 3
+        splay: 3
 
 {% endif %}
-
-
-
-
