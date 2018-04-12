@@ -31,7 +31,7 @@ update_exports:
     - name: exportfs -ra
     - require:
       - pkg: nfs_server
-    - watch:
+    - onchanges:
       - file: server_exports
 
 show_exports:

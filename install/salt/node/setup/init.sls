@@ -32,8 +32,6 @@ node-uuid-conf:
 node:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart node
     - watch:
-      - file: {{ pillar['rbd-path'] }}/node/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/etc/node/node_host_uuid.conf
+      - file: node-script
+      - file: node-uuid-conf
