@@ -60,10 +60,12 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-
+    salt-ssh -i -E "compute" state.sls minions.install
+    sleep 12
+    Echo_Info "waiting for salt-minions start"
     for module in ${COMPUTE_MODULES}
     do
-        echo "Start install $module ..."
+        Echo_Info "Start install $module ..."
         if ! (salt -E "compute" state.sls $module);then
             ((fail_num+=1))
             break
@@ -91,11 +93,15 @@ case $1 in
     check)
         check_func ${@:2}
     ;;
+    # Todo 
+    #install)
+    #    check_func && install_compute_func
+    #;;
+    #dev)
+    #    check_func force && install_compute_func
+    #;;
     install)
-        check_func && install_compute_func
-    ;;
-    dev)
-        check_func force && install_compute_func
+        install_compute_func
     ;;
     *)
         help_func
