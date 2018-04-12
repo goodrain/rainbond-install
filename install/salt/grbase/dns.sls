@@ -30,13 +30,7 @@ restart-docker:
       - file: update-resolv
     - onlyif: dc-compose stop
 
-<<<<<<< HEAD
-dns-restart:
-=======
-{% if "manage" in grains['host'] %}
-
 waiting_for_dns:
->>>>>>> 1f7ce53cddcd6fa644d38bd4eef0cc589a452030
   cmd.run:
     - name: checkdns lang.goodrain.me
     - retry:

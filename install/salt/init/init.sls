@@ -1,22 +1,14 @@
 include:
 {% if "manage" in grains['id']%}
   - init.key_build
-  - init.user
-  - init.config
-  - init.swap
-  - init.create_dir
-  - init.gr_bin
-  - init.service
-  - init.router
-  - init.key_cp
   - init.plugins
 {% else %}
-  - init.user
+  - init.gr_bin
   - init.create_dir
   - init.swap
   - init.config
-  - init.service
-  - init.key_cp
+  - init.user
   - init.router
-{% endif %}
+  - init.key_cp
+  - init.service
 
