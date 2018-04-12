@@ -5,5 +5,5 @@
 grub:
   cmd.run:
     - name: grub2-mkconfig -o /boot/grub2/grub.cfg
-    - require:
-      - /etc/default/grub
+    - onchanges:
+      - file: /etc/default/grub

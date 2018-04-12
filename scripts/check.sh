@@ -37,8 +37,6 @@ Check_Plugins(){
   do
     (netstat -tulnp | grep "\b$need_port\b") && Echo_Error "The port $need_port has been occupied"
   done
-  # 检测SElinux是否关闭
-  [ "$(grep "CentOS" /etc/os-release && getenforce)" == "Disabled" ] && Echo_Error "Please set the SElinux disabled"
 }
 
 
@@ -140,17 +138,17 @@ Get_Hardware_Info(){
 )
 
 
-Echo_Info "Check system version..."
-Check_System_Version && Echo_Ok
-
-Echo_Info "Check somrthing necessary configs."
-Check_Plugins && Echo_Ok
-
 if [ "$1" != "force" ];then
 
   Echo_Info "Checking internet connect ..."
   Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
+<<<<<<< HEAD
+=======
+  Echo_Info "Check system environment..."
+  Check_Plugins && Echo_Ok
+
+>>>>>>> 02e0d3bdd7a3c2991bdb0270ab9278d630e7db66
   Echo_Info "Check OS version..."
   Check_System_Version && Echo_Ok
 
