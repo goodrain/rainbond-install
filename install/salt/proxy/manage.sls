@@ -43,7 +43,8 @@ runner-tag:
 runner-push-image:
   cmd.run:
     - name: docker push goodrain.me/runner
-    - unless: docker inspect goodrain.me/runner
+    - require:
+      - cmd: runner-tag
 
 adapter-pull-image:
   cmd.run:
