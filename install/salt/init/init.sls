@@ -5,6 +5,7 @@ include:
   - init.config
   - init.swap
   - init.create_dir
+  - init.gr_bin
   - init.service
   - init.router
   - init.key_cp

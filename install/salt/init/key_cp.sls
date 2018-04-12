@@ -4,6 +4,7 @@
 key_echo:
   cmd.run:
     - name: cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+    - unless: grep `cat /root/.ssh/id_rsa.pub` /root/.ssh/authorized_keys
 {% else %}
 key_cp:
   file.managed:

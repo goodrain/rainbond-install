@@ -52,10 +52,6 @@ gr-docker-engine:
       - file: /usr/lib/systemd/system/docker.service
       - pkg: gr-docker-engine
 
-dps:
-    cmd.run:
-      - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-docker-utils
-      - unless: which dps
 
 install-docker-compose:
   file.managed:

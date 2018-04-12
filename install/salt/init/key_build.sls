@@ -6,6 +6,15 @@ key_build:
 key_rsa:
   cmd.run:
      - name: cp -a ~/.ssh/id_rsa /srv/salt/init/files
+     - require:
+       - cmd: key_build
+     - watch:
+       - cmd: key_build
+
 key_pub:
   cmd.run:
      - name: cp -a ~/.ssh/id_rsa.pub /srv/salt/init/files
+     - require:
+       - cmd: key_build
+     - watch:
+      - cmd: key_build
