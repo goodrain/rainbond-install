@@ -206,7 +206,7 @@ REG_Status(){
 # Name     : Check_net_card
 # Args     : $1=network config file,$2=ipaddress,$3=dnsinfo
 # Return   : 
-function Check_net_card(){
+Check_net_card(){
   net_file=$1
   ipaddr=$2
   
@@ -226,7 +226,7 @@ function Check_net_card(){
   fi
 }
 
-function Write_Host(){
+Write_Host(){
     ipaddr=$1
     name=${2:-null}
     if (grep $name /etc/hosts);then
@@ -235,9 +235,17 @@ function Write_Host(){
     echo -e "$ipaddr\t$name" >> /etc/hosts
 }
 
-function Install_PKG(){
+Install_PKG(){
     pkg_name=$1
     $INSTALL_BIN install -y -q $pkg_name
+}
+
+Cache_PKG(){
+    if [ "$SYS_NAME" == "centos" ];then
+        yum makecache
+    else
+        apt update -y
+    fi
 }
 
 

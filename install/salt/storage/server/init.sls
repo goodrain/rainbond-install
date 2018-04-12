@@ -3,10 +3,11 @@ nfs_server:
   pkg.installed:
    {% if grains['os_family']|lower == 'redhat' %}
     - name: nfs-utils
+    - unless: rpm -qa | grep nfs-utils
    {% else %}
     - name: nfs-kernel-server
+    - unless: dpkg -l | grep nfs-kernel-server
    {% endif %}
-
 
 nfs_server_running:
   service.running:

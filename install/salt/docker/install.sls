@@ -38,6 +38,12 @@ gr-docker-engine:
     - refresh: True
     - require:
       - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+  {% if grains['os_family']|lower == 'redhat' %}
+    - unless: rpm -qa | grep gr-docker-engine
+  {% else %}
+    - unless: dpkg -l | grep gr-docker-engine
+  {% endif %}
+  
   file.managed:
     - source: salt://docker/envs/docker.service
     - name: /usr/lib/systemd/system/docker.service

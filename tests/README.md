@@ -37,3 +37,11 @@ salt "*" state.sls kubernetes.server
 # install Kubernetes Node
 salt "*" state.sls kubernetes.node
 ```
+
+#### local add compute node
+
+```
+cd rainbond-install
+./scripts/compute.sh init single compute01 172.16.0.191 12345678
+./scripts/compute.sh install
+```
