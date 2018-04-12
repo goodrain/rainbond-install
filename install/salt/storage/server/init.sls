@@ -20,7 +20,7 @@ nfs_server_running:
 server_exports:
   file.managed:
     - name: /etc/exports
-    - source: salt://storage/server/exports
+    - source: salt://storage/file/exports
     - user: root
     - group: root
     - mode: 644

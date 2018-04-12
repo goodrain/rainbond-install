@@ -1,6 +1,6 @@
 include:
 {% if grains['host'] == "manage01" %}
-- storage.manage
+- storage.server
 {% else %}
-- storage.compute
+- storage.client
 {% endif %}
