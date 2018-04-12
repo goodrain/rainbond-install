@@ -35,7 +35,7 @@ Plugins Version:
 
 ```
 # stable 
-wget https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
+curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
 chmod +x install.sh 
 ./install.sh
 
