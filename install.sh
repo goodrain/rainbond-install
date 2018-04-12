@@ -31,6 +31,7 @@ APT="$(which_cmd apt)"
 YUM="$(which_cmd yum)"
 
 pkg(){
+    echo "Install the prerequisite packages..."
     if [ ! -z "$YUM" ];then
         yum makecache -q
         yum install -y -q ntpdate tar git wget perl tree nload curl telnet bind-utils htop dstat net-tools  lsof iproute rsync lvm2 bash-completion 
