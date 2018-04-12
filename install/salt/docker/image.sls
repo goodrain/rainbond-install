@@ -1,4 +1,4 @@
-{% if grains['host'] == "manage01" %}
+{% if grains['id'] == "manage01" %}
 make_domain_prepare:
   cmd.run:
     - name: echo "" > {{ pillar['rbd-path'] }}/.domain.log
@@ -17,7 +17,6 @@ update_systeminfo:
     - mode: 755
   cmd.run:
     - name: bash /tmp/domain.sh
-{% endif %}
 
 check_domain:
   cmd.run:
@@ -27,5 +26,6 @@ check_domain:
 refresh_domain:
   cmd.run:
     - name: salt "*" saltutil.refresh_pillar
+{% endif %}
 
 

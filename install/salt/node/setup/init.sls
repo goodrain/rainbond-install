@@ -35,3 +35,5 @@ node:
     - watch:
       - file: node-script
       - file: node-uuid-conf
+  cmd.run:
+    - name: systemctl restart node

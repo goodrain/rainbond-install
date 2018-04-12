@@ -37,6 +37,7 @@ COMPUTE_MODULES="init \
 storage \
 grbase.dns \
 docker \
+misc \
 etcd \
 network \
 node \

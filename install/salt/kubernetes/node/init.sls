@@ -25,7 +25,7 @@ k8s-conf:
     - makedirs: Ture
     - template: jinja
 
-{% if "manage" in grains['host'] %}
+{% if "compute" in grains['id'] %}
 kubelet-ssl-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl

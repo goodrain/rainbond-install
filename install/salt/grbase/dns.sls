@@ -1,4 +1,4 @@
-{% if "manage" in grains['host'] %}
+{% if "manage" in grains['id'] %}
 docker-pull-dns-image:
   cmd.run:
     - name: docker pull rainbond/rbd-dns:{{ pillar["rbd-version"] }}
@@ -21,14 +21,14 @@ update-resolv:
     - backup: minion
     - template: jinja
 
+{% if "manage" in grains['id'] %}
+
 restart-docker:
   cmd.run:
     - name: systemctl restart docker
     - watch:
       - file: update-resolv
     - onlyif: dc-compose stop
-
-{% if "manage" in grains['host'] %}
 
 dns-restart:
   cmd.run:
