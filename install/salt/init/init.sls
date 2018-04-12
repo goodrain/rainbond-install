@@ -2,7 +2,7 @@ include:
 {% if "manage" in grains['id'] %}
   - init.key_build
   - init.plugins
-{% else %}
+{% endif %}
   - init.gr_bin
   - init.create_dir
   - init.swap
@@ -11,4 +11,3 @@ include:
   - init.router
   - init.key_cp
   - init.service
-{% endif %}
