@@ -1,6 +1,27 @@
 {% set path = pillar['rbd-path'] %}
 
-{% if grains['id']  != 'manage01' %}
+{% if grains['id']  == 'manage01' %}
+key_build:
+  cmd.run:
+    - name: ssh-keygen -t rsa -f ~/.ssh/id_rsa -P ""
+    - unless: test -f ~/.ssh/id_rsa.pub
+
+key_rsa:
+  cmd.run:
+    - name: cp -a ~/.ssh/id_rsa /srv/salt/init/files
+    - unless: test -f /srv/salt/init/files/id_rsa
+    - require:
+      - cmd: key_build
+
+key_pub:
+  cmd.run:
+    - name: cp -a ~/.ssh/id_rsa.pub /srv/salt/init/files
+    - unless: test -f /srv/salt/init/files/id_rsa.pub
+    - require:
+      - cmd: key_build
+
+{% else %}
+
 key_cp:
   file.managed:
     - source: salt://init/files/id_rsa.pub
@@ -14,6 +35,7 @@ key_cp:
     - name: cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys
 {% endif %}
 
+{% if "manage" in grains['id']%}
 key_rsa_ssh:
   file.managed:
     - source: salt://init/files/id_rsa
@@ -58,4 +80,4 @@ key_config:
     - group: root
     - mode: 600
     - makedirs: Ture
-    
+{% endif %}
