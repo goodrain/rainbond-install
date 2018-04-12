@@ -11,13 +11,13 @@ minion_install:
 minion_conf:
   file.managed:
     - name: /etc/salt/minion.d/minion.conf
-    - source: salt://minions/install/conf/minion.conf
+    - source: salt://expand/conf/minion.conf
     - user: root
     - group: root
     - mode: 644
     - template: jinja
     - defaults:
-      minion_id: {{ grains['id'] }}
+      minion_id: {{ grains['host'] }}
     - require:
       - cmd: minion_install
 minion_service:
@@ -28,4 +28,3 @@ minion_service:
       - file: minion_conf
   cmd.run:
     - name: systemctl restart salt-minion
-

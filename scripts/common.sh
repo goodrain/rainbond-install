@@ -33,6 +33,15 @@ proxy \
 prometheus \
 kubernetes.node"
 
+COMPUTE_MODULES="init \
+storage \
+grbase.dns \
+docker \
+etcd \
+network \
+node \
+kubernetes.node"
+
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 
@@ -129,6 +138,10 @@ Echo_Failed() {
 Echo_Error() {
     printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
     exit 1
+}
+
+Echo_EXIST() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} EXIST ${TPUT_RESET} ${*} \n\n"
 }
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
