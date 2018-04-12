@@ -143,12 +143,9 @@ if [ "$1" != "force" ];then
   Echo_Info "Checking internet connect ..."
   Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
-<<<<<<< HEAD
-=======
   Echo_Info "Check system environment..."
   Check_Plugins && Echo_Ok
 
->>>>>>> 02e0d3bdd7a3c2991bdb0270ab9278d630e7db66
   Echo_Info "Check OS version..."
   Check_System_Version && Echo_Ok
 
