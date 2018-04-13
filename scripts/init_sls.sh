@@ -235,7 +235,7 @@ echo "" > /etc/salt/roster
     echo -e -n "."
     uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
     [ ! -z $uuid ] && (
-      Write_Sls_File reg-uuid "$uuid" /srv/pillar
+      Write_Sls_File reg-uuid "$uuid"
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done
