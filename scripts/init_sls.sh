@@ -239,8 +239,8 @@ echo "" > /etc/salt/roster
   Echo_Info "Waiting to start salt."
   for ((i=1;i<=10;i++ )); do
     echo -e -n "."
-    sleep 3
-    uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+    sleep 1
+    uuid=$(timeout 3 salt "*" grains.get uuid | grep '-' | awk '{print $1}')
     [ ! -z $uuid ] && (
       Write_Sls_File reg-uuid "$uuid"
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
