@@ -1,11 +1,11 @@
 pull_cfssl_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl') }}
-    - unless: docker inspect rainbond/cfssl
+    - name: docker pull {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl:dev') }}
+    - unless: docker inspect rainbond/cfssl:dev
 
 check_or_create_certificates:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl') }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl:dev') }} kip {{ pillar['inet-ip'] }}
     - unless:
       - ls /srv/salt/kubernetes/server/install/ssl/*.pem
       - ls /srv/salt/kubernetes/server/install/ssl/*.csr
@@ -14,12 +14,12 @@ check_or_create_certificates:
 
 pull_kubecfg_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg') }}
-    - unless: docker inspect rainbond/kubecfg
+    - name: docker pull {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg:dev') }}
+    - unless: docker inspect rainbond/kubecfg:dev
 
 check_or_create_kubeconfig:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg') }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg:dev') }}
     - unless: ls /srv/salt/kubernetes/server/install/kubecfg/*.kubeconfig
     - require:
       - cmd: pull_kubecfg_image

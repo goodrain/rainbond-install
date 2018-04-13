@@ -13,7 +13,7 @@ services:
     - RECORD_4=config.goodrain.me:172.30.42.1
     - RECORD_5=console.goodrain.me:172.30.42.1
     - RECORD_6=region.goodrain.me:172.30.42.1
-    - RECORD_7=kubeapi.goodrain.me:172.30.42.1
+    - RECORD_7=kubeapi.goodrain.me:{{ pillar['inet-ip'] }}
     - RECORD_8=download.goodrain.me:172.30.42.1
     logging:
       driver: json-file

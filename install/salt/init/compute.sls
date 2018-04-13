@@ -10,3 +10,17 @@ update_local_pkg_cache:
   cmd.run:
     - name: apt update -y
 {% endif %} 
+install_req_pkgs:
+  pkg.installed:
+    - pkgs:
+      - ntpdate
+      - lsof
+      - htop 
+      - nload 
+      - rsync 
+      - net-tools
+    - refresh: true
+
+update_time:
+  cmd.run:
+    - name: ntpdate 0.cn.pool.ntp.org
