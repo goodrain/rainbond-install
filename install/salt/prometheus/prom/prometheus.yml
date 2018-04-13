@@ -35,7 +35,7 @@ scrape_configs:
 
   metrics_path: '/app/metrics'
   static_configs:
-  - targets: ['10.0.55.73:6100']
+  - targets: ['127.0.0.1:6100']
     labels:
       datacenter: cloudbang
 
