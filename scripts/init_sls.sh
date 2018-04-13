@@ -186,16 +186,23 @@ run(){
 # Return : 0|!0
 Install_Salt(){
   # check salt service
-  [ $(systemctl  is-active salt-master) == "active" ] && systemctl  stop salt-master
-  [ $(systemctl  is-active salt-minion) == "active" ] && systemctl  stop salt-minion
+  Echo_Info "Checking salt ..."
+  [ $SALT_MASTER_RUNNING ] && systemctl stop salt-master
+  [ $SALT_MINION_RUNNING ] && systemctl stop salt-minion
 
-  # install salt without run
-  ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
-  || Echo_Error "Failed to install salt!"
+  # check and install salt 
+  if [ ! $SALT_MASTER_INSTALLED ] || [ ! $SALT_MINION_INSTALLED ] || [ ! $SALT_SSH_INSTALLED ];then
+    # update repo mate
+    Echo_Info "Installing salt ..."
+    Cache_PKG
 
-  Install_PKG "salt-ssh"
+    # install salt
+    Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \
+    || Echo_Error "Failed to install salt,see ${LOG_DIR}/${SALT_LOG} for more information."
+  fi
 
-  inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
+  inet_ip=$(Read_Sls_File "inet-ip" )
+
     # auto accept
 cat > /etc/salt/master.d/master.conf <<END
 interface: ${inet_ip}
@@ -231,17 +238,14 @@ echo "" > /etc/salt/roster
 
   Echo_Info "Waiting to start salt."
   for ((i=1;i<=10;i++ )); do
-    sleep 3
     echo -e -n "."
+    sleep 3
     uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
     [ ! -z $uuid ] && (
       Write_Sls_File reg-uuid "$uuid"
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done
-  
-  
-  
 }
 
 
@@ -257,7 +261,7 @@ Write_Config && Echo_Ok
 Echo_Info "Init config ..."
 run && Echo_Ok
 
-Echo_Info "Installing salt ..."
+# config salt
 Install_Salt && Echo_Ok
 
 Echo_Info "REG Check info ..."

@@ -38,7 +38,7 @@ pkg(){
 
     else
         apt update -q
-        apt install -y -q git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd
+        apt install -y -q git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd apt-transport-https
 
     fi
     echo "update localtime"

@@ -2,10 +2,11 @@
 
 [[ $DEBUG ]] && set -x
 
-# set env
+# ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_VER="stable 2017.7.4"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
+SALT_PKGS="salt-master salt-minion salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
 STORAGE_PATH="/grdata"
@@ -59,13 +60,40 @@ if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
+    PKG_BIN="rpm -qi"
+    # centos salt repo
+    cat > /etc/yum.repos.d/saltstack.repo << END
+[saltstack]
+name=SaltStack archive/2017.7.4 Release Channel for RHEL/CentOS $releasever
+baseurl=https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.4/
+        https://mirrors.tuna.tsinghua.edu.cn/saltstack/yum/redhat/7/\$basearch/archive/2017.7.5/
+skip_if_unavailable=True
+gpgcheck=0
+enabled=1
+enabled_metadata=1
+END
+
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt"
+    PKG_BIN="dpkg -l"
+    # debian salt repo
+    cat > /etc/apt/sources.list.d/saltstack.list << END
+deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
+deb https://mirrors.tuna.tsinghua.edu.cn/saltstack/apt/debian/9/amd64/2017.7 stretch main
+END
 fi
 
+SALT_MASTER_INSTALLED=$($PKG_BIN salt-master > /dev/null 2>&1 && echo 0)
+SALT_MASTER_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
 
+SALT_MINION_INSTALLED=$($PKG_BIN salt-minion > /dev/null 2>&1 && echo 0)
+SALT_MINION_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
+
+SALT_SSH_INSTALLED=$($PKG_BIN salt-ssh > /dev/null 2>&1 && echo 0)
+
+#======================= Global Functions =============================
 which_cmd() {
     which "${1}" 2>/dev/null || \
         command -v "${1}" 2>/dev/null
@@ -243,16 +271,15 @@ Install_PKG(){
 
 Cache_PKG(){
     if [ "$SYS_NAME" == "centos" ];then
-        yum makecache
+        yum makecache -q
     else
-        apt update -y
+        apt update -y -q
     fi
 }
 
 
 # Name   : Write_Sls_File
-# Args   : key
-# Return : value
+# Args   : key,valume,(path)
 Write_Sls_File(){
   key=$1
   value=$2
@@ -263,4 +290,13 @@ Write_Sls_File(){
   fi
   
   echo "$key: $value" >> $path/system_info.sls
+}
+
+# Name   : Read_Sls_File
+# Args   : key,(path)
+# Return : volume
+Read_Sls_File(){
+    key=$1
+    path=${2:-$PILLAR_DIR}
+    grep $key ${path}/system_info.sls | awk '{print $2}'
 }
