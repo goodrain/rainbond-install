@@ -211,6 +211,10 @@ END
 cat > /etc/salt/minion.d/minion.conf <<EOF
 master: ${inet_ip}
 id: $(hostname)
+# The level of log record messages to send to the console.
+log_level: error
+# The level of messages to send to the log file.
+log_level_logfile: debug
 EOF
 
 echo "" > /etc/salt/roster
