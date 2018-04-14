@@ -10,7 +10,6 @@ install/salt/key/
 
 # etcd
 install/salt/etcd/install/bin/
-install/salt/etcd/install/scripts/start-proxy.sh
 install/salt/etcd/install/systemd/petcd.service
 
 # .MD
