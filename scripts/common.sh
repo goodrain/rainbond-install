@@ -64,15 +64,15 @@ if [ "$SYS_NAME" == "centos" ];then
     # centos salt repo
     cat > /etc/yum.repos.d/saltstack.repo << END
 [saltstack]
-name=SaltStack archive/2017.7.4 Release Channel for RHEL/CentOS $releasever
-baseurl=https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.4/
+name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
+baseurl=https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
         https://mirrors.tuna.tsinghua.edu.cn/saltstack/yum/redhat/7/\$basearch/archive/2017.7.5/
 skip_if_unavailable=True
 gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
-
+    yum makecache -q -y
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
