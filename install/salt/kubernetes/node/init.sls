@@ -25,7 +25,7 @@ k8s-conf:
     - makedirs: Ture
     - template: jinja
 
-{% if "manage" in grains['host'] %}
+{% if "compute" in grains['id'] %}
 kubelet-ssl-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl
@@ -71,23 +71,39 @@ cp-bin-kubelet:
     - mode: 755
     - user: root
 
-image-pull:
+{% if grains['id'] == 'manage01' %}
+
+pull-pause-img:
+  cmd.run:
+    - name: docker pull rainbond/pause-amd64:3.0
+    - unless: docker inspect rainbond/pause-amd64:3.0
+
+rename-pause-img:
   cmd.run: 
-    - name: docker pull rainbond/pause-amd64:3.0 && docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
-    - unless: docker pull goodrain.me/pause-amd64:3.0
+    - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
+    - unless: docker inspect goodrain.me/pause-amd64:3.0
+    - require:
+      - cmd: pull-pause-img
+{% else %}
+pull-pause-img:
+  cmd.run:
+    - name: docker pull goodrain.me/pause-amd64:3.0
+    - unless: docker inspect goodrain.me/pause-amd64:3.0
+{% endif %}
 
 kubelet:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart kubelet
     - watch:
-      - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kubelet.sh
-      - file: {{ pillar['rbd-path'] }}/cni/net.d
-      - cmd: image-pull
+      - file: kubelet-env
+      - file: kubelet-cni
+{% if grains['id'] == 'manage01' %}
+      - cmd: rename-pause-img
+{% endif %}
     - require:
       - file: kubelet-env
       - file: kubelet-cni
-      - cmd: image-pull
-  
-
+      - cmd: pull-pause-img
+{% if grains['id'] == 'manage01' %}
+      - cmd: rename-pause-img
+{% endif %}

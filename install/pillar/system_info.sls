@@ -1,5 +1,5 @@
 rbd-path: /opt/rainbond
-inet-ip: 172.16.0.169
+inet-ip: 172.16.0.172
 role: manage
 dns: 8.8.8.8
 host-uuid: xxxxxxx
@@ -10,4 +10,3 @@ rbd-tag: cloudbang
 manage:
   - ip: 172.16.0.169
   - ip: 172.16.0.170
-    

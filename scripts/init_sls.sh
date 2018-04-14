@@ -111,8 +111,8 @@ kubernetes(){
 cat > ${PILLAR_DIR}/kubernetes.sls <<EOF
 kubernetes:
   server:
-    cfssl_image: rainbond/cfssl
-    kubecfg_image: rainbond/kubecfg
+    cfssl_image: rainbond/cfssl:dev
+    kubecfg_image: rainbond/kubecfg:dev
     api_image: rainbond/kube-apiserver:v1.6.4
     manager: rainbond/kube-controller-manager:v1.6.4
     schedule: rainbond/kube-scheduler:v1.6.4
@@ -186,16 +186,23 @@ run(){
 # Return : 0|!0
 Install_Salt(){
   # check salt service
-  [ $(systemctl  is-active salt-master) == "active" ] && systemctl  stop salt-master
-  [ $(systemctl  is-active salt-minion) == "active" ] && systemctl  stop salt-minion
+  Echo_Info "Checking salt ..."
+  [ $SALT_MASTER_RUNNING ] && systemctl stop salt-master
+  [ $SALT_MINION_RUNNING ] && systemctl stop salt-minion
 
-  # install salt without run
-  ./scripts/bootstrap-salt.sh  -M -X -R $SALT_REPO  $SALT_VER 2>&1 > ${LOG_DIR}/${SALT_LOG} \
-  || Echo_Error "Failed to install salt!"
+  # check and install salt 
+  if [ ! $SALT_MASTER_INSTALLED ] || [ ! $SALT_MINION_INSTALLED ] || [ ! $SALT_SSH_INSTALLED ];then
+    # update repo mate
+    Echo_Info "Installing salt ..."
+    Cache_PKG
 
-  Install_PKG "salt-ssh"
+    # install salt
+    Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \
+    || Echo_Error "Failed to install salt,see ${LOG_DIR}/${SALT_LOG} for more information."
+  fi
 
-  inet_ip=$(grep inet-ip $PILLAR_DIR/system_info.sls | awk '{print $2}')
+  inet_ip=$(Read_Sls_File "inet-ip" )
+
     # auto accept
 cat > /etc/salt/master.d/master.conf <<END
 interface: ${inet_ip}
@@ -211,7 +218,13 @@ END
 cat > /etc/salt/minion.d/minion.conf <<EOF
 master: ${inet_ip}
 id: $(hostname)
+# The level of log record messages to send to the console.
+log_level: error
+# The level of messages to send to the log file.
+log_level_logfile: debug
 EOF
+
+echo "" > /etc/salt/roster
 
   [ -d /srv/salt ] && rm /srv/salt -rf
   [ -d /srv/pillar ] && rm /srv/pillar -rf
@@ -225,17 +238,14 @@ EOF
 
   Echo_Info "Waiting to start salt."
   for ((i=1;i<=10;i++ )); do
-    sleep 3
     echo -e -n "."
-    uuid=$(salt "*" grains.get uuid | grep '-' | awk '{print $1}')
+    sleep 1
+    uuid=$(timeout 3 salt "*" grains.get uuid | grep '-' | awk '{print $1}')
     [ ! -z $uuid ] && (
-      Write_Sls_File reg-uuid "$uuid" /srv/pillar
+      Write_Sls_File reg-uuid "$uuid"
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done
-  
-  
-  
 }
 
 
@@ -251,7 +261,7 @@ Write_Config && Echo_Ok
 Echo_Info "Init config ..."
 run && Echo_Ok
 
-Echo_Info "Installing salt ..."
+# config salt
 Install_Salt && Echo_Ok
 
 Echo_Info "REG Check info ..."

@@ -1,6 +1,7 @@
 pull-calico-image:
   cmd.run:
     - name: docker pull {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
+    - unless: docker inspect {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
 
 calico-env:
   file.managed:
@@ -32,11 +33,9 @@ calico-script:
 calico:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart calico
     - watch:
-      - file: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
+      - file: calico-script
+      - file: calico-env
       - cmd: pull-calico-image
     - require:
       - file: /etc/systemd/system/calico.service

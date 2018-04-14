@@ -1,14 +1,17 @@
 pull_api_image:
   cmd.run:
     - name: docker pull {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
+    - unless: docker inspect {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
 
 pull_manager_image:
   cmd.run:
     - name: docker pull {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
+    - unless: docker inspect {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
 
 pull_schedule_image:
   cmd.run:
     - name: docker pull {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
+    - unless: docker inspect {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
 
 k8s-api-script:
   file.managed:
@@ -80,10 +83,8 @@ kube-cfg-rsync:
 kube-apiserver:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart kube-apiserver
     - watch:
-      - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-apiserver.sh
+      - file: k8s-api-script
       - cmd: pull_api_image
     - require:
       - file: k8s-api-script
@@ -92,10 +93,8 @@ kube-apiserver:
 kube-controller-manager:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart kube-controller-manager
     - watch:
-      - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-controller-manager.sh
+      - file: k8s-manager-script
       - cmd: pull_manager_image
     - require:
       - file: k8s-manager-script
@@ -105,10 +104,8 @@ kube-controller-manager:
 kube-scheduler:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart kube-scheduler
     - watch:
-      - file: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-scheduler.sh
+      - file: k8s-scheduler-script
       - cmd: pull_schedule_image
     - require:
       - file: k8s-scheduler-script

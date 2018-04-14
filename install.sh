@@ -38,7 +38,7 @@ pkg(){
 
     else
         apt update -q
-        apt install -y -q git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd
+        apt install -y -q git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd apt-transport-https
 
     fi
     echo "update localtime"
@@ -48,7 +48,13 @@ pkg(){
 run(){
     pkg
     [ -d "$PWD/rainbond-install" ] && rm -rf $PWD/rainbond-install
-    git clone --depth 1 ${REPO_URL}
+    
+    if [ "$1" == "dev" ];then
+        git clone --depth 1 -b dev ${REPO_URL}
+    else
+        git clone --depth 1 ${REPO_URL}
+    fi
+    
     cd rainbond-install
     if [[ $1 == "help" ]];then
         ./setup.sh

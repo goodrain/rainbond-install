@@ -1,0 +1,8 @@
+{
+    "Kubernets": {
+        "Master": "http://127.0.0.1:8181"
+    },
+    "RegionAPI": {
+        "URL": "http://region.goodrain.me:8888"
+    }
+}

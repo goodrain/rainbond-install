@@ -22,16 +22,25 @@ Check_Internet(){
 }
 
 
-# Name   : check docker 
+# Name   : Check_Plugins 
 # Args   : NULL
 # Return : 0|!0
-Check_Docker(){
+Check_Plugins(){
   if $(which docker >/dev/null 2>&1);then
     Echo_Error "Rainbond integrated customized docker, Please uninstall it first."
   else
     return 0
   fi
+  # 检查端口是否被占用
+  need_ports="53 80 443 2379 2380 3306 4001 6060 6100 6443 7070 8181 9999"
+  for need_port in $need_ports
+  do
+    (netstat -tulnp | grep "\b$need_port\b") && Echo_Error "The port $need_port has been occupied"
+  done
 }
+
+
+
 
 
 # Name   : Check_System_Version
@@ -129,14 +138,13 @@ Get_Hardware_Info(){
 )
 
 
-
 if [ "$1" != "force" ];then
 
   Echo_Info "Checking internet connect ..."
   Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
 
   Echo_Info "Check system environment..."
-  Check_Docker && Echo_Ok
+  Check_Plugins && Echo_Ok
 
   Echo_Info "Check OS version..."
   Check_System_Version && Echo_Ok

@@ -14,18 +14,14 @@ Support for:
 
 Plugins Version:
 
-- System OS:
-    - Debian 9
-    - Ubuntu 16.04
-    - Centos 7.x (Centos 7.3)
+- [Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution)
 - [Kubernetes v1.6.4](https://github.com/goodrain/kubernetes)
 - [Docker v1.12.6](https://github.com/goodrain/moby)
 - Calico v2.4.1
 - Etcd v3.2.13
 - [Rainbond Core Plugins v3.5](https://github.com/goodrain/rainbond)
 - [Rainbond UI v3.5](https://github.com/goodrain/rainbond-ui)
-- Salt v2017.7.4
-
+- Salt v2017.7.5
 
 ## Documentation
 
@@ -35,12 +31,12 @@ Plugins Version:
 
 ```
 # stable 
-wget https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
+curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
 chmod +x install.sh 
 ./install.sh
 
 # dev
-wget https://raw.githubusercontent.com/goodrain/rainbond-install/dev/install.sh
+curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/dev/install.sh
 chmod +x install.sh
 ./install.sh dev
 ```

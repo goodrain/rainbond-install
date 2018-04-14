@@ -1,0 +1,5 @@
+#!/bin/bash
+
+service_name=$1
+
+dc-compose ps | grep $service_name | grep Up

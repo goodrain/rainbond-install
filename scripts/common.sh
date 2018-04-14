@@ -2,10 +2,11 @@
 
 [[ $DEBUG ]] && set -x
 
-# set env
+# ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_VER="stable 2017.7.4"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
+SALT_PKGS="salt-master salt-minion salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
 STORAGE_PATH="/grdata"
@@ -33,6 +34,16 @@ proxy \
 prometheus \
 kubernetes.node"
 
+COMPUTE_MODULES="init \
+storage \
+grbase.dns \
+docker \
+misc \
+etcd \
+network \
+node \
+kubernetes.node"
+
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 
@@ -49,13 +60,40 @@ if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
+    PKG_BIN="rpm -qi"
+    # centos salt repo
+    cat > /etc/yum.repos.d/saltstack.repo << END
+[saltstack]
+name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
+baseurl=https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
+        https://mirrors.tuna.tsinghua.edu.cn/saltstack/yum/redhat/7/\$basearch/archive/2017.7.5/
+skip_if_unavailable=True
+gpgcheck=0
+enabled=1
+enabled_metadata=1
+END
+    yum makecache -q -y
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt"
+    PKG_BIN="dpkg -l"
+    # debian salt repo
+    cat > /etc/apt/sources.list.d/saltstack.list << END
+deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
+deb https://mirrors.tuna.tsinghua.edu.cn/saltstack/apt/debian/9/amd64/2017.7 stretch main
+END
 fi
 
+SALT_MASTER_INSTALLED=$($PKG_BIN salt-master > /dev/null 2>&1 && echo 0)
+SALT_MASTER_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
 
+SALT_MINION_INSTALLED=$($PKG_BIN salt-minion > /dev/null 2>&1 && echo 0)
+SALT_MINION_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
+
+SALT_SSH_INSTALLED=$($PKG_BIN salt-ssh > /dev/null 2>&1 && echo 0)
+
+#======================= Global Functions =============================
 which_cmd() {
     which "${1}" 2>/dev/null || \
         command -v "${1}" 2>/dev/null
@@ -131,6 +169,10 @@ Echo_Error() {
     exit 1
 }
 
+Echo_EXIST() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} EXIST ${TPUT_RESET} ${*} \n\n"
+}
+
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
 #          NAME:  Echo_Info
 #   DESCRIPTION:  Echo information to stdout.
@@ -178,14 +220,14 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$(cat /srv/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
+    uid=$(cat ./install/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
+    iip=$(cat ./install/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$(cat /srv/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat /srv/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
+    uid=$(cat ./install/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
+    iip=$(cat ./install/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
     domain=$(cat /srv/pillar/system_info.sls | grep domain | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
 }
@@ -193,7 +235,7 @@ REG_Status(){
 # Name     : Check_net_card
 # Args     : $1=network config file,$2=ipaddress,$3=dnsinfo
 # Return   : 
-function Check_net_card(){
+Check_net_card(){
   net_file=$1
   ipaddr=$2
   
@@ -213,7 +255,7 @@ function Check_net_card(){
   fi
 }
 
-function Write_Host(){
+Write_Host(){
     ipaddr=$1
     name=${2:-null}
     if (grep $name /etc/hosts);then
@@ -222,15 +264,22 @@ function Write_Host(){
     echo -e "$ipaddr\t$name" >> /etc/hosts
 }
 
-function Install_PKG(){
+Install_PKG(){
     pkg_name=$1
     $INSTALL_BIN install -y -q $pkg_name
 }
 
+Cache_PKG(){
+    if [ "$SYS_NAME" == "centos" ];then
+        yum makecache -q
+    else
+        apt update -y -q
+    fi
+}
+
 
 # Name   : Write_Sls_File
-# Args   : key
-# Return : value
+# Args   : key,valume,(path)
 Write_Sls_File(){
   key=$1
   value=$2
@@ -241,4 +290,13 @@ Write_Sls_File(){
   fi
   
   echo "$key: $value" >> $path/system_info.sls
+}
+
+# Name   : Read_Sls_File
+# Args   : key,(path)
+# Return : volume
+Read_Sls_File(){
+    key=$1
+    path=${2:-$PILLAR_DIR}
+    grep $key ${path}/system_info.sls | awk '{print $2}'
 }

@@ -38,6 +38,12 @@ gr-docker-engine:
     - refresh: True
     - require:
       - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+  {% if grains['os_family']|lower == 'redhat' %}
+    - unless: rpm -qa | grep gr-docker-engine
+  {% else %}
+    - unless: dpkg -l | grep gr-docker-engine
+  {% endif %}
+  
   file.managed:
     - source: salt://docker/envs/docker.service
     - name: /usr/lib/systemd/system/docker.service
@@ -52,10 +58,6 @@ gr-docker-engine:
       - file: /usr/lib/systemd/system/docker.service
       - pkg: gr-docker-engine
 
-dps:
-    cmd.run:
-      - name: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock rainbond/archiver gr-docker-utils
-      - unless: which dps
 
 install-docker-compose:
   file.managed:

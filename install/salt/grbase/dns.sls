@@ -1,12 +1,16 @@
-{% if "manage" in grains['host'] %}
+{% if "manage" in grains['id'] %}
 docker-pull-dns-image:
   cmd.run:
     - name: docker pull rainbond/rbd-dns:{{ pillar["rbd-version"] }}
+    - unless: docker inspect rainbond/rbd-dns:{{ pillar["rbd-version"] }}
 
 dns-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-dns
-    - unless: docker images | grep rainbond/rbd-dns:{{ pillar["rbd-version"] }}
+    - require:
+      - cmd: docker-pull-dns-image
+    - onchanges:
+      - cmd: docker-pull-dns-image
 
 {% endif %}
 
@@ -17,22 +21,22 @@ update-resolv:
     - backup: minion
     - template: jinja
 
+{% if "manage" in grains['id'] %}
+
 restart-docker:
   cmd.run:
     - name: systemctl restart docker
+    - onchanges:
+      - file: update-resolv
     - onlyif: dc-compose stop
 
-{% if "manage" in grains['host'] %}
-
-dns-restart:
+waiting_for_dns:
   cmd.run:
-    - name: dc-compose up -d rbd-dns
-    - unless: dps | grep rbd-dns
-    - require:
-      - cmd: restart-docker
+    - name: checkdns lang.goodrain.me
+    - retry:
+        attempts: 20
+        until: True
+        interval: 3
+        splay: 3
 
 {% endif %}
-
-
-
-

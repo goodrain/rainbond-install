@@ -3,6 +3,7 @@
 pull-etcd-image:
   cmd.run:
     - name: docker pull {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
+    - unless: docker inspect {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
 
 etcd-env:
   file.managed:
@@ -34,11 +35,9 @@ etcd-script:
 etcd:
   service.running:
     - enable: True
-  cmd.run:
-    - name: systemctl restart etcd
     - watch:
-      - file: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
+      - file: etcd-script
+      - file: etcd-env
       - cmd: pull-etcd-image
     - require:
       - file: /etc/systemd/system/etcd.service
