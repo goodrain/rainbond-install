@@ -7,7 +7,7 @@ services:
     - KUBEURL=http://127.0.0.1:8181
     - FORWARD={{ pillar['dns'] }},114.114.114.114
     - SKYDNS_DOMAIN=goodrain.me
-    - RECORD_1=goodrain.me:172.30.42.1
+    - RECORD_1=goodrain.me:{{ pillar['inet-ip'] }}
     - RECORD_2=lang.goodrain.me:172.30.42.1
     - RECORD_3=maven.goodrain.me:172.30.42.1
     - RECORD_4=config.goodrain.me:172.30.42.1

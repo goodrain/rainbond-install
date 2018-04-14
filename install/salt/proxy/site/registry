@@ -7,7 +7,7 @@ upstream registry {
 }
 
 server {
-    listen       172.30.42.1:443;
+    listen       443;
     server_name  goodrain.me;
 
     ssl          on;
