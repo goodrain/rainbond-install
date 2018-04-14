@@ -71,6 +71,8 @@ cp-bin-kubelet:
     - mode: 755
     - user: root
 
+{% if grains['id'] == 'manage01' %}
+
 pull-pause-img:
   cmd.run:
     - name: docker pull rainbond/pause-amd64:3.0
@@ -82,6 +84,12 @@ rename-pause-img:
     - unless: docker inspect goodrain.me/pause-amd64:3.0
     - require:
       - cmd: pull-pause-img
+{% else %}
+pull-pause-img:
+  cmd.run:
+    - name: docker pull goodrain.me/pause-amd64:3.0
+    - unless: docker inspect goodrain.me/pause-amd64:3.0
+{% endif %}
 
 kubelet:
   service.running:
@@ -89,11 +97,13 @@ kubelet:
     - watch:
       - file: kubelet-env
       - file: kubelet-cni
+{% if grains['id'] == 'manage01' %}
       - cmd: rename-pause-img
+{% endif %}
     - require:
       - file: kubelet-env
       - file: kubelet-cni
       - cmd: pull-pause-img
+{% if grains['id'] == 'manage01' %}
       - cmd: rename-pause-img
-  
-
+{% endif %}
