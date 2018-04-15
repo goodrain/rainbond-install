@@ -25,6 +25,9 @@ Plugins Version:
 
 ## Documentation
 
+> Please read [Select-Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution) before installation.
+
+
 #### Install
 
 - Quick start
