@@ -14,9 +14,6 @@ write_fstab:
     - unless: grep "/grdata" /etc/fstab
 
 automount:
-    cmd.run:
-      - name: mount /grdata
-      - unless: ls /grdata/services
-
-
-    
+  cmd.run:
+    - name: mount /grdata
+    - unless: ls /grdata/services
