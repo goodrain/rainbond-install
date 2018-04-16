@@ -145,12 +145,5 @@
 /grdata:
   file.directory:
    - name: /grdata
-   - user: root
-   - group: root
    - mode: 755
    - makedirs: Ture
-   - recurse:
-     - user
-     - group
-
-
