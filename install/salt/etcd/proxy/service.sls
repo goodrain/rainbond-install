@@ -34,10 +34,14 @@ etcd-proxy-script:
 etcd-proxy:
   service.running:
     - enable: True
-    - reload: True
     - watch:
       - file: {{ pillar['rbd-path'] }}/petcd/scripts/start.sh
       - file: {{ pillar['rbd-path'] }}/etc/envs/petcd.sh
+      - cmd: pull-etcd-proxy-image
+    - require:
+      - file: /etc/systemd/system/etcd-proxy.service
+      - file: etcd-proxy-script
+      - file: etcd-proxy-env
       - cmd: pull-etcd-proxy-image
 
 {% endif %}
