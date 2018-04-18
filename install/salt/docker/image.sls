@@ -21,7 +21,7 @@ update_systeminfo:
 check_domain:
   cmd.run:
     - name:  echo "domain not found"
-    - unless: grep "domain" /srv/pillar/system_info.sls
+    - unless: grep "domain" /srv/pillar/goodrain.sls
 
 refresh_domain:
   cmd.run:
