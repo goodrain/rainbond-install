@@ -72,7 +72,7 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
-    yum makecache -q -y
+    yum makecache fast -q -y
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
@@ -271,7 +271,7 @@ Install_PKG(){
 
 Cache_PKG(){
     if [ "$SYS_NAME" == "centos" ];then
-        yum makecache -q
+        yum makecache fast -q
     else
         apt update -y -q
     fi

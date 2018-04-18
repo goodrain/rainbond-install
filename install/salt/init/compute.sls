@@ -4,7 +4,7 @@ update_compute_hostname:
 {% if grains['os_family']|lower == 'redhat' %}
 update_local_pkg_cache:
   cmd.run:
-    - name: yum makecache
+    - name: yum makecache fast
 {% else %}
 update_local_pkg_cache:
   cmd.run:
