@@ -220,15 +220,15 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$(cat ./install/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat ./install/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
+    uid=$(cat ./install/pillar/goodrain.sls | grep reg-uuid | awk '{print $2}')
+    iip=$(cat ./install/pillar/goodrain.sls | grep inet-ip | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$(cat ./install/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat ./install/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
-    domain=$(cat /srv/pillar/system_info.sls | grep domain | awk '{print $2}')
+    uid=$(cat ./install/pillar/goodrain.sls | grep reg-uuid | awk '{print $2}')
+    iip=$(cat ./install/pillar/goodrain.sls | grep inet-ip | awk '{print $2}')
+    domain=$(cat /srv/pillar/goodrain.sls | grep domain | awk '{print $2}')
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
 }
 
@@ -284,12 +284,12 @@ Write_Sls_File(){
   key=$1
   value=$2
   path=${3:-$PILLAR_DIR}
-  hasKey=$(grep $key $path/system_info.sls)
+  hasKey=$(grep $key $path/goodrain.sls)
   if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $path/system_info.sls
+    sed -i -e "/$key/d" $path/goodrain.sls
   fi
   
-  echo "$key: $value" >> $path/system_info.sls
+  echo "$key: $value" >> $path/goodrain.sls
 }
 
 # Name   : Read_Sls_File
@@ -298,7 +298,7 @@ Write_Sls_File(){
 Read_Sls_File(){
     key=$1
     path=${2:-$PILLAR_DIR}
-    grep $key ${path}/system_info.sls | awk '{print $2}'
+    grep $key ${path}/goodrain.sls | awk '{print $2}'
 }
 
 

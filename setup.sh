@@ -17,7 +17,7 @@
 
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
 [ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
-[ ! -f $PILLAR_DIR/system_info.sls ] && touch $PILLAR_DIR/system_info.sls
+[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls
 
  # trap program exit
 trap 'Quit_Clear; exit' QUIT TERM EXIT
