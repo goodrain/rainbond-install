@@ -1,15 +1,9 @@
 docker-envs:
   file.managed:
-    {% if grains['os_family']|lower == 'redhat' and grains['osrelease_info'][1] == 4 %}
-    - source: salt://docker/envs/docker-patch.sh
-    {% else %}
     - source: salt://docker/envs/docker.sh
-    {% endif %}
     - name: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
     - template: jinja
     - makedirs: Ture
-    - mode: 644
-    - user: root
 
 docker-mirrors:
   file.managed:
