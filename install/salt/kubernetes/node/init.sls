@@ -25,7 +25,6 @@ k8s-conf:
     - makedirs: Ture
     - template: jinja
 
-{% if "compute" in grains['id'] %}
 kubelet-ssl-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl
@@ -36,7 +35,7 @@ kubelet-cfg-rsync:
     - source: salt://kubernetes/server/install/kubecfg
     - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg
 
-{% endif %}
+
 
 kubelet-cni:
   file.recurse:
@@ -96,13 +95,19 @@ kubelet:
     - enable: True
     - watch:
       - file: kubelet-env
+      - file: k8s-conf
       - file: kubelet-cni
+      - file: kubelet-ssl-rsync
+      - file: kubelet-cfg-rsync
 {% if grains['id'] == 'manage01' %}
       - cmd: rename-pause-img
 {% endif %}
     - require:
       - file: kubelet-env
+      - file: k8s-conf
       - file: kubelet-cni
+      - file: kubelet-ssl-rsync
+      - file: kubelet-cfg-rsync
       - cmd: pull-pause-img
 {% if grains['id'] == 'manage01' %}
       - cmd: rename-pause-img
