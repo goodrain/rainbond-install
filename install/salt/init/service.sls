@@ -25,3 +25,4 @@ NetworkManager:
 iptables:
   cmd.run:
     - name: iptables -F;iptables -X;iptables -Z
+    - unless: iptables -L -nv  | grep DOCKER

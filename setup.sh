@@ -19,6 +19,9 @@
 [ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
 [ ! -f $PILLAR_DIR/system_info.sls ] && touch $PILLAR_DIR/system_info.sls
 
+ # trap program exit
+trap 'Quit_Clear; exit' QUIT TERM EXIT
+
 clear
 
 # -----------------------------------------------------------------------------

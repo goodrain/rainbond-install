@@ -300,3 +300,15 @@ Read_Sls_File(){
     path=${2:-$PILLAR_DIR}
     grep $key ${path}/system_info.sls | awk '{print $2}'
 }
+
+
+# Clear the job and data when  exit the program
+function Quit_Clear() {
+    echo -e "\e[31mQuit rainbond install program.\e[0m"
+    Echo_Info "Checking salt job ..."
+    saltjob=$(salt-run jobs.active --out=yaml | head -n 1| sed -e "s/'//g" -e 's/://')
+    if [ "$saltjob" != "{}" ];then
+        Echo_Info "Stop salt job ..."
+        salt '*' saltutil.term_job $saltjob && Echo_Ok
+     fi
+}

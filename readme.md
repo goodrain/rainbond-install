@@ -28,11 +28,11 @@ Plugins Version:
 > Please read [Select-Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution) before installation.
 
 
-#### Install
+### Install
 
 - Quick start
 
-```
+```Bash
 # stable 
 curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
 chmod +x install.sh 
@@ -46,7 +46,30 @@ chmod +x install.sh
 
 You can find all the documentation in the [Wiki](https://github.com/goodrain/rainbond-install/wiki).
 
-#### Usage
+### Add a compute node
+Through a script Which is "add_node.sh" to add a compute node.
+
+**Parameter**
+
+```
+-r <Role>,       Specify a node type <compute|manage> ,follow-up support management node.
+-i <IP>,         The ip address what you Specified node
+-p <Password>    The login password what you Specified node
+```
+
+**Usage**
+
+```Bash
+bash ./add_node.sh -r <compute|manage> -i <IP> -p <Password>
+```
+
+> **Such as:**
+>
+> ```Bash
+> bash ./add_node.sh -r compute -i 192.168.1.1 -p 123456
+> ```
+
+### Documents
 
 You can find all the documentation in the [Docs](https://www.rainbond.com/docs/stable/).
 
