@@ -344,5 +344,11 @@ function Quit_Clear() {
 
     Echo_Info "  Checking docker ..."
     Check_Service_State docker && systemctl stop docker && Echo_Ok
+
+    Echo_Info "  Clear rainbond data ..."
+    rbdpath=$(salt '*' pillar.item rbd-path --output=yaml | grep rbd-path | awk '{print $2}')
+    if [ "$rbdpath" != "" ];then
+        [ -d $rbdpath/data ] && rm -rf $rbdpath/data && Echo_Ok
+    fi
     
 }
