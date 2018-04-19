@@ -220,15 +220,15 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$(cat ./install/pillar/goodrain.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat ./install/pillar/goodrain.sls | grep inet-ip | awk '{print $2}')
+    uid=$( Read_Sls_File reg-uuid ./install/pillar/goodrain.sls )
+    iip=$( Read_Sls_File inet-ip ./install/pillar/goodrain.sls )
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$(cat ./install/pillar/goodrain.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat ./install/pillar/goodrain.sls | grep inet-ip | awk '{print $2}')
-    domain=$(cat /srv/pillar/goodrain.sls | grep domain | awk '{print $2}')
+    uid=$( Read_Sls_File reg-uuid ./install/pillar/goodrain.sls )
+    iip=$( Read_Sls_File inet-ip ./install/pillar/goodrain.sls )
+    domain=$( Read_Sls_File domain /srv/pillar/goodrain.sls )
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
 }
 

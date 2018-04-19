@@ -162,7 +162,7 @@ write_top(){
 cat > ${PILLAR_DIR}/top.sls <<EOF
 base:
   '*':
-    - system_info
+    - goodrain
     - etcd
     - network
     - kubernetes
