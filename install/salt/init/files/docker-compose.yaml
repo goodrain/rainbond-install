@@ -8,8 +8,8 @@ services:
     - FORWARD={{ pillar['dns'] }},114.114.114.114
     - SKYDNS_DOMAIN=goodrain.me
     - RECORD_1=goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_2=lang.goodrain.me:172.30.42.1
-    - RECORD_3=maven.goodrain.me:172.30.42.1
+    - RECORD_2=lang.goodrain.me:{{ pillar['inet-ip'] }}
+    - RECORD_3=maven.goodrain.me:{{ pillar['inet-ip'] }}
     - RECORD_4=config.goodrain.me:172.30.42.1
     - RECORD_5=console.goodrain.me:172.30.42.1
     - RECORD_6=region.goodrain.me:172.30.42.1
@@ -152,20 +152,6 @@ services:
     - /usr/local/bin/kubectl:/usr/bin/kubectl
     - /root/.kube:/root/.kube
     command: --hostIP={{ pillar['inet-ip'] }}
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-  rbd-proxy:
-    image: rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
-    container_name: rbd-proxy
-    volumes:
-    - {{ pillar['rbd-path'] }}/proxy/sites:/usr/local/tengine/conf/sites
-    - {{ pillar['rbd-path'] }}/proxy/ssl:/usr/local/tengine/conf/ssl
-    - /grdata:/grdata
     logging:
       driver: json-file
       options:

@@ -1,26 +1,3 @@
-docker-pull-proxy-image:
-  cmd.run:
-    - name: docker pull rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
-
-registry:
-  file.managed:
-    - source: salt://proxy/site/registry
-    - name: {{ pillar['rbd-path'] }}/proxy/sites/registry
-    - template: jinja
-    - makedirs: Ture
-
-ssl-config:
-  file.recurse:
-    - source: salt://proxy/ssl/goodrain.me
-    - name: {{ pillar['rbd-path'] }}/proxy/ssl/goodrain.me
-    - makedirs: Ture
-
-proxy-upstart:
-  cmd.run:
-    - name: dc-compose up -d rbd-proxy
-    - unless: check_compose rbd-proxy
-
 docker-pull-plugins:
   cmd.run:
     - name: docker pull rainbond/plugins:tcm
