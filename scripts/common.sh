@@ -313,7 +313,7 @@ Read_Sls_File(){
 
 
 # Clear the job and data when  exit the program
-function Quit_Clear() {
+function Exit_Clear() {
     echo -e "\e[31mQuit rainbond install program.\e[0m"
     Echo_Info "Restore dns configuration ..."
     [ -f /etc/resolv.conf.bak ] && \cp -f /etc/resolv.conf.bak /etc/resolv.conf && Echo_Ok

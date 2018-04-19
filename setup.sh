@@ -20,8 +20,7 @@
 [ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls
 
  # trap program exit
-trap 'Quit_Clear; exit' QUIT TERM EXIT
-
+trap 'Exit_Clear; exit' SIGINT SIGHUP
 clear
 
 # -----------------------------------------------------------------------------
