@@ -235,7 +235,7 @@ services:
     image: rainbond/rbd-repo:{{ pillar['rbd-version'] }}
     container_name: rbd-repo
     volumes:
-    - /grdata/services/artifactory5:/var/opt/jfrog/artifactory
+    - /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
     logging:
       driver: json-file
       options:
