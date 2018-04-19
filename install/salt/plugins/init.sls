@@ -6,8 +6,7 @@ docker-pull-worker-image:
 worker-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-worker
-    - onchanges:
-      - cmd: docker-pull-worker-image
+    - unless: check_compose rbd-worker
     - require:
       - cmd: docker-pull-worker-image
 
@@ -19,8 +18,7 @@ docker-pull-eventlog-image:
 eventlog-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-eventlog
-    - onchanges:
-      - cmd: docker-pull-eventlog-image
+    - unless: check_compose rbd-eventlog
     - require:
       - cmd: docker-pull-eventlog-image
 
@@ -32,8 +30,7 @@ docker-pull-entrance-image:
 entrance-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-entrance
-    - onchanges:
-      - cmd: docker-pull-entrance-image
+    - unless: check_compose rbd-entrance
     - require:
       - cmd: docker-pull-entrance-image
 
@@ -45,8 +42,7 @@ docker-pull-api-image:
 api-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-api
-    - onchanges:
-      - cmd: docker-pull-api-image
+    - unless: check_compose rbd-api
     - require:
       - cmd: docker-pull-api-image
 
@@ -58,8 +54,7 @@ docker-pull-chaos-image:
 chaos-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-chaos
-    - onchanges:
-      - cmd: docker-pull-chaos-image
+    - unless: check_compose rbd-chaos
     - require:
       - cmd: docker-pull-chaos-image
 
@@ -71,8 +66,7 @@ docker-pull-lb-image:
 lb-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-lb
-    - onchanges:
-      - cmd: docker-pull-lb-image
+    - unless: check_compose rbd-lb
     - require:
       - cmd: docker-pull-lb-image
 
@@ -94,8 +88,7 @@ docker-pull-mq-image:
 mq-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-mq
-    - onchanges:
-      - cmd: docker-pull-mq-image
+    - unless: check_compose rbd-mq
     - require:
       - cmd: docker-pull-mq-image
 
@@ -107,8 +100,7 @@ docker-pull-webcli-image:
 webcli-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-webcli
-    - onchanges:
-      - cmd: docker-pull-webcli-image
+    - unless: check_compose rbd-webcli
     - require:
       - cmd: docker-pull-webcli-image
 
@@ -127,8 +119,7 @@ app-ui-logs:
 app-ui-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-app-ui
-    - onchanges:
-      - cmd: docker-pull-app-ui-image
+    - unless: check_compose rbd-app-ui
     - require:
       - cmd: docker-pull-app-ui-image
 

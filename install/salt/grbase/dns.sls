@@ -7,12 +7,16 @@ docker-pull-dns-image:
 dns-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-dns
+    - unless: check_compose rbd-dns
     - require:
-      - cmd: docker-pull-dns-image
-    - onchanges:
       - cmd: docker-pull-dns-image
 
 {% endif %}
+
+backup-resolv:
+  cmd.run:
+    - name: cp /etc/resolv.conf /etc/resolv.conf.bak
+    - unless: test -f /etc/resolv.conf.bak
 
 update-resolv:
   file.managed:
@@ -20,6 +24,8 @@ update-resolv:
     - name: /etc/resolv.conf
     - backup: minion
     - template: jinja
+    - require:
+      - cmd: backup-resolv
 
 {% if "manage" in grains['id'] %}
 

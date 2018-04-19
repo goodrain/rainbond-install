@@ -26,8 +26,10 @@ Check_Internet(){
 # Args   : NULL
 # Return : 0|!0
 Check_Plugins(){
-  if $(which docker >/dev/null 2>&1);then
-    Echo_Error "Rainbond integrated customized docker, Please uninstall it first."
+  existDocker=$(docker -v | awk '{print $3$5}' 2>/dev/null)
+  
+  if [ "$existDocker" != "$DOCKER_VERSION" ];then
+    Echo_Error "Rainbond integrated customized docker, Please stop and uninstall it first."
   else
     return 0
   fi

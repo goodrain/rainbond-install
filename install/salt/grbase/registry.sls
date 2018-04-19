@@ -8,7 +8,6 @@ docker-pull-hub-image:
 hub-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-hub
-    - onchanges:
-      - cmd: docker-pull-hub-image
+    - unless: check_compose rbd-hub
     - require:
       - cmd: docker-pull-hub-image

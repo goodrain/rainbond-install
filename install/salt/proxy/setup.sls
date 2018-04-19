@@ -19,7 +19,7 @@ ssl-config:
 proxy-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-proxy
-    - unless: docker images | grep rainbond/rbd-proxy:{{ pillar['rbd-version'] }}
+    - unless: check_compose rbd-proxy
 
 docker-pull-plugins:
   cmd.run:

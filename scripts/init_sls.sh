@@ -187,8 +187,8 @@ run(){
 Install_Salt(){
   # check salt service
   Echo_Info "Checking salt ..."
-  [ $SALT_MASTER_RUNNING ] && systemctl stop salt-master
-  [ $SALT_MINION_RUNNING ] && systemctl stop salt-minion
+  Check_Service_State salt-master && systemctl stop salt-master
+  Check_Service_State salt-minion && systemctl stop salt-minion
 
   # check and install salt 
   if [ ! $SALT_MASTER_INSTALLED ] || [ ! $SALT_MINION_INSTALLED ] || [ ! $SALT_SSH_INSTALLED ];then

@@ -8,7 +8,6 @@ docker-pull-repo-image:
 repo-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-repo
-    - onchanges:
-      - cmd: docker-pull-repo-image
+    - unless: check_compose rbd-repo
     - require:
       - cmd: docker-pull-repo-image

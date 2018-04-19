@@ -6,7 +6,7 @@ docker-pull-db-image:
 db-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-db
-    - unless: dc-compose ps | grep rbd-db | grep -v Up
+    - unless: check_compose rbd-db
     - require:
       - cmd: docker-pull-db-image
 

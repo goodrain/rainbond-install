@@ -4,6 +4,7 @@
 
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
+DOCKER_VERSION="1.12.6,1526e3f"
 SALT_VER="stable 2017.7.4"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
 SALT_PKGS="salt-master salt-minion salt-ssh"
@@ -19,6 +20,8 @@ OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
+K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
+RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="init \
 storage \
 docker \
@@ -86,14 +89,21 @@ END
 fi
 
 SALT_MASTER_INSTALLED=$($PKG_BIN salt-master > /dev/null 2>&1 && echo 0)
-SALT_MASTER_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
-
 SALT_MINION_INSTALLED=$($PKG_BIN salt-minion > /dev/null 2>&1 && echo 0)
-SALT_MINION_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
-
 SALT_SSH_INSTALLED=$($PKG_BIN salt-ssh > /dev/null 2>&1 && echo 0)
 
+
+
 #======================= Global Functions =============================
+
+# Name   : Check service status
+# Arges  : Service name
+# Return : 0|!0 
+Check_Service_State(){
+    sname=$1
+    systemctl  is-active $sname > /dev/null 2>&1
+}
+
 which_cmd() {
     which "${1}" 2>/dev/null || \
         command -v "${1}" 2>/dev/null
@@ -305,10 +315,34 @@ Read_Sls_File(){
 # Clear the job and data when  exit the program
 function Quit_Clear() {
     echo -e "\e[31mQuit rainbond install program.\e[0m"
+    Echo_Info "Restore dns configuration ..."
+    [ -f /etc/resolv.conf.bak ] && \cp -f /etc/resolv.conf.bak /etc/resolv.conf && Echo_Ok
+
     Echo_Info "Checking salt job ..."
     saltjob=$(salt-run jobs.active --out=yaml | head -n 1| sed -e "s/'//g" -e 's/://')
     if [ "$saltjob" != "{}" ];then
         Echo_Info "Stop salt job ..."
         salt '*' saltutil.term_job $saltjob && Echo_Ok
-     fi
+    fi
+    Echo_Info "Terminate running services ..."
+    Echo_Info "  Checking k8s services ..."
+    for kservice in ${K8S_SERVICE[*]}
+    do
+        Check_Service_State $kservice && systemctl stop $kservice 
+    done
+
+    Echo_Info "  Checking rainbond services ..."
+    for rservice in ${RAINBOND_SERVICE[*]}
+    do
+        Check_Service_State $rservice && systemctl stop $rservice 
+    done
+    if $(which dc-compose > /dev/null 2>&1);then
+        if $(dc-compose ps > /dev/null 2>&1);then
+            dc-compose stop && cclear
+        fi
+    fi
+
+    Echo_Info "  Checking docker ..."
+    Check_Service_State docker && systemctl stop docker && Echo_Ok
+    
 }
