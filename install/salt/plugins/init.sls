@@ -1,3 +1,4 @@
+#==================== rbd-worker ====================
 docker-pull-worker-image:
   cmd.run:
     - name: docker pull rainbond/rbd-worker:{{ pillar['rbd-version'] }}
@@ -10,6 +11,7 @@ worker-upstart:
     - require:
       - cmd: docker-pull-worker-image
 
+#==================== rbd-eventlog ====================
 docker-pull-eventlog-image:
   cmd.run:
     - name: docker pull rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
@@ -22,6 +24,7 @@ eventlog-upstart:
     - require:
       - cmd: docker-pull-eventlog-image
 
+#==================== rbd-entrance ====================
 docker-pull-entrance-image:
   cmd.run:
     - name: docker pull rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
@@ -34,6 +37,7 @@ entrance-upstart:
     - require:
       - cmd: docker-pull-entrance-image
 
+#==================== rbd-api ====================
 docker-pull-api-image:
   cmd.run:
     - name: docker pull rainbond/rbd-api:{{ pillar['rbd-version'] }}
@@ -46,6 +50,7 @@ api-upstart:
     - require:
       - cmd: docker-pull-api-image
 
+#==================== rbd-chaos ====================
 docker-pull-chaos-image:
   cmd.run:
     - name: docker pull rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
@@ -58,6 +63,7 @@ chaos-upstart:
     - require:
       - cmd: docker-pull-chaos-image
 
+#==================== rbd-lb ====================
 docker-pull-lb-image:
   cmd.run:
     - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
@@ -85,16 +91,17 @@ lb-upstart:
       - file: proxy_site_conf
       - file: proxy_site_ssl
 
-check_forward:
-  file.managed:
-    - source: salt://plugins/data/forward.conf
-    - name: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
-    - makedirs: Ture
+lb-restart:
   cmd.run:
     - name: dc-compose restart rbd-lb
     - onchanges:
-      - file: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
-
+      - file: proxy_site_conf
+      - file: proxy_site_ssl
+    - require:
+      - cmd: docker-pull-lb-image
+      - file: proxy_site_conf
+      - file: proxy_site_ssl
+#==================== rbd-mq ======================
 docker-pull-mq-image:
   cmd.run:
     - name: docker pull rainbond/rbd-mq:{{ pillar['rbd-version'] }}
@@ -107,6 +114,7 @@ mq-upstart:
     - require:
       - cmd: docker-pull-mq-image
 
+#==================== rbd-webcli ====================
 docker-pull-webcli-image:
   cmd.run:
     - name: docker pull rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
@@ -119,6 +127,7 @@ webcli-upstart:
     - require:
       - cmd: docker-pull-webcli-image
 
+#==================== rbd-app-ui ====================
 docker-pull-app-ui-image:
   cmd.run:
     - name: docker pull rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
@@ -143,6 +152,8 @@ update-app-ui:
     - name: docker exec rbd-app-ui python /app/ui/manage.py migrate && docker exec rbd-db touch /data/.inited
     - unless: docker exec rbd-db ls /data/.inited
 
+
+#==================== init region db ====================
 {% if grains['host'] == "manage01" %}
 update_sql:
   file.managed:
