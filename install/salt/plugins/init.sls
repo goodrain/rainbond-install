@@ -63,12 +63,27 @@ docker-pull-lb-image:
     - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
     - unless: docker inspect rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
+proxy_site_conf:
+  file.managed:
+    - source: salt://plugins/data/proxy.conf
+    - name: {{ pillar['rbd-path'] }}/openresty/servers/http/proxy.conf
+    - template: jinja
+    - makedirs: Ture
+
+proxy_site_ssl:
+  file.recurse:
+    - source: salt://proxy/ssl/goodrain.me
+    - name: {{ pillar['rbd-path'] }}/openresty/ssl/goodrain.me
+    - makedirs: Ture
+
 lb-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-lb
     - unless: check_compose rbd-lb
     - require:
       - cmd: docker-pull-lb-image
+      - file: proxy_site_conf
+      - file: proxy_site_ssl
 
 check_forward:
   file.managed:
