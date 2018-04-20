@@ -19,6 +19,8 @@ Init_system(){
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
+  else
+    Write_Sls_File public-ip ""
   fi
 
   # reset /etc/hosts
