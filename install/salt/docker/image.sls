@@ -6,7 +6,11 @@ make_domain_prepare:
 
 make_domain:
   cmd.run:
+  {% if pillar['public-ip'] %}
+    - name: docker run  --rm -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['public-ip'] }}
+  {% else %}
     - name: docker run  --rm -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['inet-ip'] }}
+  {% endif %}
     - unless:  grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
 
 update_systeminfo:
