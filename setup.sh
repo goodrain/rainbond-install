@@ -36,7 +36,7 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
-        ./scripts/init_sls.sh && touch ./.inited
+        ./scripts/init_sls.sh && touch $INIT_FILE
     fi
 }
 
