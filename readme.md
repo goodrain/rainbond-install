@@ -34,12 +34,12 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# stable 
+# stable (master CentOS 7.3)
 curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
 chmod +x install.sh 
 ./install.sh
 
-# dev
+# dev (dev support CentOS 7.4)
 curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/dev/install.sh
 chmod +x install.sh
 ./install.sh dev
