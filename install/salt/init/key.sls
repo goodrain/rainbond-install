@@ -3,19 +3,19 @@
 {% if grains['id']  == 'manage01' %}
 key_build:
   cmd.run:
-    - name: ssh-keygen -t rsa -f ~/.ssh/id_rsa -P ""
-    - unless: test -f ~/.ssh/id_rsa.pub
+    - name: ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ""
+    - unless: test -f /root/.ssh/id_rsa.pub
 
 key_rsa:
   cmd.run:
-    - name: cp -a ~/.ssh/id_rsa /srv/salt/init/files
+    - name: cp -a /root/.ssh/id_rsa /srv/salt/init/files
     - unless: test -f /srv/salt/init/files/id_rsa
     - require:
       - cmd: key_build
 
 key_pub:
   cmd.run:
-    - name: cp -a ~/.ssh/id_rsa.pub /srv/salt/init/files
+    - name: cp -a /root/.ssh/id_rsa.pub /srv/salt/init/files
     - unless: test -f /srv/salt/init/files/id_rsa.pub
     - require:
       - cmd: key_build

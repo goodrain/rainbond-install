@@ -135,8 +135,8 @@ docker-pull-app-ui-image:
 
 app-ui-logs:
   cmd.run:
-    - name: touch {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/{goodrain.log,request.log}
-    - unless: ls {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/{goodrain.log,request.log}
+    - name: touch {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/goodrain.log
+    - unless: ls {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/goodrain.log
     - require:
       - cmd: docker-pull-app-ui-image
 

@@ -42,6 +42,20 @@ Get_Rainbond_Install_Path(){
   Write_Sls_File rbd-path $DEFAULT_INSTALL_PATH 
 }
 
+# Name   : Install_Base_Pkg
+# Args   : NULL
+# Return : 0|!0
+Install_Base_Pkg(){
+ 
+if [ "$SYS_NAME" == "centos" ];then
+yum install -y -q tar ntpdate wget curl tree lsof htop nload net-tools telnet rsync lvm2 git perl bind-utils dstat iproute bash-completion > /dev/null
+else
+apt-get install -y -q tar ntpdate wget curl tree lsof htop nload net-tools telnet rsync lvm2 git uuid-runtime iproute2 systemd apt-transport-https > /dev/null
+fi
+    Echo_Info "update localtime"
+    ntpdate 0.cn.pool.ntp.org
+}
+
 # Name   : Write_Config
 # Args   : null
 # Return : 0|!0
@@ -196,7 +210,7 @@ Install_Salt(){
   if [ ! $SALT_MASTER_INSTALLED ] || [ ! $SALT_MINION_INSTALLED ] || [ ! $SALT_SSH_INSTALLED ];then
     # update repo mate
     Echo_Info "Installing salt ..."
-    Cache_PKG
+    Cache_PKG > /dev/null
 
     # install salt
     Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \
@@ -205,37 +219,35 @@ Install_Salt(){
 
   inet_ip=$(Read_Sls_File "inet-ip" )
 
-    # auto accept
-cat > /etc/salt/master.d/master.conf <<END
-interface: ${inet_ip}
-open_mode: True
-auto_accept: True
-# 简介输出,当失败全部输出
-state_output: mixed
-# 当单个的状态执行失败后，将会通知所有的状态停止运行状态
-failhard: True
-END
-
-
-cat > /etc/salt/minion.d/minion.conf <<EOF
-master: ${inet_ip}
-id: $(hostname)
-# The level of log record messages to send to the console.
-log_level: error
-# The level of messages to send to the log file.
-log_level_logfile: debug
+cat > /etc/salt/roster <<EOF
+manage01:
+  host: $inet_ip
+  port: 22
+  user: root
+  priv: /etc/salt/pki/master/ssh/salt-ssh.rsa
 EOF
 
-echo "" > /etc/salt/roster
+[ -d "/root/.ssh" ] || (mkdir -p /root/.ssh && chmod 700 /root/.ssh )
+[ -f "/etc/salt/pki/master/ssh/salt-ssh.rsa.pub" ] && cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys || (
+  salt-ssh "*" w 2>&1 >/dev/null || cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys
+)
+
+  [ ! -d "~/.ssh/id_rsa" ] && (
+    cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa ~/.ssh/id_rsa
+    cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa.pub ~/.ssh/id_rsa.pub
+  )
 
   [ -d /srv/salt ] && rm /srv/salt -rf
   [ -d /srv/pillar ] && rm /srv/pillar -rf
   cp -rp $PWD/install/salt /srv/
   cp -rp $PWD/install/pillar /srv/
 
-  systemctl enable salt-master
+  Echo_Info "Salt-ssh test."
+  salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
+
+  salt-ssh "*" state.sls salt.setup --state-output=mixed
+
   systemctl restart salt-master
-  systemctl enable salt-minion
   systemctl restart salt-minion
 
   Echo_Info "Waiting to start salt."
@@ -250,6 +262,8 @@ echo "" > /etc/salt/roster
   done
 }
 
+Echo_Info "Install Base Package ..."
+Install_Base_Pkg && Echo_Ok
 
 Echo_Info "Init system config ..."
 Init_system && Echo_Ok

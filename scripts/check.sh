@@ -131,7 +131,7 @@ Get_Hardware_Info(){
 #=============== main ==============
 
 [ ! -f "/usr/lib/python2.7/site-packages/sitecustomize.py" ] && (
-    cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
+    [ ! -d "/usr/lib/python2.7/site-packages/" ] || cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
     Echo_Info "Configure python defaultencoding"
     Echo_Ok
 ) || (

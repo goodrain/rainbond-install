@@ -5,6 +5,13 @@ docker-envs:
     - template: jinja
     - makedirs: Ture
 
+docker-envs-old:
+  file.managed:
+    - source: salt://docker/envs/docker.sh
+    - name: /etc/goodrain/envs/docker.sh
+    - template: jinja
+    - makedirs: Ture
+
 docker-mirrors:
   file.managed:
     - source: salt://docker/envs/daemon.json
@@ -31,17 +38,29 @@ gr-docker-engine:
   pkg.installed:
     - refresh: True
     - require:
-      - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+      - file: docker-envs
+  {% if grains['os_family']|lower == 'debian' %}
+      - file: docker-envs-old
+  {% endif%}    
   {% if grains['os_family']|lower == 'redhat' %}
     - unless: rpm -qa | grep gr-docker-engine
   {% else %}
+    - skip_verify: True
     - unless: dpkg -l | grep gr-docker-engine
   {% endif %}
-  
+
+docker_service:
   file.managed:
     - source: salt://docker/envs/docker.service
+  {% if grains['os_family']|lower == 'redhat' %}
     - name: /usr/lib/systemd/system/docker.service
+  {% else %}
+    - name: /lib/systemd/system/docker.service
+  {% endif %}
     - template: jinja
+    - makedirs: Ture
+
+docker_status:
   service.running:
     - name: docker
     - enable: True
@@ -49,9 +68,8 @@ gr-docker-engine:
       - pkg: gr-docker-engine
     - watch:
       - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
-      - file: /usr/lib/systemd/system/docker.service
+      - file: docker_service
       - pkg: gr-docker-engine
-
 
 install-docker-compose:
   file.managed:
