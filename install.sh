@@ -34,15 +34,13 @@ pkg(){
     echo "Install the prerequisite packages..."
     if [ ! -z "$YUM" ];then
         yum makecache fast -q
-        yum install -y -q ntpdate tar git wget perl tree nload curl telnet bind-utils htop dstat net-tools  lsof iproute rsync lvm2 bash-completion 
-
+        yum install -y -q git ntpdate > /dev/null
     else
-        apt update -q
-        apt install -y -q git ntpdate wget curl tar lsof htop nload rsync net-tools telnet iproute2 lvm2 tree systemd apt-transport-https
+        apt-get update -q
+        apt-get install -y -q git ntpdate apt-transport-https > /dev/null
 
     fi
-    echo "update localtime"
-    ntpdate 0.cn.pool.ntp.org
+    ntpdate 0.cn.pool.ntp.org > /dev/null
 }
 
 run(){

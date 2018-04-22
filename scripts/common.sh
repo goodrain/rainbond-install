@@ -5,9 +5,9 @@
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 DOCKER_VERSION="1.12.6,1526e3f"
-SALT_VER="stable 2017.7.4"
+SALT_VER="stable 2017.7.5"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
-SALT_PKGS="salt-master salt-minion salt-ssh"
+SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
 STORAGE_PATH="/grdata"
@@ -80,13 +80,16 @@ END
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
-    INSTALL_BIN="apt"
+    INSTALL_BIN="apt-get"
     PKG_BIN="dpkg -l"
     # debian salt repo
     cat > /etc/apt/sources.list.d/saltstack.list << END
 deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
 deb https://mirrors.tuna.tsinghua.edu.cn/saltstack/apt/debian/9/amd64/2017.7 stretch main
 END
+
+wget -q -O - https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - 
+
 fi
 
 SALT_MASTER_INSTALLED=$($PKG_BIN salt-master > /dev/null 2>&1 && echo 0)
@@ -284,7 +287,7 @@ Cache_PKG(){
     if [ "$SYS_NAME" == "centos" ];then
         yum makecache fast -q
     else
-        apt update -y -q
+        apt-get update -y -q
     fi
 }
 
