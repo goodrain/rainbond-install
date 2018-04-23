@@ -46,14 +46,10 @@ Get_Rainbond_Install_Path(){
 # Args   : NULL
 # Return : 0|!0
 Install_Base_Pkg(){
- 
-if [ "$SYS_NAME" == "centos" ];then
-yum install -y -q tar ntpdate wget curl tree lsof htop nload net-tools telnet rsync lvm2 git perl bind-utils dstat iproute bash-completion > /dev/null
-else
-apt-get install -y -q tar ntpdate wget curl tree lsof htop nload net-tools telnet rsync lvm2 git uuid-runtime iproute2 systemd apt-transport-https > /dev/null
-fi
-    Echo_Info "update localtime"
-    ntpdate 0.cn.pool.ntp.org
+  Install_PKG $SYS_COMMON_PKGS $SYS_BASE_PKGS
+
+  Echo_Info "update localtime"
+  ntpdate 0.cn.pool.ntp.org
 }
 
 # Name   : Write_Config

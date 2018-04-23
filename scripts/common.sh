@@ -47,6 +47,21 @@ network \
 node \
 kubernetes.node"
 
+# system common pkgs
+SYS_COMMON_PKGS="tar \
+ntpdate \
+wget \
+curl \
+tree \
+lsof \
+htop \
+nload \
+net-tools \
+telnet \
+rsync \
+lvm2 \
+git"
+
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 
@@ -60,32 +75,43 @@ DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | 
 DNS_SERVER="114.114.114.114"
 INIT_FILE="./.initialized"
 
+# redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
     PKG_BIN="rpm -qi"
+    SYS_BASE_PKGS="perl 
+    bind-utils \
+    dstat iproute \
+    bash-completion"
+
     # centos salt repo
-    cat > /etc/yum.repos.d/saltstack.repo << END
+    cat > /etc/yum.repos.d/salt.list << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
-baseurl=https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
-        https://mirrors.tuna.tsinghua.edu.cn/saltstack/yum/redhat/7/\$basearch/archive/2017.7.5/
+baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
 skip_if_unavailable=True
 gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
     yum makecache fast -q -y
+# debian and ubuntu
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt-get"
     PKG_BIN="dpkg -l"
+    SYS_BASE_PKGS="uuid-runtime \
+    iproute2 \
+    systemd \
+    dnsutils \
+    apt-transport-https"
+
     # debian salt repo
-    cat > /etc/apt/sources.list.d/saltstack.list << END
-deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
-deb https://mirrors.tuna.tsinghua.edu.cn/saltstack/apt/debian/9/amd64/2017.7 stretch main
+    cat > /etc/apt/sources.list.d/salt.list << END
+deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
 END
 
 wget -q -O - https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - 
@@ -280,7 +306,7 @@ Write_Host(){
 
 Install_PKG(){
     pkg_name=$1
-    $INSTALL_BIN install -y -q $pkg_name
+    $INSTALL_BIN install -y -q $pkg_name > /dev/null
 }
 
 Cache_PKG(){
