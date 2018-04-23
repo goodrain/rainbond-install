@@ -306,7 +306,7 @@ Write_Host(){
 
 Install_PKG(){
     pkg_name="$@"
-    $INSTALL_BIN install -y -q "$pkg_name" > /dev/null
+    $INSTALL_BIN install -y -q $pkg_name > /dev/null
 }
 
 Cache_PKG(){
