@@ -349,10 +349,12 @@ function Exit_Clear() {
     [ -f /etc/resolv.conf.bak ] && \cp -f /etc/resolv.conf.bak /etc/resolv.conf && Echo_Ok
 
     Echo_Info "Checking salt job ..."
-    saltjob=$(salt-run jobs.active --out=yaml | head -n 1| sed -e "s/'//g" -e 's/://')
-    if [ "$saltjob" != "{}" ];then
-        Echo_Info "Stop salt job ..."
-        salt '*' saltutil.term_job $saltjob && Echo_Ok
+    if (which salt-run > /dev/null 2>&1);then
+        saltjob=$(salt-run jobs.active --out=yaml | head -n 1| sed -e "s/'//g" -e 's/://')
+        if [ "$saltjob" != "{}" ];then
+            Echo_Info "Stop salt job ..."
+            salt '*' saltutil.term_job $saltjob && Echo_Ok
+        fi
     fi
     Echo_Info "Terminate running services ..."
     Echo_Info "  Checking k8s services ..."
@@ -376,9 +378,12 @@ function Exit_Clear() {
     Check_Service_State docker && systemctl stop docker && Echo_Ok
 
     Echo_Info "  Clear rainbond data ..."
-    rbdpath=$(salt '*' pillar.item rbd-path --output=yaml | grep rbd-path | awk '{print $2}')
-    if [ "$rbdpath" != "" ];then
-        [ -d $rbdpath/data ] && rm -rf $rbdpath/data && Echo_Ok
+
+    if (which salt-run > /dev/null 2>&1);then
+        rbdpath=$(salt '*' pillar.item rbd-path --output=yaml | grep rbd-path | awk '{print $2}')
+        if [ "$rbdpath" != "" ];then
+            [ -d $rbdpath/data ] && rm -rf $rbdpath/data && Echo_Ok
+        fi
     fi
     
 }
