@@ -79,15 +79,16 @@ Check_System_Version(){
 Check_Net(){
 
   eths=($(ls -1 /sys/class/net|grep -v lo))
+  default_eths=""
   if [ ${#eths[@]} -gt 1 ];then
     echo "The system has multiple network cards, please select the device to use:"
     for eth in ${eths[@]}
     do
       ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
       isinternal=$(echo $ipaddr | egrep '10.|172.|192.168' | grep -v '172.30.42.1')
-      if [ ! -z "$isinternal" ] && [ -z $DEFAULT_LOCAL_IP ];then
+      if [ ! -z "$isinternal" ] && [ -z $default_eths ];then
         echo "$eth: $ipaddr (default)"
-        DEFAULT_LOCAL_IP=$ipaddr
+        default_eths=$ipaddr
       else
         echo "$eth: $ipaddr"
       fi
