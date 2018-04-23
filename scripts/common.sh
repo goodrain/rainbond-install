@@ -48,7 +48,7 @@ node \
 kubernetes.node"
 
 # system common pkgs
-SYS_COMMON_PKGS="tar \
+SYS_COMMON_PKGS=( tar \
 ntpdate \
 wget \
 curl \
@@ -60,7 +60,7 @@ net-tools \
 telnet \
 rsync \
 lvm2 \
-git"
+git )
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
@@ -81,13 +81,13 @@ if [ "$SYS_NAME" == "centos" ];then
     NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
     PKG_BIN="rpm -qi"
-    SYS_BASE_PKGS="perl 
+    SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
-    bash-completion"
+    bash-completion )
 
     # centos salt repo
-    cat > /etc/yum.repos.d/salt.list << END
+    cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
 baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
@@ -103,11 +103,11 @@ else
     NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt-get"
     PKG_BIN="dpkg -l"
-    SYS_BASE_PKGS="uuid-runtime \
+    SYS_BASE_PKGS=( uuid-runtime \
     iproute2 \
     systemd \
     dnsutils \
-    apt-transport-https"
+    apt-transport-https )
 
     # debian salt repo
     cat > /etc/apt/sources.list.d/salt.list << END
@@ -305,8 +305,8 @@ Write_Host(){
 }
 
 Install_PKG(){
-    pkg_name=$1
-    $INSTALL_BIN install -y -q $pkg_name > /dev/null
+    pkg_name="$@"
+    $INSTALL_BIN install -y -q "$pkg_name" > /dev/null
 }
 
 Cache_PKG(){

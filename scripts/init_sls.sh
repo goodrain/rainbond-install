@@ -27,7 +27,7 @@ Init_system(){
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
 
   # config hostname to hosts
-  Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
+  Write_Host "${DEFAULT_LOCAL_IP}" "${DEFAULT_HOSTNAME}"
 
   return 0
 }
@@ -46,7 +46,7 @@ Get_Rainbond_Install_Path(){
 # Args   : NULL
 # Return : 0|!0
 Install_Base_Pkg(){
-  Install_PKG $SYS_COMMON_PKGS $SYS_BASE_PKGS
+  Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 
   Echo_Info "update localtime"
   ntpdate 0.cn.pool.ntp.org
