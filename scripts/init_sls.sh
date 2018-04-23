@@ -210,7 +210,7 @@ Install_Salt(){
 
     # install salt
     Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \
-    || Echo_Error "Failed to install salt,see ${LOG_DIR}/${SALT_LOG} for more information."
+    || Echo_Error "Failed to install salt,see rainbond-install/${LOG_DIR}/${SALT_LOG} for more information."
   fi
 
   inet_ip=$(Read_Sls_File "inet-ip" )

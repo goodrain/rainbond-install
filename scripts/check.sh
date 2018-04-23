@@ -26,13 +26,14 @@ Check_Internet(){
 # Args   : NULL
 # Return : 0|!0
 Check_Plugins(){
-  existDocker=$(docker -v | awk '{print $3$5}' 2>/dev/null)
+
+  if (which docker > /dev/null 2>&1 );then
+    existDocker=$(docker -v | awk '{print $3$5}' 2>/dev/null)
   
-  if [ "$existDocker" != "$DOCKER_VERSION" ];then
-    Echo_Error "Rainbond integrated customized docker, Please stop and uninstall it first."
-  else
-    return 0
+    if [ "$existDocker" != "$DOCKER_VERSION" ];then
+      Echo_Error "Rainbond integrated customized docker, Please stop and uninstall it first."
   fi
+  
   # 检查端口是否被占用
   need_ports="53 80 443 2379 2380 3306 4001 6060 6100 6443 7070 8181 9999"
   for need_port in $need_ports
