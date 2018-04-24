@@ -35,12 +35,6 @@ Check_Plugins(){
     fi
   fi
 
-  # 检查端口是否被占用
-  need_ports="53 80 443 2379 2380 3306 4001 6060 6100 6443 7070 8181 9999"
-  for need_port in $need_ports
-  do
-    (netstat -tulnp | grep "\b$need_port\b") && Echo_Error "The port $need_port has been occupied"
-  done
 }
 
 
