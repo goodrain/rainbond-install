@@ -208,7 +208,7 @@ Install_Salt(){
   Check_Service_State salt-minion && systemctl stop salt-minion
 
   # check and install salt 
-  if [ ! $SALT_MASTER_INSTALLED ] || [ ! $SALT_MINION_INSTALLED ] || [ ! $SALT_SSH_INSTALLED ];then
+  if [ ! $SALT_SSH_INSTALLED ];then
     # update repo mate
     Echo_Info "Installing salt ..."
     Cache_PKG > /dev/null

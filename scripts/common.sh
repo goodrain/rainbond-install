@@ -118,8 +118,6 @@ wget -q -O - https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTAC
 
 fi
 
-SALT_MASTER_INSTALLED=$($PKG_BIN salt-master > /dev/null 2>&1 && echo 0)
-SALT_MINION_INSTALLED=$($PKG_BIN salt-minion > /dev/null 2>&1 && echo 0)
 SALT_SSH_INSTALLED=$($PKG_BIN salt-ssh > /dev/null 2>&1 && echo 0)
 
 
