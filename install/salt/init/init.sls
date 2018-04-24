@@ -2,20 +2,22 @@ include:
 {% if "manage" in grains['id']%}
   - init.key
   - init.user
-  - init.config
+  - init.limits
   - init.swap
   - init.create_dir
   - init.service
   - init.router
   - init.plugins
   - init.gr_bin
+  - init.dns
 {% else %}
   - init.user
   - init.create_dir
   - init.swap
-  - init.config
+  - init.limits
   - init.service
   - init.key
   - init.router
   - init.gr_bin
+  - init.dns
 {% endif %}
