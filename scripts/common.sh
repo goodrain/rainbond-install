@@ -387,3 +387,12 @@ function Exit_Clear() {
     fi
     
 }
+
+# check python urllib3 for aliyun (CentOS 7.x)
+Check_Python_Urllib(){
+    if ( which pip > /dev/null 2>&1 );then
+        if ( pip show urllib3 > /dev/null 2>&1 );then
+            pip uninstall urllib3 -y
+        fi
+    fi
+}

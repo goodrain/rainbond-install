@@ -197,6 +197,11 @@ run(){
 # Args   : Null
 # Return : 0|!0
 Install_Salt(){
+
+  # check python env
+  Echo_Info "Check python environment ..."
+  Check_Python_Urllib && Echo_Ok
+  
   # check salt service
   Echo_Info "Checking salt ..."
   Check_Service_State salt-master && systemctl stop salt-master
