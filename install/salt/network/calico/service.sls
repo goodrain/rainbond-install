@@ -43,7 +43,7 @@ calico:
       - file: calico-env
       - cmd: pull-calico-image
 
-{% if grains['host'] == 'manage01' %}
+{% if grains['id'] == 'manage01' %}
 /tmp/init.calico:
   file.managed:
     - source: salt://network/calico/install/run/init.calico

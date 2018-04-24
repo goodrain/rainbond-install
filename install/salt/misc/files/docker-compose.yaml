@@ -177,7 +177,7 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-{% if grains['host'] == "manage01" %}
+{% if grains['id'] == "manage01" %}
   rbd-db:
     image: rainbond/rbd-db:{{ pillar['rbd-version'] }}
     container_name: rbd-db

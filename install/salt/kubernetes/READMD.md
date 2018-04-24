@@ -4,9 +4,9 @@
 # old init.sls
 
 include:
-{% if "manage" in grains['host'] and grains['host'] != "manage01" %}
+{% if "manage" in grains['id'] and grains['id'] != "manage01" %}
   - kubernetes.master
-{% elif grains['host'] == "manage01" %}
+{% elif grains['id'] == "manage01" %}
   - kubernetes.master
   - kubernetes.node
 {% else %}

@@ -14,7 +14,7 @@
     - group: root
     - unless: test -f /usr/local/bin/docker-compose
 
-{% if "manage" in grains['host'] %}
+{% if "manage" in grains['id'] %}
 /usr/local/bin/etcdctl:
   file.managed:
     - source: salt://misc/file/bin/etcdctl
@@ -40,7 +40,7 @@
     - unless: test -f /usr/local/bin/kubectl
 {% endif %}
 
-{% if "compute" in grains['host'] %}
+{% if "compute" in grains['id'] %}
 /usr/local/bin/kubelet:
   file.managed:
     - source: salt://misc/file/bin/kubelet

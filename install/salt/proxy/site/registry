@@ -1,5 +1,5 @@
 upstream registry {
-  {% if "manage" in grains['host'] %}
+  {% if "manage" in grains['id'] %}
     server 127.0.0.1:5000;
   {% else %}
     server {{ pillar['inet-ip'] }}:5000;

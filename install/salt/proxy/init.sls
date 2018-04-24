@@ -1,6 +1,6 @@
 include:
 - proxy.setup
-{% if "manage" in grains['host'] %}
+{% if "manage" in grains['id'] %}
 - proxy.manage
 {% else %}
 - proxy.compute

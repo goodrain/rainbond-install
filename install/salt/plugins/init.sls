@@ -154,7 +154,7 @@ update-app-ui:
 
 
 #==================== init region db ====================
-{% if grains['host'] == "manage01" %}
+{% if grains['id'] == "manage01" %}
 update_sql:
   file.managed:
     - source: salt://plugins/data/init.sql
