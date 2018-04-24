@@ -392,7 +392,7 @@ function Exit_Clear() {
 Check_Python_Urllib(){
     if ( which pip > /dev/null 2>&1 );then
         if ( pip show urllib3 > /dev/null 2>&1 );then
-            pip uninstall urllib3 -y
+            pip uninstall urllib3 -y  > /dev/null 2>&1 
         fi
     fi
 }
