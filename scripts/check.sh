@@ -79,7 +79,7 @@ Check_Net(){
     for eth in ${eths[@]}
     do
       ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
-      isinternal=$(echo $ipaddr | egrep ' 10.|172.|192.168' | grep -v '172.30.42.1')
+      isinternal=$(echo $ipaddr | egrep '10.|172.|192.168' | grep -v '172.30.42.1')
       if [ ! -z "$isinternal" ] && [ -z $default_eths ];then
         echo "$eth: $ipaddr (default)"
         default_eths=$ipaddr
