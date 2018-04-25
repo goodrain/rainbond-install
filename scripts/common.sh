@@ -107,6 +107,7 @@ else
     iproute2 \
     systemd \
     dnsutils \
+    python-pip \
     apt-transport-https )
 
     # debian salt repo
@@ -341,7 +342,7 @@ Read_Sls_File(){
 
 
 # Clear the job and data when  exit the program
-function Exit_Clear() {
+Exit_Clear() {
     echo -e "\e[31mQuit rainbond install program.\e[0m"
     Echo_Info "Restore dns configuration ..."
     [ -f /etc/resolv.conf.bak ] && \cp -f /etc/resolv.conf.bak /etc/resolv.conf && Echo_Ok
@@ -392,6 +393,9 @@ Check_Python_Urllib(){
         if ( which pip > /dev/null 2>&1 );then
             if ( pip show urllib3 > /dev/null 2>&1 );then
                 pip uninstall urllib3 -y  > /dev/null 2>&1 
+            fi
+            if [ "$SYS_NAME" == "ubuntu" ];then
+                pip install -U urllib3 -y > /dev/null 2>&1
             fi
         fi
     fi
