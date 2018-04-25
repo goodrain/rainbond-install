@@ -58,17 +58,10 @@ kubelet-cni-bin:
     - source: salt://kubernetes/node/install/systemd/kubelet.service
     - template: jinja
 
-cp-bin-kubelet:
+/usr/local/bin/kubelet:
   file.managed:
     - source: salt://misc/file/bin/kubelet
-    - name: /usr/local/bin/kubelet
     - mode: 755
-
-/usr/bin/kubelet:
-  file.managed:
-    - source: /usr/local/bin/kubelet
-    - mode: 755
-    - user: root
 
 {% if grains['id'] == 'manage01' %}
 
