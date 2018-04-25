@@ -27,6 +27,13 @@ check_domain:
     - name:  echo "domain not found"
     - unless: grep "domain" /srv/pillar/goodrain.sls
 
+rsync_update_domain:
+  file.managed:
+    - source: salt://docker/envs/.domain.sh
+    - name: {{ pillar['rbd-path'] }}/bin/.domain.sh
+    - mode: 755
+    - makedirs: Ture
+
 refresh_domain:
   cmd.run:
     - name: salt "*" saltutil.refresh_pillar
