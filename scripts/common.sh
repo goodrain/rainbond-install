@@ -69,9 +69,9 @@ CPU_NUM=$(grep "processor" /proc/cpuinfo | wc -l )
 CPU_LIMIT=2
 MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
 MEM_LIMIT=4
-ipaddr=$(ip add | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
-DEFAULT_LOCAL_IP="$(echo $ipaddr | egrep '^10.|^172.|^192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
-DEFAULT_PUBLIC_IP="$(echo $ipaddr | egrep -v '^10.|^172.|^192.168|^127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
+
+DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
+DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
 DNS_SERVER="114.114.114.114"
 INIT_FILE="./.initialized"
 
@@ -394,7 +394,7 @@ Check_Python_Urllib(){
             if ( pip show urllib3 > /dev/null 2>&1 );then
                 pip uninstall urllib3 -y  > /dev/null 2>&1 
             fi
-            if [ "$SYS_NAME" == "ubuntu" ];then
+            if [ "$SYS_NAME" != "centos" ];then
                 pip install -U urllib3 -y > /dev/null 2>&1
             fi
         fi
