@@ -392,9 +392,6 @@ Check_Python_Urllib(){
     if [ ! -f $INIT_FILE ];then
         if ( which pip > /dev/null 2>&1 );then
             if ( pip show urllib3 > /dev/null 2>&1 );then
-                pip uninstall urllib3 -y  > /dev/null 2>&1 
-            fi
-            if [ "$SYS_NAME" != "centos" ];then
                 pip install -U urllib3 -y > /dev/null 2>&1
             fi
         fi
