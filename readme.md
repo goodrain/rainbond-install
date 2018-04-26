@@ -26,7 +26,6 @@ Plugins Version:
 ## Documentation
 
 > Please read [Select-Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution) before installation.
-> ## Not supported on CentOS 7.4；Supported on CentOS 7.3 ##
 
 
 ### Install
@@ -34,12 +33,12 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# stable (master CentOS 7.3)
+# stable 
 curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/master/install.sh 
 chmod +x install.sh 
 ./install.sh
 
-# dev (dev support CentOS 7.4)
+# dev 
 curl -k -L -o install.sh https://raw.githubusercontent.com/goodrain/rainbond-install/dev/install.sh
 chmod +x install.sh
 ./install.sh dev
