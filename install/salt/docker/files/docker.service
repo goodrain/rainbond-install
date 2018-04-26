@@ -8,7 +8,7 @@ Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
-EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/docker.sh
+EnvironmentFile={{ pillar['rbd-path'] }}/envs/docker.sh
 ExecStart=/usr/bin/dockerd $DOCKER_OPTS
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead

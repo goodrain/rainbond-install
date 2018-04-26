@@ -46,4 +46,3 @@ minion_service:
     - enable: True
     - require:
       - file: salt-minion-conf
-

@@ -1,19 +1,20 @@
 docker-envs:
   file.managed:
-    {% if grains['os_family']|lower == 'redhat' and grains['osrelease_info'][1] == 4 %}
-    - source: salt://docker/envs/docker-patch.sh
-    {% else %}
-    - source: salt://docker/envs/docker.sh
-    {% endif %}
-    - name: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+    - source: salt://docker/files/docker.sh
+    - name: {{ pillar['rbd-path'] }}/envs/docker.sh
     - template: jinja
     - makedirs: Ture
-    - mode: 644
-    - user: root
+
+docker-envs-old:
+  file.managed:
+    - source: salt://docker/files/docker.sh
+    - name: /etc/goodrain/envs/docker.sh
+    - template: jinja
+    - makedirs: Ture
 
 docker-mirrors:
   file.managed:
-    - source: salt://docker/envs/daemon.json
+    - source: salt://docker/files/daemon.json
     - name: /etc/docker/daemon.json
     - makedirs: Ture
 
@@ -37,32 +38,43 @@ gr-docker-engine:
   pkg.installed:
     - refresh: True
     - require:
-      - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+      - file: docker-envs
+  {% if grains['os_family']|lower == 'debian' %}
+      - file: docker-envs-old
+  {% endif%}    
   {% if grains['os_family']|lower == 'redhat' %}
     - unless: rpm -qa | grep gr-docker-engine
   {% else %}
+    - skip_verify: True
     - unless: dpkg -l | grep gr-docker-engine
   {% endif %}
-  
+
+docker_service:
   file.managed:
-    - source: salt://docker/envs/docker.service
+    - source: salt://docker/files/docker.service
+  {% if grains['os_family']|lower == 'redhat' %}
     - name: /usr/lib/systemd/system/docker.service
+  {% else %}
+    - name: /lib/systemd/system/docker.service
+  {% endif %}
     - template: jinja
+    - makedirs: Ture
+
+docker_status:
   service.running:
     - name: docker
     - enable: True
     - require:
       - pkg: gr-docker-engine
     - watch:
-      - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
-      - file: /usr/lib/systemd/system/docker.service
+      - file: {{ pillar['rbd-path'] }}/envs/docker.sh
+      - file: docker_service
       - pkg: gr-docker-engine
-
 
 install-docker-compose:
   file.managed:
     - name: /usr/local/bin/dc-compose
-    - source: salt://docker/envs/dc-compose
+    - source: salt://docker/files/dc-compose
     - makedirs: Ture
     - template: jinja
     - mode: 755

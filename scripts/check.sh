@@ -26,17 +26,15 @@ Check_Internet(){
 # Args   : NULL
 # Return : 0|!0
 Check_Plugins(){
-  if $(which docker >/dev/null 2>&1);then
-    Echo_Error "Rainbond integrated customized docker, Please uninstall it first."
-  else
-    return 0
+
+  if (which docker > /dev/null 2>&1 );then
+    existDocker=$(docker -v | awk '{print $3$5}' 2>/dev/null)
+  
+    if [ "$existDocker" != "$DOCKER_VERSION" ];then
+      Echo_Error "Rainbond integrated customized docker, Please stop and uninstall it first."
+    fi
   fi
-  # 检查端口是否被占用
-  need_ports="53 80 443 2379 2380 3306 4001 6060 6100 6443 7070 8181 9999"
-  for need_port in $need_ports
-  do
-    (netstat -tulnp | grep "\b$need_port\b") && Echo_Error "The port $need_port has been occupied"
-  done
+
 }
 
 
@@ -75,15 +73,16 @@ Check_System_Version(){
 Check_Net(){
 
   eths=($(ls -1 /sys/class/net|grep -v lo))
+  default_eths=""
   if [ ${#eths[@]} -gt 1 ];then
     echo "The system has multiple network cards, please select the device to use:"
     for eth in ${eths[@]}
     do
       ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
       isinternal=$(echo $ipaddr | egrep '10.|172.|192.168' | grep -v '172.30.42.1')
-      if [ ! -z "$isinternal" ] && [ -z $DEFAULT_LOCAL_IP ];then
+      if [ ! -z "$isinternal" ] && [ -z $default_eths ];then
         echo "$eth: $ipaddr (default)"
-        DEFAULT_LOCAL_IP=$ipaddr
+        default_eths=$ipaddr
       else
         echo "$eth: $ipaddr"
       fi
@@ -129,7 +128,7 @@ Get_Hardware_Info(){
 #=============== main ==============
 
 [ ! -f "/usr/lib/python2.7/site-packages/sitecustomize.py" ] && (
-    cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
+    [ ! -d "/usr/lib/python2.7/site-packages/" ] || cp ./scripts/sitecustomize.py /usr/lib/python2.7/site-packages/sitecustomize.py
     Echo_Info "Configure python defaultencoding"
     Echo_Ok
 ) || (

@@ -19,13 +19,15 @@ Init_system(){
   Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
     Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
+  else
+    Write_Sls_File public-ip ""
   fi
 
   # reset /etc/hosts
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
 
   # config hostname to hosts
-  Write_Host "$DEFAULT_LOCAL_IP" "${DEFAULT_HOSTNAME}"
+  Write_Host "${DEFAULT_LOCAL_IP}" "${DEFAULT_HOSTNAME}"
 
   return 0
 }
@@ -38,6 +40,16 @@ Get_Rainbond_Install_Path(){
   Echo_Info "[$DEFAULT_INSTALL_PATH] is used to installation rainbond."
 
   Write_Sls_File rbd-path $DEFAULT_INSTALL_PATH 
+}
+
+# Name   : Install_Base_Pkg
+# Args   : NULL
+# Return : 0|!0
+Install_Base_Pkg(){
+  Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
+
+  Echo_Info "update localtime"
+  ntpdate 0.cn.pool.ntp.org
 }
 
 # Name   : Write_Config
@@ -162,7 +174,7 @@ write_top(){
 cat > ${PILLAR_DIR}/top.sls <<EOF
 base:
   '*':
-    - system_info
+    - goodrain
     - etcd
     - network
     - kubernetes
@@ -185,55 +197,58 @@ run(){
 # Args   : Null
 # Return : 0|!0
 Install_Salt(){
+
+  # check python env
+  Echo_Info "Check python environment ..."
+  Check_Python_Urllib && Echo_Ok
+  
   # check salt service
   Echo_Info "Checking salt ..."
-  [ $SALT_MASTER_RUNNING ] && systemctl stop salt-master
-  [ $SALT_MINION_RUNNING ] && systemctl stop salt-minion
+  Check_Service_State salt-master && systemctl stop salt-master
+  Check_Service_State salt-minion && systemctl stop salt-minion
 
   # check and install salt 
-  if [ ! $SALT_MASTER_INSTALLED ] || [ ! $SALT_MINION_INSTALLED ] || [ ! $SALT_SSH_INSTALLED ];then
+  if [ ! $SALT_SSH_INSTALLED ];then
     # update repo mate
     Echo_Info "Installing salt ..."
-    Cache_PKG
+    Cache_PKG > /dev/null
 
     # install salt
     Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \
-    || Echo_Error "Failed to install salt,see ${LOG_DIR}/${SALT_LOG} for more information."
+    || Echo_Error "Failed to install salt,see rainbond-install/${LOG_DIR}/${SALT_LOG} for more information."
   fi
 
   inet_ip=$(Read_Sls_File "inet-ip" )
 
-    # auto accept
-cat > /etc/salt/master.d/master.conf <<END
-interface: ${inet_ip}
-open_mode: True
-auto_accept: True
-# 简介输出,当失败全部输出
-state_output: mixed
-# 当单个的状态执行失败后，将会通知所有的状态停止运行状态
-failhard: True
-END
-
-
-cat > /etc/salt/minion.d/minion.conf <<EOF
-master: ${inet_ip}
-id: $(hostname)
-# The level of log record messages to send to the console.
-log_level: error
-# The level of messages to send to the log file.
-log_level_logfile: debug
+cat > /etc/salt/roster <<EOF
+manage01:
+  host: $inet_ip
+  port: 22
+  user: root
+  priv: /etc/salt/pki/master/ssh/salt-ssh.rsa
 EOF
 
-echo "" > /etc/salt/roster
+[ -d "/root/.ssh" ] || (mkdir -p /root/.ssh && chmod 700 /root/.ssh )
+[ -f "/etc/salt/pki/master/ssh/salt-ssh.rsa.pub" ] && cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys || (
+  salt-ssh "*" w 2>&1 >/dev/null || cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys
+)
+
+  [ ! -d "~/.ssh/id_rsa" ] && (
+    cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa ~/.ssh/id_rsa
+    cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa.pub ~/.ssh/id_rsa.pub
+  )
 
   [ -d /srv/salt ] && rm /srv/salt -rf
   [ -d /srv/pillar ] && rm /srv/pillar -rf
   cp -rp $PWD/install/salt /srv/
   cp -rp $PWD/install/pillar /srv/
 
-  systemctl enable salt-master
+  Echo_Info "Salt-ssh test."
+  salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
+
+  salt-ssh "*" state.sls salt.setup --state-output=mixed
+
   systemctl restart salt-master
-  systemctl enable salt-minion
   systemctl restart salt-minion
 
   Echo_Info "Waiting to start salt."
@@ -248,6 +263,8 @@ echo "" > /etc/salt/roster
   done
 }
 
+Echo_Info "Install Base Package ..."
+Install_Base_Pkg && Echo_Ok
 
 Echo_Info "Init system config ..."
 Init_system && Echo_Ok

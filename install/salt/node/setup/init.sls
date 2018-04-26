@@ -1,7 +1,7 @@
 node-script:
   file.managed:
-    - source: salt://node/install/scripts/start.sh
-    - name: {{ pillar['rbd-path'] }}/node/scripts/start.sh
+    - source: salt://node/install/scripts/start-node.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-node.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -11,7 +11,14 @@ node-script:
 node-config-mapper.yaml:
   file.managed:
     - source: salt://node/install/config/mapper.yaml
-    - name: {{ pillar['rbd-path'] }}/node/config/mapper.yml
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-node/mapper.yml
+    - makedirs: Ture
+    - template: jinja
+
+node-uuid-conf:
+  file.managed:
+    - source: salt://node/install/envs/node_host_uuid.conf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf
     - makedirs: Ture
     - template: jinja
 
@@ -21,13 +28,6 @@ node-config-mapper.yaml:
     - template: jinja
     - user: root
     - group: root
-
-node-uuid-conf:
-  file.managed:
-    - source: salt://node/install/envs/node_host_uuid.conf
-    - name: {{ pillar['rbd-path'] }}/etc/node/node_host_uuid.conf
-    - makedirs: Ture
-    - template: jinja
 
 node:
   service.running:

@@ -4,9 +4,10 @@
 
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
-SALT_VER="stable 2017.7.4"
+DOCKER_VERSION="1.12.6,1526e3f"
+SALT_VER="stable 2017.7.5"
 SALT_REPO="mirrors.ustc.edu.cn/salt"
-SALT_PKGS="salt-master salt-minion salt-ssh"
+SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
 STORAGE_PATH="/grdata"
@@ -19,6 +20,8 @@ OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
+K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
+RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="init \
 storage \
 docker \
@@ -44,6 +47,21 @@ network \
 node \
 kubernetes.node"
 
+# system common pkgs
+SYS_COMMON_PKGS=( tar \
+ntpdate \
+wget \
+curl \
+tree \
+lsof \
+htop \
+nload \
+net-tools \
+telnet \
+rsync \
+lvm2 \
+git )
+
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 
@@ -53,47 +71,68 @@ MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '
 MEM_LIMIT=4
 
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
-DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v '10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
+DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
 DNS_SERVER="114.114.114.114"
+INIT_FILE="./.initialized"
 
+# redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
     PKG_BIN="rpm -qi"
+    SYS_BASE_PKGS=( perl \
+    bind-utils \
+    dstat iproute \
+    bash-completion )
+
     # centos salt repo
-    cat > /etc/yum.repos.d/saltstack.repo << END
+    cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
-baseurl=https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
-        https://mirrors.tuna.tsinghua.edu.cn/saltstack/yum/redhat/7/\$basearch/archive/2017.7.5/
+baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
 skip_if_unavailable=True
 gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
-    yum makecache -q -y
+    yum makecache fast -q -y
+# debian and ubuntu
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
-    INSTALL_BIN="apt"
+    INSTALL_BIN="apt-get"
     PKG_BIN="dpkg -l"
+    SYS_BASE_PKGS=( uuid-runtime \
+    iproute2 \
+    systemd \
+    dnsutils \
+    python-pip \
+    apt-transport-https )
+
     # debian salt repo
-    cat > /etc/apt/sources.list.d/saltstack.list << END
-deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
-deb https://mirrors.tuna.tsinghua.edu.cn/saltstack/apt/debian/9/amd64/2017.7 stretch main
+    cat > /etc/apt/sources.list.d/salt.list << END
+deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
 END
+
+wget -q -O - https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - 
+
 fi
-
-SALT_MASTER_INSTALLED=$($PKG_BIN salt-master > /dev/null 2>&1 && echo 0)
-SALT_MASTER_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
-
-SALT_MINION_INSTALLED=$($PKG_BIN salt-minion > /dev/null 2>&1 && echo 0)
-SALT_MINION_RUNNING=$(systemctl  is-active salt-master > /dev/null 2>&1 && echo 0)
 
 SALT_SSH_INSTALLED=$($PKG_BIN salt-ssh > /dev/null 2>&1 && echo 0)
 
+
+
 #======================= Global Functions =============================
+
+# Name   : Check service status
+# Arges  : Service name
+# Return : 0|!0 
+Check_Service_State(){
+    sname=$1
+    systemctl  is-active $sname > /dev/null 2>&1
+}
+
 which_cmd() {
     which "${1}" 2>/dev/null || \
         command -v "${1}" 2>/dev/null
@@ -220,15 +259,15 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$(cat ./install/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat ./install/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
+    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
+    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$(cat ./install/pillar/system_info.sls | grep reg-uuid | awk '{print $2}')
-    iip=$(cat ./install/pillar/system_info.sls | grep inet-ip | awk '{print $2}')
-    domain=$(cat /srv/pillar/system_info.sls | grep domain | awk '{print $2}')
+    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
+    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
+    domain=$( Read_Sls_File domain /srv/pillar/ )
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
 }
 
@@ -265,15 +304,15 @@ Write_Host(){
 }
 
 Install_PKG(){
-    pkg_name=$1
-    $INSTALL_BIN install -y -q $pkg_name
+    pkg_name="$@"
+    $INSTALL_BIN install -y -q $pkg_name > /dev/null
 }
 
 Cache_PKG(){
     if [ "$SYS_NAME" == "centos" ];then
-        yum makecache -q
+        yum makecache fast -q
     else
-        apt update -y -q
+        apt-get update -y -q
     fi
 }
 
@@ -284,12 +323,12 @@ Write_Sls_File(){
   key=$1
   value=$2
   path=${3:-$PILLAR_DIR}
-  hasKey=$(grep $key $path/system_info.sls)
+  hasKey=$(grep $key $path/goodrain.sls)
   if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $path/system_info.sls
+    sed -i -e "/$key/d" $path/goodrain.sls
   fi
   
-  echo "$key: $value" >> $path/system_info.sls
+  echo "$key: $value" >> $path/goodrain.sls
 }
 
 # Name   : Read_Sls_File
@@ -298,17 +337,67 @@ Write_Sls_File(){
 Read_Sls_File(){
     key=$1
     path=${2:-$PILLAR_DIR}
-    grep $key ${path}/system_info.sls | awk '{print $2}'
+    grep $key ${path}/goodrain.sls | awk '{print $2}'
 }
 
 
 # Clear the job and data when  exit the program
-function Quit_Clear() {
+Exit_Clear() {
     echo -e "\e[31mQuit rainbond install program.\e[0m"
+    Echo_Info "Restore dns configuration ..."
+    [ -f /etc/resolv.conf.bak ] && \cp -f /etc/resolv.conf.bak /etc/resolv.conf && Echo_Ok
+
     Echo_Info "Checking salt job ..."
-    saltjob=$(salt-run jobs.active --out=yaml | head -n 1| sed -e "s/'//g" -e 's/://')
-    if [ "$saltjob" != "{}" ];then
-        Echo_Info "Stop salt job ..."
-        salt '*' saltutil.term_job $saltjob && Echo_Ok
-     fi
+    if (which salt-run > /dev/null 2>&1);then
+        saltjob=$(salt-run jobs.active --out=yaml | head -n 1| sed -e "s/'//g" -e 's/://')
+        if [ "$saltjob" != "{}" ];then
+            Echo_Info "Stop salt job ..."
+            salt '*' saltutil.term_job $saltjob && Echo_Ok
+        fi
+    fi
+    Echo_Info "Terminate running services ..."
+    Echo_Info "  Checking k8s services ..."
+    for kservice in ${K8S_SERVICE[*]}
+    do
+        Check_Service_State $kservice && systemctl stop $kservice 
+    done
+
+    Echo_Info "  Checking rainbond services ..."
+    for rservice in ${RAINBOND_SERVICE[*]}
+    do
+        Check_Service_State $rservice && systemctl stop $rservice 
+    done
+    if $(which dc-compose > /dev/null 2>&1);then
+        if $(dc-compose ps > /dev/null 2>&1);then
+            dc-compose stop && cclear
+        fi
+    fi
+
+    Echo_Info "  Checking docker ..."
+    Check_Service_State docker && systemctl stop docker && Echo_Ok
+
+    Echo_Info "  Clear rainbond data ..."
+
+    if (which salt-run > /dev/null 2>&1);then
+        rbdpath=$(salt '*' pillar.item rbd-path --output=yaml | grep rbd-path | awk '{print $2}')
+        if [ "$rbdpath" != "" ];then
+            [ -d $rbdpath/data ] && rm -rf $rbdpath/data && Echo_Ok
+        fi
+    fi
+    
+}
+
+# check python urllib3 for aliyun (CentOS 7.x)
+Check_Python_Urllib(){
+    if [ ! -f $INIT_FILE ];then
+        if ( which pip > /dev/null 2>&1 );then
+            if ( pip show urllib3 > /dev/null 2>&1 );then
+                if [ "$SYS_NAME" == "centos" ];then
+                    pip uninstall urllib3 -y  > /dev/null 2>&1 
+                else
+                    pip install -U urllib3 -y > /dev/null 2>&1
+                fi
+            fi
+        fi
+    fi
 }

@@ -1,5 +1,5 @@
 include:
-{% if grains['host'] == "manage01" %}
+{% if grains['id'] == "manage01" %}
 - storage.server
 {% else %}
 - storage.client

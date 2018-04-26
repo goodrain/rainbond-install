@@ -8,7 +8,7 @@ pull-etcd-image:
 etcd-env:
   file.managed:
     - source: salt://etcd/install/envs/etcd.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/etcd.sh
+    - name: {{ pillar['rbd-path'] }}/envs/etcd.sh
     - template: jinja
     - makedirs: Ture
     - mode: 644
@@ -17,8 +17,8 @@ etcd-env:
 
 etcd-script:
   file.managed:
-    - source: salt://etcd/install/scripts/start.sh
-    - name: {{ pillar['rbd-path'] }}/etcd/scripts/start.sh
+    - source: salt://etcd/install/scripts/start-etcd.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-etcd.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755

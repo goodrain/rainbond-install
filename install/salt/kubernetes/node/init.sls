@@ -1,7 +1,7 @@
 kubelet-script:
   file.managed:
     - source: salt://kubernetes/node/install/scripts/start-kubelet.sh
-    - name: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kubelet.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-kubelet.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -11,44 +11,41 @@ kubelet-script:
 kubelet-env:
   file.managed:
     - source: salt://kubernetes/node/install/envs/kubelet.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/kubelet.sh
+    - name: {{ pillar['rbd-path'] }}/envs/kubelet.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
     - user: root
     - group: root
 
-k8s-conf:
+k8s-custom-conf:
   file.managed:
-    - source: salt://kubernetes/node/install/k8s/custom.conf
-    - name: {{ pillar['rbd-path'] }}/kubernetes/k8s/custom.conf
+    - source: salt://kubernetes/node/install/custom.conf
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf
     - makedirs: Ture
     - template: jinja
 
-{% if "compute" in grains['id'] %}
 kubelet-ssl-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl
-    - name: {{ pillar['rbd-path'] }}/kubernetes/ssl
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
 
 kubelet-cfg-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
-    - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg
-
-{% endif %}
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg
 
 kubelet-cni:
   file.recurse:
     - source: salt://kubernetes/node/install/cni
-    - name: {{ pillar['rbd-path'] }}/cni/net.d
+    - name: {{ pillar['rbd-path'] }}/etc/cni/
     - template: jinja
     - makedirs: Ture
 
 kubelet-cni-bin:
   file.recurse:
     - source: salt://misc/file/cni/bin
-    - name: {{ pillar['rbd-path'] }}/cni/bin
+    - name: {{ pillar['rbd-path'] }}/bin
     - file_mode: '0755'
     - user: root
     - group: root
@@ -59,17 +56,10 @@ kubelet-cni-bin:
     - source: salt://kubernetes/node/install/systemd/kubelet.service
     - template: jinja
 
-cp-bin-kubelet:
+/usr/local/bin/kubelet:
   file.managed:
     - source: salt://misc/file/bin/kubelet
-    - name: /usr/local/bin/kubelet
     - mode: 755
-
-/usr/bin/kubelet:
-  file.managed:
-    - source: /usr/local/bin/kubelet
-    - mode: 755
-    - user: root
 
 {% if grains['id'] == 'manage01' %}
 
@@ -96,13 +86,20 @@ kubelet:
     - enable: True
     - watch:
       - file: kubelet-env
+      - file: k8s-custom-conf
       - file: kubelet-cni
+      - file: kubelet-ssl-rsync
+      - file: kubelet-cfg-rsync
+      - file: kubelet-script
 {% if grains['id'] == 'manage01' %}
       - cmd: rename-pause-img
 {% endif %}
     - require:
       - file: kubelet-env
+      - file: k8s-custom-conf
       - file: kubelet-cni
+      - file: kubelet-ssl-rsync
+      - file: kubelet-cfg-rsync
       - cmd: pull-pause-img
 {% if grains['id'] == 'manage01' %}
       - cmd: rename-pause-img

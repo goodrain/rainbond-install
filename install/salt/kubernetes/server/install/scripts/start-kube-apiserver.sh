@@ -7,11 +7,11 @@ KUBE_APISERVER_OPTS="--insecure-bind-address=127.0.0.1 \
 --authorization-mode=RBAC \
 --runtime-config=rbac.authorization.k8s.io/v1beta1 \
 --experimental-bootstrap-token-auth \
---token-auth-file={{ pillar['rbd-path'] }}/kubernetes/kubecfg/token.csv \
---tls-cert-file={{ pillar['rbd-path'] }}/kubernetes/ssl/kubernetes.pem \
---tls-private-key-file={{ pillar['rbd-path'] }}/kubernetes/ssl/kubernetes-key.pem \
---client-ca-file={{ pillar['rbd-path'] }}/kubernetes/ssl/ca.pem \
---service-account-key-file={{ pillar['rbd-path'] }}/kubernetes/ssl/ca-key.pem \
+--token-auth-file={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/token.csv \
+--tls-cert-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/kubernetes.pem \
+--tls-private-key-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/kubernetes-key.pem \
+--client-ca-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca.pem \
+--service-account-key-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca-key.pem \
 --logtostderr=true \
 --service-cluster-ip-range=11.1.0.0/16"
 
@@ -22,6 +22,6 @@ exec /usr/bin/docker \
   --restart=always \
   --net=host \
   --name kube-apiserver \
-  --volume={{ pillar['rbd-path'] }}/kubernetes:{{ pillar['rbd-path'] }}/kubernetes \
+  --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes \
   rainbond/kube-apiserver:v1.6.4 \
   $KUBE_APISERVER_OPTS

@@ -6,7 +6,7 @@ pull-calico-image:
 calico-env:
   file.managed:
     - source: salt://network/calico/install/envs/calico.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/calico.sh
+    - name: {{ pillar['rbd-path'] }}/envs/calico.sh
     - template: jinja
     - makedirs: Ture
     - mode: 644
@@ -15,8 +15,8 @@ calico-env:
 
 calico-script:
   file.managed:
-    - source: salt://network/calico/install/scripts/start.sh
-    - name: {{ pillar['rbd-path'] }}/calico/scripts/start.sh
+    - source: salt://network/calico/install/scripts/start-calico.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-calico.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -43,9 +43,10 @@ calico:
       - file: calico-env
       - cmd: pull-calico-image
 
-{% if grains['host'] == 'manage01' %}
-/tmp/init.calico:
+{% if grains['id'] == 'manage01' %}
+init.calico:
   file.managed:
+    - name: {{ pillar['rbd-path'] }}/bin/init.calico
     - source: salt://network/calico/install/run/init.calico
     - template: jinja
     - mode: 755
@@ -54,6 +55,8 @@ calico:
 
 init_calico:
   cmd.run: 
-    - name: bash /tmp/init.calico
+    - name: bash {{ pillar['rbd-path'] }}/bin/init.calico
+    - require:
+      - file: init.calico
 
 {% endif %}

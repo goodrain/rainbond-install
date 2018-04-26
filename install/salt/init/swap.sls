@@ -4,6 +4,10 @@
 
 grub:
   cmd.run:
+  {% if grains['os_family']|lower == 'redhat' %}
     - name: grub2-mkconfig -o /boot/grub2/grub.cfg
+  {% else %}
+    - name: grub-mkconfig -o /boot/grub/grub.cfg
+  {% endif %}
     - onchanges:
       - file: /etc/default/grub

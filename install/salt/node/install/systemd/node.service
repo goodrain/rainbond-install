@@ -8,9 +8,9 @@ User=root
 LimitCORE=infinity
 LimitNOFILE=102400
 LimitNPROC=102400
-EnvironmentFile=-{{ pillar['rbd-path'] }}/etc/envs/node.sh
+EnvironmentFile=-{{ pillar['rbd-path'] }}/envs/node.sh
 PermissionsStartOnly=true
-ExecStart={{ pillar['rbd-path'] }}/node/scripts/start.sh
+ExecStart={{ pillar['rbd-path'] }}/scripts/start-node.sh
 Restart=always
 RestartSec=10
 

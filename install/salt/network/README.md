@@ -3,7 +3,7 @@
 ```
 include:
   - network.calico.service
-  {% if grains['host'] == 'manage01'  %}
+  {% if grains['id'] == 'manage01'  %}
   - network.calico.setup
   {% endif %
 ```

@@ -1,149 +1,104 @@
 {% set DIR = salt['pillar.get']('rbd-path','/opt/rainbond') %}
-/rainbond/etc/cni:
-  file.directory:
-    - name: {{ DIR }}/etc/cni
-    - user: rain 
-    - group: rain
-    - mode: 755
-    - makedirs: True
-    - recurse:
-      - user
-      - group
-      - mode
 
-/rainbond/cni:
+#=========================== /cache directory ===========================
+cache-dir:
   file.directory:
-    - name: {{ DIR }}/cni
+    - name: /cache
     - makedirs: True
 
-/rainbond/etc/etcd/envs:
+cache-build-dir:
   file.directory:
-    - name: {{ DIR }}/etc/etcd/envs
+    - name: /cache/build
     - makedirs: True
 
-/rainbond/etc/etcd/scripts:
+cache-source-dir:
   file.directory:
-    - name: {{ DIR }}/etc/etcd/scripts
+    - name: /cache/source
     - makedirs: True
 
-/rainbond/etc/docker/envs:
+#=========================== /grdata directory ===========================
+grdata-dir:
   file.directory:
-    - name: {{ DIR }}/etc/docker/envs
-    - makedirs: Ture
+    - name: /grdata
+    - makedirs: True
 
-/rainbond/etc/docker/scripts:
+#=========================== rainbond/scripts directory ===========================
+scripts-dir:
   file.directory:
-    - name: {{ DIR }}/etc/docker/scripts
-    - makedirs: Ture
+    - name: {{ DIR }}/scripts
+    - makedirs: True
 
-/rainbond/etc/rbd-lb:
+#=========================== rainbond/envs directory ===========================
+env-dir:
   file.directory:
-    - name: {{ DIR }}/etc/rbd-lb
-    - makedirs: Ture
+    - name: {{ DIR }}/envs
+    - makedirs: True
 
-/rainbond/etc/rbd-proxy:
+
+#=========================== rainbond/etc directory ===========================
+etc-dir:
   file.directory:
-    - name: {{ DIR }}/etc/rbd-proxy
-    - makedirs: Ture
+    - name: {{ DIR }}/etc
+    - makedirs: True
 
-/rainbond/etc/rbd-db:
-  file.directory:
-    - name: {{ DIR }}/etc/rbd-db
-    - makedirs: Ture
-
-/rainbond/etc/rbd-chaos/ssh:
+etc-chaos-dir:
   file.directory:
     - name: {{ DIR }}/etc/rbd-chaos/ssh
-    - makedirs: Ture
+    - makedirs: True
 
-/rainbond/etc/prometheus:
+etc-lb-dir:
+  file.directory:
+    - name: {{ DIR }}/etc/rbd-lb
+    - makedirs: True
+
+etc-db-dir:
+  file.directory:
+    - name: {{ DIR }}/etc/rbd-db
+    - makedirs: True
+
+etc-prometheus-dir:
   file.directory:
     - name: {{ DIR }}/etc/prometheus
-    - makedirs: Ture
+    - makedirs: True
 
-/rainbond/etc/node/scripts:
+#=========================== rainbond/data directory ===========================
+data-dir:
   file.directory:
-    - name: {{ DIR }}/etc/node/scripts
-    - makedirs: Ture
+    - name: {{ DIR }}/data
+    - makedirs: True
 
-/rainbond/etc/calico/scripts:
-  file.directory:
-    - name: {{ DIR }}/etc/calico/scripts
-    - makedirs: Ture
-
-/rainbond/etc/calico/envs:
-  file.directory:
-    - name: {{ DIR }}/etc/calico/envs
-    - makedirs: Ture
-
-/rainbond/etc/k8s/scripts:
-  file.directory:
-    - name: {{ DIR }}/etc/k8s/scripts
-    - makedirs: Ture
-
-/rainbond/etc/k8s/envs:
-  file.directory:
-    - name: {{ DIR }}/etc/k8s/envs
-    - makedirs: Ture
-
-/rainbond/cache/build:
-  file.directory:
-    - name: {{ DIR }}/cache/build
-    - makedirs: Ture
-
-/rainbond/cache/source:
-  file.directory:
-    - name: {{ DIR }}/cache/source
-    - makedirs: Ture
-
-/rainbond/logs/docker_logs:
-  file.directory:
-    - name: {{ DIR }}/logs/docker_logs
-    - makedirs: Ture
-
-/rainbond/logs/service_logs/goodrain_web:
-  file.directory:
-    - name: {{ DIR }}/logs/service_logs/goodrain_web
-    - makedirs: Ture
-
-/rainbond/logs/service_logs/rbd-lb:
-  file.directory:
-    - name: {{ DIR }}/logs/service_logs/rbd-lb
-    - makedirs: Ture
-
-/rainbond/logs/service_logs/webcli:
-  file.directory:
-    - name: {{ DIR }}/logs/service_logs/webcli
-    - makedirs: Ture
-
-/rainbond/logs/service_logs/labor:
-  file.directory:
-    - name: {{ DIR }}/logs/service_logs/labor
-    - makedirs: Ture
-
-/rainbond/logs/service_logs/openrestry:
-  file.directory:
-    - name: {{ DIR }}/logs/service_logs/openrestry
-    - makedirs: Ture
-
-/rainbond/logs/service_logs/rbd-api:
-  file.directory:
-    - name: {{ DIR }}/logs/service_logs/rbd-api
-    - makedirs: Ture
-
-/rainbond/data/rbd-db:
+data-db-dir:
  file.directory:
     - name: {{ DIR }}/data/rbd-db
-    - makedirs: Ture
+    - makedirs: True
 
-/rainbond/data/etcd:
+data-etcd-dir:
   file.directory:
     - name: {{ DIR }}/data/etcd
-    - makedirs: Ture
+    - makedirs: True
 
-
-/grdata:
+#=========================== rainbond/logs directory ===========================
+logs-dir:
   file.directory:
-   - name: /grdata
-   - mode: 755
-   - makedirs: Ture
+    - name: {{ DIR }}/logs
+    - makedirs: True
+
+logs-appui-dir:
+  file.directory:
+    - name: {{ DIR }}/logs/rbd-app-ui
+    - makedirs: True
+
+logs-lb-dir:
+  file.directory:
+    - name: {{ DIR }}/logs/rbd-lb
+    - makedirs: True
+
+logs-api-dir:
+  file.directory:
+    - name: {{ DIR }}/logs/rbd-api
+    - makedirs: True
+
+logs-eventlog-dir:
+  file.directory:
+    - name: {{ DIR }}/logs/rbd-eventlog
+    - makedirs: True

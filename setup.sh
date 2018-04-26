@@ -17,11 +17,10 @@
 
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
 [ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
-[ ! -f $PILLAR_DIR/system_info.sls ] && touch $PILLAR_DIR/system_info.sls
+[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls
 
  # trap program exit
-trap 'Quit_Clear; exit' QUIT TERM EXIT
-
+trap 'Exit_Clear; exit' SIGINT SIGHUP
 clear
 
 # -----------------------------------------------------------------------------
@@ -35,8 +34,10 @@ check_func(){
 }
 
 init_config(){
-    Echo_Info "Init rainbond configure."
-    ./scripts/init_sls.sh
+    if [ ! -f $INIT_FILE ];then
+        Echo_Info "Init rainbond configure."
+        ./scripts/init_sls.sh && touch $INIT_FILE
+    fi
 }
 
 install_func(){
@@ -53,9 +54,12 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
-        REG_Status
+        REG_Status || return 0
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
-        grctl node up $uuid
+        notready=$(grctl  node list | grep $uuid | grep false)
+        if [ "$notready" != "" ];then
+            grctl node up $uuid
+        fi
         Echo_Info "install successfully"
         grctl show
     fi

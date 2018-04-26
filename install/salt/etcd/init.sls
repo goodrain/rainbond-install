@@ -1,5 +1,5 @@
 include:
-{% if "manage" in grains['host'] %}
+{% if "manage" in grains['id'] %}
 - etcd.server
 {% else %}
 - etcd.proxy

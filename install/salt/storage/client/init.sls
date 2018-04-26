@@ -8,10 +8,12 @@ nfs_client:
     - unless: dpkg -l | grep nfs-common
    {% endif %}
 
-write_fstab:
-  cmd.run:
-    - name: echo "{{ pillar['inet-ip'] }}:/grdata /grdata nfs rw 0 0" >> /etc/fstab
-    - unless: grep "/grdata" /etc/fstab
+/etc/fstab:
+  file.append:
+    - text:
+      - "{{ pillar['inet-ip'] }}:/grdata /grdata nfs rw 0 0"
+    - require:
+      - pkg: nfs_client
 
 automount:
   cmd.run:

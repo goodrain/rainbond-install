@@ -1,3 +1,4 @@
+#==================== rbd-worker ====================
 docker-pull-worker-image:
   cmd.run:
     - name: docker pull rainbond/rbd-worker:{{ pillar['rbd-version'] }}
@@ -6,11 +7,11 @@ docker-pull-worker-image:
 worker-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-worker
-    - onchanges:
-      - cmd: docker-pull-worker-image
+    - unless: check_compose rbd-worker
     - require:
       - cmd: docker-pull-worker-image
 
+#==================== rbd-eventlog ====================
 docker-pull-eventlog-image:
   cmd.run:
     - name: docker pull rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
@@ -19,11 +20,11 @@ docker-pull-eventlog-image:
 eventlog-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-eventlog
-    - onchanges:
-      - cmd: docker-pull-eventlog-image
+    - unless: check_compose rbd-eventlog
     - require:
       - cmd: docker-pull-eventlog-image
 
+#==================== rbd-entrance ====================
 docker-pull-entrance-image:
   cmd.run:
     - name: docker pull rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
@@ -32,11 +33,11 @@ docker-pull-entrance-image:
 entrance-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-entrance
-    - onchanges:
-      - cmd: docker-pull-entrance-image
+    - unless: check_compose rbd-entrance
     - require:
       - cmd: docker-pull-entrance-image
 
+#==================== rbd-api ====================
 docker-pull-api-image:
   cmd.run:
     - name: docker pull rainbond/rbd-api:{{ pillar['rbd-version'] }}
@@ -45,11 +46,11 @@ docker-pull-api-image:
 api-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-api
-    - onchanges:
-      - cmd: docker-pull-api-image
+    - unless: check_compose rbd-api
     - require:
       - cmd: docker-pull-api-image
 
+#==================== rbd-chaos ====================
 docker-pull-chaos-image:
   cmd.run:
     - name: docker pull rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
@@ -58,34 +59,49 @@ docker-pull-chaos-image:
 chaos-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-chaos
-    - onchanges:
-      - cmd: docker-pull-chaos-image
+    - unless: check_compose rbd-chaos
     - require:
       - cmd: docker-pull-chaos-image
 
+#==================== rbd-lb ====================
 docker-pull-lb-image:
   cmd.run:
     - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
     - unless: docker inspect rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
+proxy_site_conf:
+  file.managed:
+    - source: salt://plugins/data/proxy.conf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/servers/http/proxy.conf
+    - template: jinja
+    - makedirs: Ture
+
+proxy_site_ssl:
+  file.recurse:
+    - source: salt://proxy/ssl/goodrain.me
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/ssl/goodrain.me
+    - makedirs: Ture
+
 lb-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-lb
-    - onchanges:
-      - cmd: docker-pull-lb-image
+    - unless: check_compose rbd-lb
     - require:
       - cmd: docker-pull-lb-image
+      - file: proxy_site_conf
+      - file: proxy_site_ssl
 
-check_forward:
-  file.managed:
-    - source: salt://plugins/data/forward.conf
-    - name: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
-    - makedirs: Ture
+lb-restart:
   cmd.run:
     - name: dc-compose restart rbd-lb
     - onchanges:
-      - file: {{ pillar['rbd-path'] }}/openresty/servers/http/forward.conf
-
+      - file: proxy_site_conf
+      - file: proxy_site_ssl
+    - require:
+      - cmd: docker-pull-lb-image
+      - file: proxy_site_conf
+      - file: proxy_site_ssl
+#==================== rbd-mq ======================
 docker-pull-mq-image:
   cmd.run:
     - name: docker pull rainbond/rbd-mq:{{ pillar['rbd-version'] }}
@@ -94,11 +110,11 @@ docker-pull-mq-image:
 mq-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-mq
-    - onchanges:
-      - cmd: docker-pull-mq-image
+    - unless: check_compose rbd-mq
     - require:
       - cmd: docker-pull-mq-image
 
+#==================== rbd-webcli ====================
 docker-pull-webcli-image:
   cmd.run:
     - name: docker pull rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
@@ -107,11 +123,11 @@ docker-pull-webcli-image:
 webcli-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-webcli
-    - onchanges:
-      - cmd: docker-pull-webcli-image
+    - unless: check_compose rbd-webcli
     - require:
       - cmd: docker-pull-webcli-image
 
+#==================== rbd-app-ui ====================
 docker-pull-app-ui-image:
   cmd.run:
     - name: docker pull rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
@@ -119,16 +135,15 @@ docker-pull-app-ui-image:
 
 app-ui-logs:
   cmd.run:
-    - name: touch {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/{goodrain.log,request.log}
-    - unless: ls {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/{goodrain.log,request.log}
+    - name: touch {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log
+    - unless: ls {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log
     - require:
       - cmd: docker-pull-app-ui-image
 
 app-ui-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-app-ui
-    - onchanges:
-      - cmd: docker-pull-app-ui-image
+    - unless: check_compose rbd-app-ui
     - require:
       - cmd: docker-pull-app-ui-image
 
@@ -137,7 +152,9 @@ update-app-ui:
     - name: docker exec rbd-app-ui python /app/ui/manage.py migrate && docker exec rbd-db touch /data/.inited
     - unless: docker exec rbd-db ls /data/.inited
 
-{% if grains['host'] == "manage01" %}
+
+#==================== init region db ====================
+{% if grains['id'] == "manage01" %}
 update_sql:
   file.managed:
     - source: salt://plugins/data/init.sql

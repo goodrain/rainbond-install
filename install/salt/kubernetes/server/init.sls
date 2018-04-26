@@ -16,7 +16,7 @@ pull_schedule_image:
 k8s-api-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-apiserver.sh
-    - name: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-apiserver.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-kube-apiserver.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -26,7 +26,7 @@ k8s-api-script:
 k8s-manager-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-controller-manager.sh
-    - name: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-controller-manager.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-kube-controller-manager.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -36,7 +36,7 @@ k8s-manager-script:
 k8s-scheduler-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-scheduler.sh
-    - name: {{ pillar['rbd-path'] }}/kubernetes/scripts/start-kube-scheduler.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-kube-scheduler.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -45,8 +45,8 @@ k8s-scheduler-script:
 
 k8s-conf:
   file.managed:
-    - source: salt://kubernetes/server/install/k8s/custom.conf
-    - name: {{ pillar['rbd-path'] }}/kubernetes/k8s/custom.conf
+    - source: salt://kubernetes/server/install/custom.conf
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf
     - makedirs: Ture
     - template: jinja
 
@@ -60,7 +60,7 @@ k8s-conf:
 kube-ssl-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl
-    - name: {{ pillar['rbd-path'] }}/kubernetes/ssl
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
 
 kube-cfg-rsync-grdata:
   file.recurse:
@@ -78,15 +78,21 @@ kube-ssl-rsync-grdata:
 kube-cfg-rsync:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
-    - name: {{ pillar['rbd-path'] }}/kubernetes/kubecfg 
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
 
 kube-apiserver:
   service.running:
     - enable: True
     - watch:
+      - file: k8s-conf
+      - file: kube-ssl-rsync
+      - file: kube-cfg-rsync
       - file: k8s-api-script
       - cmd: pull_api_image
     - require:
+      - file: k8s-conf
+      - file: kube-ssl-rsync
+      - file: kube-cfg-rsync
       - file: k8s-api-script
       - cmd: pull_api_image
 
@@ -94,9 +100,15 @@ kube-controller-manager:
   service.running:
     - enable: True
     - watch:
+      - file: k8s-conf
+      - file: kube-ssl-rsync
+      - file: kube-cfg-rsync
       - file: k8s-manager-script
       - cmd: pull_manager_image
     - require:
+      - file: k8s-conf
+      - file: kube-ssl-rsync
+      - file: kube-cfg-rsync
       - file: k8s-manager-script
       - cmd: pull_manager_image
 
@@ -105,15 +117,21 @@ kube-scheduler:
   service.running:
     - enable: True
     - watch:
+      - file: k8s-conf
+      - file: kube-ssl-rsync
+      - file: kube-cfg-rsync
       - file: k8s-scheduler-script
       - cmd: pull_schedule_image
     - require:
+      - file: k8s-conf
+      - file: kube-ssl-rsync
+      - file: kube-cfg-rsync
       - file: k8s-scheduler-script
       - cmd: pull_schedule_image
 
 kube-local:
   file.managed:
-    - source: {{ pillar['rbd-path'] }}/kubernetes/kubecfg/admin.kubeconfig
+    - source: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig
     - name: /root/.kube/config
     - makedirs: Ture
     - mode: 600
