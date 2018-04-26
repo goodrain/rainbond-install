@@ -6,9 +6,9 @@ Requires=docker.service
 [Service]
 Type=simple
 User=root
-EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/kubelet.sh
+EnvironmentFile={{ pillar['rbd-path'] }}/envs/kubelet.sh
 PermissionsStartOnly=true
-ExecStart={{ pillar['rbd-path'] }}/kubernetes/scripts/start-kubelet.sh
+ExecStart={{ pillar['rbd-path'] }}/scripts/start-kubelet.sh
 Restart=always
 RestartSec=10
 

@@ -6,8 +6,8 @@ pull-etcd-proxy-image:
 
 etcd-proxy-env:
   file.managed:
-    - source: salt://etcd/install/envs/petcd.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/petcd.sh
+    - source: salt://etcd/install/envs/etcd-proxy.sh
+    - name: {{ pillar['rbd-path'] }}/envs/etcd-proxy.sh
     - template: jinja
     - makedirs: Ture
     - mode: 644
@@ -16,8 +16,8 @@ etcd-proxy-env:
 
 etcd-proxy-script:
   file.managed:
-    - source: salt://etcd/install/scripts/start-proxy.sh
-    - name: {{ pillar['rbd-path'] }}/petcd/scripts/start.sh
+    - source: salt://etcd/install/scripts/start-etcdproxy.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
     - makedirs: Ture
     - template: jinja
     - mode: 755
@@ -35,8 +35,8 @@ etcd-proxy:
   service.running:
     - enable: True
     - watch:
-      - file: {{ pillar['rbd-path'] }}/petcd/scripts/start.sh
-      - file: {{ pillar['rbd-path'] }}/etc/envs/petcd.sh
+      - file: etcd-proxy-script
+      - file: etcd-proxy-env
       - cmd: pull-etcd-proxy-image
     - require:
       - file: /etc/systemd/system/etcd-proxy.service

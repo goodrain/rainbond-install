@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 User=root
-EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/petcd.sh
+EnvironmentFile={{ pillar['rbd-path'] }}/envs/etcd-proxy.sh
 PermissionsStartOnly=true
 ExecStartPre=-/usr/bin/docker rm -f etcd-proxy
-ExecStart={{ pillar['rbd-path'] }}/petcd/scripts/start.sh
+ExecStart={{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
 ExecStop=-/usr/bin/docker stop etcd-proxy
 Restart=always
 RestartSec=10

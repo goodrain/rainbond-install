@@ -5,10 +5,10 @@ Requires=docker.service
 
 [Service]
 User=root
-EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/calico.sh
+EnvironmentFile={{ pillar['rbd-path'] }}/envs/calico.sh
 PermissionsStartOnly=true
 ExecStartPre=-/usr/bin/docker rm -f calico
-ExecStart={{ pillar['rbd-path'] }}/calico/scripts/start.sh
+ExecStart={{ pillar['rbd-path'] }}/scripts/start-calico.sh
 Restart=always
 ExecStop=-/usr/bin/docker stop calico
 RestartSec=10

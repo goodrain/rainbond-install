@@ -44,7 +44,7 @@ services:
       K8S_MASTER: http://127.0.0.1:8181
       CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
     volumes:
-    - {{ pillar['rbd-path'] }}/logs/eventlog:/var/log
+    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
     - /grdata/downloads/log:/grdata/logs
     logging:
       driver: json-file
@@ -64,8 +64,8 @@ services:
     network_mode: host
     restart: always
     volumes:
-    - {{ pillar['rbd-path'] }}/etc/node/node_host_uuid.conf:/etc/goodrain/host_uuid.conf
-    - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/etc/goodrain/host_uuid.conf
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     command:
     - --plugin-name=nginx
     - --plugin-opts=httpapi=http://127.0.0.1:10002
@@ -81,10 +81,10 @@ services:
       LicenseSwitch: 'off'
     volumes:
     - /grdata:/grdata
-    - {{ pillar['rbd-path'] }}/etc/api:/etc/goodrain
-    - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/etc/rbd-api:/etc/goodrain
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
-    - {{ pillar['rbd-path'] }}/logs/rainbond-api:/logs
+    - {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
     command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
@@ -97,6 +97,9 @@ services:
     image: rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
     container_name: rbd-chaos
     command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    environment:
+    - SOURCE_DIR=/cache/source
+    - CACHE_DIR=/cache
     logging:
       driver: json-file
       options:
@@ -123,8 +126,8 @@ services:
       HTTP_SUFFIX_URL: {{ pillar['domain'] }}
       NGINX_SSL_PORT: 10443
     volumes:
-    - {{ pillar['rbd-path'] }}/openresty:/usr/local/openresty/nginx/conf
-    - {{ pillar['rbd-path'] }}/logs/openrestry/logs:/usr/local/openresty/nginx/logs
+    - {{ pillar['rbd-path'] }}/etc/rbd-lb:/usr/local/openresty/nginx/conf
+    - {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
     logging:
       driver: json-file
       options:
@@ -169,7 +172,7 @@ services:
       MYSQL_DB: console
     volumes:
     - /grdata/services/console:/data
-    - {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/goodrain.log:/tmp/goodrain.log
+    - {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log:/tmp/goodrain.log
     logging:
       driver: json-file
       options:
@@ -181,8 +184,11 @@ services:
   rbd-db:
     image: rainbond/rbd-db:{{ pillar['rbd-version'] }}
     container_name: rbd-db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     volumes:
     - {{ pillar['rbd-path'] }}/data/rbd-db:/data
+    - {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
     logging:
       driver: json-file
       options:
@@ -203,7 +209,7 @@ services:
       CUR_NET: calico
       EX_DOMAIN: {{ pillar['domain'] }}
     volumes:
-    - {{ pillar['rbd-path'] }}/kubernetes/kubecfg:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - /grdata:/grdata
     command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
       --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
@@ -231,7 +237,7 @@ services:
     container_name: prometheus
     volumes:
     - /grdata/services/prometheus/data:/prometheusdata
-    - {{ pillar['rbd-path'] }}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    - {{ pillar['rbd-path'] }}/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
     logging:
       driver: json-file

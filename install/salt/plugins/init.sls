@@ -72,14 +72,14 @@ docker-pull-lb-image:
 proxy_site_conf:
   file.managed:
     - source: salt://plugins/data/proxy.conf
-    - name: {{ pillar['rbd-path'] }}/openresty/servers/http/proxy.conf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/servers/http/proxy.conf
     - template: jinja
     - makedirs: Ture
 
 proxy_site_ssl:
   file.recurse:
     - source: salt://proxy/ssl/goodrain.me
-    - name: {{ pillar['rbd-path'] }}/openresty/ssl/goodrain.me
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/ssl/goodrain.me
     - makedirs: Ture
 
 lb-upstart:
@@ -135,8 +135,8 @@ docker-pull-app-ui-image:
 
 app-ui-logs:
   cmd.run:
-    - name: touch {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/goodrain.log
-    - unless: ls {{ pillar['rbd-path'] }}/logs/service_logs/goodrain_web/goodrain.log
+    - name: touch {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log
+    - unless: ls {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log
     - require:
       - cmd: docker-pull-app-ui-image
 

@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 User=root
-EnvironmentFile={{ pillar['rbd-path'] }}/etc/envs/etcd.sh
+EnvironmentFile={{ pillar['rbd-path'] }}/envs/etcd.sh
 PermissionsStartOnly=true
 ExecStartPre=-/usr/bin/docker rm -f etcd
-ExecStart={{ pillar['rbd-path'] }}/etcd/scripts/start.sh
+ExecStart={{ pillar['rbd-path'] }}/scripts/start-etcd.sh
 ExecStop=-/usr/bin/docker stop etcd
 Restart=always
 RestartSec=10
