@@ -1,7 +1,7 @@
 prometheus-yml:
   file.managed:
     - source: salt://prometheus/prom/prometheus.yml
-    - name: {{ pillar['rbd-path'] }}/prometheus/prometheus.yml
+    - name: {{ pillar['rbd-path'] }}/etc/prometheus/prometheus.yml
     - template: jinja
     - makedirs: Ture
 

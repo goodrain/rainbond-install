@@ -15,12 +15,13 @@ make_domain:
 
 update_systeminfo:
   file.managed:
-    - source: salt://docker/envs/domain.sh
-    - name: /tmp/domain.sh
+    - source: salt://docker/files/domain.sh
+    - name: {{ pillar['rbd-path'] }}/bin/domain.sh
     - template: jinja
     - mode: 755
+    - makedirs: Ture
   cmd.run:
-    - name: bash /tmp/domain.sh
+    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh
 
 check_domain:
   cmd.run:
@@ -29,8 +30,9 @@ check_domain:
 
 rsync_update_domain:
   file.managed:
-    - source: salt://docker/envs/.domain.sh
+    - source: salt://docker/files/.domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/.domain.sh
+    - template: jinja
     - mode: 755
     - makedirs: Ture
 

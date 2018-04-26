@@ -3,7 +3,7 @@
 KUBE_SCHEDULER_OPTS="--logtostderr=true \
 --v=5 \
 --master=127.0.0.1:8181 \
---custom-config={{ pillar['rbd-path'] }}/kubernetes/k8s/custom.conf \
+--custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf \
 --leader-elect=true \
 "
 
@@ -13,6 +13,6 @@ exec /usr/bin/docker \
   --restart=always \
   --net=host \
   --name kube-scheduler \
-  --volume={{ pillar['rbd-path'] }}/kubernetes/k8s:{{ pillar['rbd-path'] }}/kubernetes/k8s \
+  --volume={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:{{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg \
   rainbond/kube-scheduler:v1.6.4 \
   $KUBE_SCHEDULER_OPTS

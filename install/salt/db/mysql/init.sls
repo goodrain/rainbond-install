@@ -3,12 +3,41 @@ docker-pull-db-image:
     - name: docker pull {{ pillar.database.mysql.get('image', 'rainbond/rbd-db:3.5') }}
     - unless: docker inspect {{ pillar.database.mysql.get('image', 'rainbond/rbd-db:3.5') }}
 
+my.cnf:
+  file.managed:
+    - source: salt://db/mysql/files/my.cnf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-db/my.cnf
+
+charset.cnf:
+  file.managed:
+    - source: salt://db/mysql/files/charset.cnf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-db/conf.d/charset.cnf
+    - makedirs: Ture
+
 db-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-db
     - unless: check_compose rbd-db
     - require:
       - cmd: docker-pull-db-image
+      - file: charset.cnf
+      - file: my.cnf
+
+stop-rbd-db:
+  cmd.run:
+    - name: dc-compose stop rbd-db
+    - unless: check_compose rbd-db
+    - require:
+      - cmd: db-upstart
+      - cmd: docker-pull-db-image
+
+clear-dead-container:
+  cmd.run:
+    - name: cclear
+    - unless: docker ps -a -q --filter 'status=exited'
+    - require:
+      - cmd: stop-rbd-db
+
 
 waiting_for_db:
   cmd.run:

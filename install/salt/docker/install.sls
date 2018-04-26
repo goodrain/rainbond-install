@@ -1,20 +1,20 @@
 docker-envs:
   file.managed:
-    - source: salt://docker/envs/docker.sh
-    - name: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+    - source: salt://docker/files/docker.sh
+    - name: {{ pillar['rbd-path'] }}/envs/docker.sh
     - template: jinja
     - makedirs: Ture
 
 docker-envs-old:
   file.managed:
-    - source: salt://docker/envs/docker.sh
+    - source: salt://docker/files/docker.sh
     - name: /etc/goodrain/envs/docker.sh
     - template: jinja
     - makedirs: Ture
 
 docker-mirrors:
   file.managed:
-    - source: salt://docker/envs/daemon.json
+    - source: salt://docker/files/daemon.json
     - name: /etc/docker/daemon.json
     - makedirs: Ture
 
@@ -51,7 +51,7 @@ gr-docker-engine:
 
 docker_service:
   file.managed:
-    - source: salt://docker/envs/docker.service
+    - source: salt://docker/files/docker.service
   {% if grains['os_family']|lower == 'redhat' %}
     - name: /usr/lib/systemd/system/docker.service
   {% else %}
@@ -67,14 +67,14 @@ docker_status:
     - require:
       - pkg: gr-docker-engine
     - watch:
-      - file: {{ pillar['rbd-path'] }}/etc/envs/docker.sh
+      - file: {{ pillar['rbd-path'] }}/envs/docker.sh
       - file: docker_service
       - pkg: gr-docker-engine
 
 install-docker-compose:
   file.managed:
     - name: /usr/local/bin/dc-compose
-    - source: salt://docker/envs/dc-compose
+    - source: salt://docker/files/dc-compose
     - makedirs: Ture
     - template: jinja
     - mode: 755

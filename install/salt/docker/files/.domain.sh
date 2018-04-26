@@ -3,8 +3,8 @@
 IP=$1
 
 function domain() {
-    EX_DOMAIN=$(cat /opt/rainbond/.domain.log)
-    grep "goodrain.org" /opt/rainbond/.domain.log > /dev/null
+    EX_DOMAIN=$(cat {{ pillar['rbd-path'] }}/.domain.log)
+    grep "goodrain.org" {{ pillar['rbd-path'] }}/.domain.log > /dev/null
     if [ "$?" -ne 0 ];then
         echo "DOMAIN NOT ALLOW"
     else
