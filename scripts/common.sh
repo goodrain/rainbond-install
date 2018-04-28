@@ -80,6 +80,7 @@ if [ "$SYS_NAME" == "centos" ];then
     DNS_INFO="^DNS"
     NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
+    Cache_PKG="$INSTALL_BIN makecache fast -q"
     PKG_BIN="rpm -qi"
     SYS_BASE_PKGS=( perl \
     bind-utils \
@@ -96,12 +97,13 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
-    yum makecache fast -q -y
+
 # debian and ubuntu
 else
     DNS_INFO="dns-nameservers"
     NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt-get"
+    Cache_PKG="$INSTALL_BIN update -y -q"
     PKG_BIN="dpkg -l"
     SYS_BASE_PKGS=( uuid-runtime \
     iproute2 \
@@ -307,15 +309,6 @@ Install_PKG(){
     pkg_name="$@"
     $INSTALL_BIN install -y -q $pkg_name > /dev/null
 }
-
-Cache_PKG(){
-    if [ "$SYS_NAME" == "centos" ];then
-        yum makecache fast -q
-    else
-        apt-get update -y -q
-    fi
-}
-
 
 # Name   : Write_Sls_File
 # Args   : key,valume,(path)

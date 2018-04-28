@@ -46,6 +46,7 @@ Get_Rainbond_Install_Path(){
 # Args   : NULL
 # Return : 0|!0
 Install_Base_Pkg(){
+  $Cache_PKG
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 
   Echo_Info "update localtime"
@@ -211,7 +212,7 @@ Install_Salt(){
   if [ ! $SALT_SSH_INSTALLED ];then
     # update repo mate
     Echo_Info "Installing salt ..."
-    Cache_PKG > /dev/null
+    $Cache_PKG > /dev/null
 
     # install salt
     Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \

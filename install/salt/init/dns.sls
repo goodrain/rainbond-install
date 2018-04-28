@@ -33,3 +33,9 @@ rbd-app-ui-domain:
     - ip: {{ hostip }}
     - names:
       - console.goodrain.me
+
+# Modify /etc/resolv.conf
+/etc/resolv.conf:
+  file.append:
+    - text:
+      - "nameserver {{ pillar['dns'] }}"
