@@ -1,3 +1,3 @@
 {
-    "registry-mirrors": ["https://registry.docker-cn.com"]
+    "registry-mirrors": ["{{ pillar.get('registry-mirrors', 'https://registry.docker-cn.com') }}"]
 }

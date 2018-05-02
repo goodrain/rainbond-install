@@ -16,6 +16,7 @@ docker-mirrors:
   file.managed:
     - source: salt://docker/files/daemon.json
     - name: /etc/docker/daemon.json
+    - template: jinja
     - makedirs: Ture
 
 docker-repo:

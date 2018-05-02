@@ -1,4 +1,5 @@
 {% if grains['id'] == "manage01" %}
+{% if not pillar.get('domain','') %}
 make_domain_prepare:
   cmd.run:
     - name: echo "" > {{ pillar['rbd-path'] }}/.domain.log
@@ -39,6 +40,7 @@ rsync_update_domain:
 refresh_domain:
   cmd.run:
     - name: salt "*" saltutil.refresh_pillar
+{% endif %}
 {% endif %}
 
 

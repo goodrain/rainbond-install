@@ -184,6 +184,24 @@ base:
 EOF
 }
 
+custom_config(){
+  # domain
+  # registry-mirrors
+  if read -t 10 -p "custom domain config:" domain
+  then
+    Write_Sls_File domain "$domain"
+    Echo_Info "you need to add A record: *.$domain --> ${DEFAULT_LOCAL_IP} "
+  else
+    Echo_Info "will use goodrain.org as default domain"
+  fi
+  if read -t 10 -p "custom docker mirrors config:" mirrors
+  then
+    Write_Sls_File registry-mirrors "$mirrors"
+  else
+    Echo_Info "will use docker-cn as default mirros"
+  fi
+}
+
 run(){
     db_init
     etcd
@@ -191,6 +209,7 @@ run(){
     calico
     plugins
     write_top
+    custom_config
 }
 
 
