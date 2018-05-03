@@ -39,7 +39,6 @@ kubernetes.node"
 
 COMPUTE_MODULES="init \
 storage \
-grbase.dns \
 docker \
 misc \
 etcd \
