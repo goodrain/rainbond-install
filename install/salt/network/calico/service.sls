@@ -48,6 +48,7 @@ init.calico:
   file.managed:
     - name: {{ pillar['rbd-path'] }}/bin/init.calico
     - source: salt://network/calico/install/run/init.calico
+    - makedirs: Ture
     - template: jinja
     - mode: 755
     - user: root

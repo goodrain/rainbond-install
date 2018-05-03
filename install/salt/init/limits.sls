@@ -7,3 +7,11 @@
       - "* hard nofile 102400"
       - "* soft memlock unlimited"
       - "* hard memlock unlimited"
+
+vm.max_map_count:
+  sysctl.present:
+    - value: 262144
+
+net.ipv4.ip_forward:
+  sysctl.present:
+    - value: 1

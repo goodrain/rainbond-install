@@ -187,14 +187,15 @@ EOF
 custom_config(){
   # domain
   # registry-mirrors
-  if read -t 10 -p "custom domain config:" domain
+  Echo_Info "Info: https://github.com/goodrain/rainbond-install/wiki/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE(Custom-configuration)"
+  if read  -p "custom domain config:" domain
   then
     Write_Sls_File domain "$domain"
     Echo_Info "you need to add A record: *.$domain --> ${DEFAULT_LOCAL_IP} "
   else
     Echo_Info "will use goodrain.org as default domain"
   fi
-  if read -t 10 -p "custom docker mirrors config:" mirrors
+  if read  -p "custom docker mirrors config:" mirrors
   then
     Write_Sls_File registry-mirrors "$mirrors"
   else
