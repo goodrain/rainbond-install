@@ -184,6 +184,25 @@ base:
 EOF
 }
 
+custom_config(){
+  # domain
+  # registry-mirrors
+  Echo_Info "Info: https://github.com/goodrain/rainbond-install/wiki/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE(Custom-configuration)"
+  if read  -p "custom domain config:" domain
+  then
+    Write_Sls_File domain "$domain"
+    Echo_Info "you need to add A record: *.$domain --> ${DEFAULT_LOCAL_IP} "
+  else
+    Echo_Info "will use goodrain.org as default domain"
+  fi
+  if read  -p "custom docker mirrors config:" mirrors
+  then
+    Write_Sls_File registry-mirrors "$mirrors"
+  else
+    Echo_Info "will use docker-cn as default mirros"
+  fi
+}
+
 run(){
     db_init
     etcd
@@ -191,6 +210,7 @@ run(){
     calico
     plugins
     write_top
+    custom_config
 }
 
 

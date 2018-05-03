@@ -6,7 +6,6 @@ include:
   - init.swap
   - init.create_dir
   - init.service
-  - init.router
   - init.plugins
   - init.gr_bin
   - init.dns
@@ -17,7 +16,6 @@ include:
   - init.limits
   - init.service
   - init.key
-  - init.router
   - init.gr_bin
   - init.dns
 {% endif %}
