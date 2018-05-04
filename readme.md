@@ -23,10 +23,13 @@ Plugins Version:
 - [Rainbond UI v3.5](https://github.com/goodrain/rainbond-ui)
 - Salt v2017.7.5
 
-## Documentation
+## Operations Guide
 
-> Please read [Select-Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution) before installation.
+### Prerequisites
 
+- [Distribution-recommendation](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution)
+- [Custom-configuration](https://github.com/goodrain/rainbond-install/wiki/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE(Custom-configuration))
+- [Software-and-Hardware-Requirements](https://github.com/goodrain/rainbond-install/wiki/Software-and-Hardware-Requirements)
 
 ### Install
 
@@ -45,29 +48,6 @@ chmod +x install.sh
 ```
 
 You can find all the documentation in the [Wiki](https://github.com/goodrain/rainbond-install/wiki).
-
-### Add a compute node
-Through a script Which is "add_node.sh" to add a compute node.
-
-**Parameter**
-
-```
--r <Role>,       Specify a node type <compute|manage> ,follow-up support management node.
--i <IP>,         The ip address what you Specified node
--p <Password>    The login password what you Specified node
-```
-
-**Usage**
-
-```Bash
-bash ./add_node.sh -r <compute|manage> -i <IP> -p <Password>
-```
-
-> **Such as:**
->
-> ```Bash
-> bash ./add_node.sh -r compute -i 192.168.1.1 -p 123456
-> ```
 
 ### Documents
 
