@@ -1,0 +1,1 @@
+registry-mirrors: https://registry.docker-cn.com

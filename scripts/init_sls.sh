@@ -64,7 +64,7 @@ Write_Config(){
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
   # Config region info
-  Write_Sls_File rbd-tag "rainbond"
+  Write_Sls_File rbd-tag "cloudbang"
   # Get dns info
   Write_Sls_File dns "$dns_value"
   # Get cli info
@@ -175,6 +175,7 @@ write_top(){
 cat > ${PILLAR_DIR}/top.sls <<EOF
 base:
   '*':
+    - custom
     - goodrain
     - etcd
     - network
@@ -185,24 +186,7 @@ EOF
 }
 
 custom_config(){
-  # domain
-  # registry-mirrors
-  #Echo_Info "Info: https://github.com/goodrain/rainbond-install/wiki/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE(Custom-configuration)"
-  read -p "Press Enter to use the default domain or input your custom domain:" domain
-  if [ ! -z "$domain" ];then
-      Write_Sls_File domain "$domain"
-      Echo_Info "you need to add A record: *.$domain --> ${DEFAULT_LOCAL_IP} ${DEFAULT_PUBLIC_IP} "
-  else
-      Echo_Info "will use goodrain.org as default domain"
-  fi
 
-  read  -p "Press Enter to use the default mirros or input your custom docker mirrors config:" mirrors
-  if [ ! -z "$mirrors" ];then
-      Write_Sls_File registry-mirrors "$mirrors"
-  else
-      Echo_Info "will use docker-cn as default mirros"
-      Write_Sls_File registry-mirrors "https://registry.docker-cn.com"
-  fi
 }
 
 run(){
@@ -211,8 +195,8 @@ run(){
     kubernetes
     calico
     plugins
-    write_top
     custom_config
+    write_top
 }
 
 

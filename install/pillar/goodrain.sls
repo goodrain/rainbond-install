@@ -6,7 +6,6 @@ host-uuid: xxxxxxx
 rbd-version: 3.5
 install-script-path: /root
 cli-image: rainbond/static:allcli_v3.5
-registry-mirrors: https://registry.docker-cn.com
 rbd-tag: cloudbang
 manage:
   - ip: 172.16.0.169
