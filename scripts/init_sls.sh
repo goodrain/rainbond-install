@@ -169,6 +169,11 @@ plugins:
 EOF
 }
 
+custom_config(){
+  # Todo
+  echo ""
+}
+
 # -----------------------------------------------------------------------------
 # init top configure
 write_top(){
@@ -183,10 +188,6 @@ base:
     - db
     - plugins
 EOF
-}
-
-custom_config(){
-
 }
 
 run(){

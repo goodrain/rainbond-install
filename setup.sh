@@ -16,8 +16,7 @@
 . scripts/common.sh
 
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
-[ ! -d $PILLAR_DIR ] && mkdir $PILLAR_DIR || rm $PILLAR_DIR/* -rf
-[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls
+[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls || echo "" > $PILLAR_DIR/goodrain.sls
 
  # trap program exit
 trap 'Exit_Clear; exit' SIGINT SIGHUP
