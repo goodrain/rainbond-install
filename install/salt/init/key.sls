@@ -22,6 +22,14 @@ key_pub:
 
 {% else %}
 
+ssh_dir:
+  file.managed:
+    - name: /root/.ssh
+    - user: root
+    - group: root
+    - makedirs: Ture
+    - mode: 700
+
 key_cp:
   file.managed:
     - source: salt://init/files/id_rsa.pub
@@ -33,6 +41,9 @@ key_cp:
     - unless: test -f /tmp/id_rsa.pub
   cmd.run:
     - name: cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys
+    - require:
+      - file: ssh_dir
+
 {% endif %}
 
 {% if "manage" in grains['id']%}
