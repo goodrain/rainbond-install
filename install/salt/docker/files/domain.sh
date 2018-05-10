@@ -1,7 +1,20 @@
 #!/bin/bash
-grep "domain" /srv/pillar/goodrain.sls
+
+DOMAIN_IP=$1
+DOMAIN_UUID={{ grains['uuid'] }}
+DOMAIN_LOG={{ pillar['rbd-path'] }}/.domain.log
+DOMAIN_API="http://domain-api.grapps.cn/domain"
+
+if [ -f "/tmp/.goodrain" ];then
+    DOMAIN_TYPE="True"
+else
+    DOMAIN_TYPE="False"
+fi
+
+grep "domain" /srv/pillar/custom.sls
 if [[ $? -ne 0 ]];then
-    echo "domain: $(cat {{ pillar['rbd-path'] }}/.domain.log)" >> /srv/pillar/goodrain.sls
+    curl $DOMAIN_API?ip=$DOMAIN_IP\&uuid=$DOMAIN_UUID\&type=$DOMAIN_TYPE > $DOMAIN_LOG
+    echo "domain: $(cat {{ pillar['rbd-path'] }}/.domain.log)" >> /srv/pillar/custom.sls
 else
     echo "domain exist"
 fi

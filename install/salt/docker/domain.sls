@@ -6,15 +6,6 @@ make_domain_prepare:
     - unless: grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
 
 make_domain:
-  cmd.run:
-  {% if pillar['public-ip'] %}
-    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['public-ip'] }}
-  {% else %}
-    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['inet-ip'] }}
-  {% endif %}
-    - unless:  grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
-
-update_systeminfo:
   file.managed:
     - source: salt://docker/files/domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/domain.sh
@@ -22,7 +13,11 @@ update_systeminfo:
     - mode: 755
     - makedirs: Ture
   cmd.run:
-    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh
+  {% if pillar['public-ip'] %}
+    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['public-ip'] }}
+  {% else %}
+    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['inet-ip'] }}
+  {% endif %}
 
 check_domain:
   cmd.run:
