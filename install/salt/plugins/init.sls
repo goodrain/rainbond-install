@@ -88,18 +88,18 @@ lb-upstart:
     - unless: check_compose rbd-lb
     - require:
       - cmd: docker-pull-lb-image
-      - file: proxy_site_conf
+      - file: default_http_conf
       - file: proxy_site_ssl
 
 lb-restart:
   cmd.run:
     - name: dc-compose restart rbd-lb
     - onchanges:
-      - file: proxy_site_conf
+      - file: default_http_conf
       - file: proxy_site_ssl
     - require:
       - cmd: docker-pull-lb-image
-      - file: proxy_site_conf
+      - file: default_http_conf
       - file: proxy_site_ssl
 #==================== rbd-mq ======================
 docker-pull-mq-image:
