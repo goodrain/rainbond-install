@@ -66,20 +66,20 @@ chaos-upstart:
 #==================== rbd-lb ====================
 docker-pull-lb-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+    - name: docker pull rainbond/rbd-lb:3.5-new
+    - unless: docker inspect rainbond/rbd-lb:3.5-new
 
-proxy_site_conf:
+default_http_conf:
   file.managed:
     - source: salt://plugins/data/proxy.conf
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/servers/http/proxy.conf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
     - template: jinja
     - makedirs: Ture
 
 proxy_site_ssl:
   file.recurse:
     - source: salt://proxy/ssl/goodrain.me
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/ssl/goodrain.me
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
     - makedirs: Ture
 
 lb-upstart:

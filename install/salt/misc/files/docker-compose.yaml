@@ -54,7 +54,7 @@ services:
     network_mode: host
     restart: always
   rbd-entrance:
-    image: rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
+    image: rainbond/rbd-entrance:3.5-new
     container_name: rbd-entrance
     logging:
       driver: json-file
@@ -63,15 +63,17 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+    environment:
+      DEFAULT_HTTP_PORT: 80
+      DEFAULT_HTTPS_PORT: 443
     volumes:
-    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/etc/goodrain/host_uuid.conf
     - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     command:
-    - --plugin-name=nginx
-    - --plugin-opts=httpapi=http://127.0.0.1:10002
-    - --plugin-opts=streamapi=http://127.0.0.1:10002
+    - --plugin-name=openresty
+    - --plugin-opts=urls=http://127.0.0.1:10002
     - --kube-conf=/etc/goodrain/kubernetes/admin.kubeconfig
     - --log-level=info
+    - --etcd-endpoints http://127.0.0.1:2379
   rbd-api:
     image: rainbond/rbd-api:{{ pillar['rbd-version'] }}
     container_name: rbd-api
@@ -114,20 +116,13 @@ services:
     network_mode: host
     restart: always
   rbd-lb:
-    image: rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+    image: rainbond/rbd-lb:3.5-new
     container_name: rbd-lb
     environment:
-      NGINX_INIT_PORT: 80
-      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
-      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
-      MYSQL_USERNAME: {{ pillar['database']['mysql']['user'] }}
-      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
-      MYSQL_DATABASE: region
+      DEFAULT_PORT: 80
       HTTP_SUFFIX_URL: {{ pillar['domain'] }}
-      NGINX_SSL_PORT: 10443
     volumes:
-    - {{ pillar['rbd-path'] }}/etc/rbd-lb:/usr/local/openresty/nginx/conf
-    - {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
+    - {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
     logging:
       driver: json-file
       options:
