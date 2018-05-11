@@ -66,8 +66,8 @@ chaos-upstart:
 #==================== rbd-lb ====================
 docker-pull-lb-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-lb:3.5-new
-    - unless: docker inspect rainbond/rbd-lb:3.5-new
+    - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+    - unless: docker inspect rainbond/rbd-lb:{{ pillar['rbd-version'] }}
 
 default_http_conf:
   file.managed:

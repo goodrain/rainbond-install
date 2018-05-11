@@ -54,7 +54,7 @@ services:
     network_mode: host
     restart: always
   rbd-entrance:
-    image: rainbond/rbd-entrance:3.5-new
+    image: rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
     container_name: rbd-entrance
     logging:
       driver: json-file
@@ -116,7 +116,7 @@ services:
     network_mode: host
     restart: always
   rbd-lb:
-    image: rainbond/rbd-lb:3.5-new
+    image: rainbond/rbd-lb:{{ pillar['rbd-version'] }}
     container_name: rbd-lb
     environment:
       DEFAULT_PORT: 80
