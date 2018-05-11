@@ -35,4 +35,4 @@ install_req_pkgs:
 
 update_time:
   cmd.run:
-    - name: ntpdate 0.cn.pool.ntp.org
+    - name: ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com

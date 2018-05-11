@@ -50,7 +50,7 @@ Install_Base_Pkg(){
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 
   Echo_Info "update localtime"
-  ntpdate 0.cn.pool.ntp.org
+  ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
 }
 
 # Name   : Write_Config

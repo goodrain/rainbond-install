@@ -40,7 +40,7 @@ pkg(){
         apt-get install -y -q git ntpdate apt-transport-https > /dev/null
 
     fi
-    ntpdate 0.cn.pool.ntp.org > /dev/null
+    ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null
 }
 
 run(){
