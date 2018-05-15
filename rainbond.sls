@@ -6,14 +6,25 @@
 # more information: http://mikefarah.github.io/yq/
 rbd-version: 3.5
 rbd-path: /opt/rainbond
-inet-ip: 172.16.0.210
-public-ip:
+inet-ip: 
+public-ip: 
 # master-hostname: 
 hostname: manage01
-domain: kvvl8.goodrain.org
-install-script-path: /root/rainbond-install
+domain: xxx.goodrain.org
+install-script-path: 
 rbd-tag: rainbond
 dns: 114.114.114.114
+rbd-images:
+  allcli: rainbond/static:allcli_v3.5
+  calico-node: rainbond/calico-node:v2.4.1
+  rbd-db: rainbond/rbd-db:3.5
+  etcd: rainbond/etcd:v3.2.13
+  cfssl_image: rainbond/cfssl:dev
+  kubecfg_image: rainbond/kubecfg:dev
+  api_image: rainbond/kube-apiserver:v1.6.4
+  manager: rainbond/kube-controller-manager:v1.6.4
+  schedule: rainbond/kube-scheduler:v1.6.4
+
 cli-image: rainbond/static:allcli_v3.5
 
 # rbd-db

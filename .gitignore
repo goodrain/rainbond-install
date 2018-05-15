@@ -1,17 +1,3 @@
-download/
-logs/
-
-# docker
-
-install/salt/docker/deb/
-install/salt/docker/rpm/
-install/salt/key/
-
-
-# etcd
-install/salt/etcd/install/bin/
-install/salt/etcd/install/systemd/petcd.service
-
-# .MD
-
-TODO.md
+# offline directory
+install/imgs/*.gz
+install/pkgs/*.rpm
