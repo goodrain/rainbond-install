@@ -7,6 +7,7 @@ my.cnf:
   file.managed:
     - source: salt://db/mysql/files/my.cnf
     - name: {{ pillar['rbd-path'] }}/etc/rbd-db/my.cnf
+    - makedirs: Ture
 
 charset.cnf:
   file.managed:
