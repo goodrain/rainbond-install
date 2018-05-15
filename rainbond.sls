@@ -25,6 +25,13 @@ rbd-images:
   manager: rainbond/kube-controller-manager:v1.6.4
   schedule: rainbond/kube-scheduler:v1.6.4
 
+rbd-pkgs:
+  manage:
+    - salt-master
+    - salt-minion
+  compute:
+    - salt-minion
+
 cli-image: rainbond/static:allcli_v3.5
 
 # rbd-db
