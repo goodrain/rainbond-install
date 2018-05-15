@@ -24,22 +24,6 @@ db-upstart:
       - file: charset.cnf
       - file: my.cnf
 
-stop-rbd-db:
-  cmd.run:
-    - name: dc-compose stop rbd-db
-    - unless: check_compose rbd-db
-    - require:
-      - cmd: db-upstart
-      - cmd: docker-pull-db-image
-
-clear-dead-container:
-  cmd.run:
-    - name: cclear
-    - unless: docker ps -a -q --filter 'status=exited'
-    - require:
-      - cmd: stop-rbd-db
-
-
 waiting_for_db:
   cmd.run:
     - name: docker exec rbd-db mysql -e "show databases"
