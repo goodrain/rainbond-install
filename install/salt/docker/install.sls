@@ -23,7 +23,7 @@ docker-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}
     - humanname: Goodrain CentOS-$releasever - for x86_64
-    - baseurl: http://repo.goodrain.com/centos/\$releasever/3.5/\$basearch
+    - baseurl: http://repo.goodrain.com/centos/$releasever/3.5/$basearch
     - enabled: 1
     - gpgcheck: 1
     - gpgkey: http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
