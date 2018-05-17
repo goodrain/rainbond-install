@@ -51,4 +51,5 @@ exec /usr/bin/docker \
   --initial-cluster $INITIAL_CLUSTER \
   --initial-cluster-token {{ pillar.etcd.server.token }} \
   --initial-cluster-state ${INITIAL_CLUSTER_STATE:-new} \
-  --auto-compaction-retention 1
+  --auto-compaction-retention 1 \
+  --quota-backend-bytes=$((4*1024*1024*1024))
