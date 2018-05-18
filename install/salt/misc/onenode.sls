@@ -36,12 +36,12 @@ rsync_kube-proxy_kubeconfig:
 
 pull_static_image:
   cmd.run:
-    - name: docker pull {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.5') }}
-    - unless: docker inspect rainbond/static:allcli_v3.5
+    - name: docker pull {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }}
+    - unless: docker inspect rainbond/static:allcli_v3.6
 
 prepare_cli_tools:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.5') }} tar zxf /pkg.tgz -C /sysdir
+    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }} tar zxf /pkg.tgz -C /sysdir
     - require:
       - cmd: pull_static_image
     - unless:

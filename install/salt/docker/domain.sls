@@ -19,11 +19,6 @@ make_domain:
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['inet-ip'] }}
   {% endif %}
 
-check_domain:
-  cmd.run:
-    - name:  echo "domain not found"
-    - unless: grep "domain" /srv/pillar/goodrain.sls
-
 rsync_update_domain:
   file.managed:
     - source: salt://docker/files/.domain.sh

@@ -1,17 +1,25 @@
-docker-pull-plugins:
+{% if grains['id'] == "manage01" %}
+pull-plugin-tcm:
   cmd.run:
     - name: docker pull rainbond/plugins:tcm
-    - unless: docker inspect rainbond/plugins:tcm
-    
-plugins-tag:
+
+retag-plugin-tcm:
   cmd.run:
     - name: docker tag rainbond/plugins:tcm goodrain.me/tcm
-    - unless: docker inspect goodrain.me/tcm
-    - require:
-      - cmd: docker-pull-plugins
 
-plugins-push:
+push-plugin-tcm:
   cmd.run:
     - name: docker push goodrain.me/tcm
-    - require:
-      - cmd: plugins-tag
+
+pull-plugin-mesh:
+  cmd.run:
+    - name: docker pull rainbond/plugins:mesh_plugin
+
+retag-plugin-mesh:
+  cmd.run:
+    - name: docker tag rainbond/plugins:mesh_plugin goodrain.me/mesh_plugin
+
+push-plugin-mesh:
+  cmd.run:
+    - name: docker push goodrain.me/mesh_plugin
+{% endif %}

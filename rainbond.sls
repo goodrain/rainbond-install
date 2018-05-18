@@ -4,7 +4,7 @@
 # read:           ./scripts/yq r t.yml etcd.server.members[0].name
 # write/update:   ./scripts/yq w t.yml etcd.server.members[0].name compute01
 # more information: http://mikefarah.github.io/yq/
-rbd-version: 3.5
+rbd-version: 3.6
 rbd-path: /opt/rainbond
 inet-ip: 
 public-ip: 
@@ -15,9 +15,9 @@ install-script-path:
 rbd-tag: rainbond
 dns: 114.114.114.114
 rbd-images:
-  allcli: rainbond/static:allcli_v3.5
+  allcli: rainbond/static:allcli_v3.6
   calico-node: rainbond/calico-node:v2.4.1
-  rbd-db: rainbond/rbd-db:3.5
+  rbd-db: rainbond/rbd-db:3.6
   etcd: rainbond/etcd:v3.2.13
   cfssl_image: rainbond/cfssl:dev
   kubecfg_image: rainbond/kubecfg:dev
@@ -32,7 +32,7 @@ rbd-pkgs:
   compute:
     - salt-minion
 
-cli-image: rainbond/static:allcli_v3.5
+cli-image: rainbond/static:allcli_v3.6
 
 # rbd-db
 database:
