@@ -74,7 +74,7 @@ Create_Repo(){
 #----------------------------------------------------------------------------------------------------------------------
 Download_Image(){
 #list every image we need
-    [ ! $( systemctl is-active docker ) ] && systemctl start docker && systemctl enable docker >/dev/null
+    [ $( systemctl is-active docker ) != "active" ] && systemctl start docker && systemctl enable docker >/dev/null
     rbd_moudles=(rbd-api rbd-dns rbd-registry rbd-repo rbd-worker rbd-eventlog rbd-entrance rbd-chaos rbd-lb rbd-mq rbd-webcli rbd-app-ui prometheus)
     database=(mysql)
     etcd=(server)
