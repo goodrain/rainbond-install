@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. scripts/common.sh
+. scripts/common.sh $1
 
 [[ $DEBUG ]] && set -x
 
@@ -48,9 +48,13 @@ Get_Rainbond_Install_Path(){
 Install_Base_Pkg(){
   $Cache_PKG
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
-
+#judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
+  if [[ $1 != "offline" ]];then
   Echo_Info "update localtime"
   ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
+  else
+  return 0
+  fi
 }
 
 # Name   : Write_Config
@@ -251,10 +255,11 @@ EOF
   cp -rp $PWD/install/salt /srv/
   cp -rp $PWD/install/pillar /srv/
 
+
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
-
-  salt-ssh "*" state.sls salt.setup --state-output=mixed
+#judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+  [[ $1 != "offline" ]] && salt-ssh "*" state.sls salt.setup --state-output=mixed
 
   systemctl restart salt-master
   systemctl restart salt-minion
@@ -271,8 +276,16 @@ EOF
   done
 }
 
+Define_Domain(){
+  #judgment below uses for offline env : define domain name by user ( changed by guox 2018.5.18 ).
+  if [[ $1 == "offline" ]];then
+    read -p "Please input your custom domain: "  Doman_Name
+    echo "domain: $Doman_Name" > /srv/pillar/custom.sls
+  fi
+}
+
 Echo_Info "Install Base Package ..."
-Install_Base_Pkg && Echo_Ok
+Install_Base_Pkg $1 && Echo_Ok
 
 Echo_Info "Init system config ..."
 Init_system && Echo_Ok
@@ -289,5 +302,9 @@ run && Echo_Ok
 # config salt
 Install_Salt && Echo_Ok
 
+Define_Domain $1 && Echo_Ok
+#judgment below uses for offline env : do not exec REG_Check ( changed by guox 2018.5.18 ).
+if [[ $1 != "offline" ]];then
 Echo_Info "REG Check info ..."
 REG_Check && Echo_Ok
+fi

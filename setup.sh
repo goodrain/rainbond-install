@@ -13,7 +13,7 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
-. scripts/common.sh
+. scripts/common.sh $1
 
 [ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
 [ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls || echo "" > $PILLAR_DIR/goodrain.sls
@@ -35,14 +35,15 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
-        ./scripts/init_sls.sh && touch $INIT_FILE
+        ./scripts/init_sls.sh $1 && touch $INIT_FILE
     fi
 }
 
 install_func(){
     fail_num=0
     Echo_Info "will install manage node."
-
+#judgment below uses for offline env : del docker from MANAGE_MODULES ( changed by guox 2018.5.18 ).
+    [[ $@ == "offline" ]] && export MANAGE_MODULES="${MANAGE_MODULES%%docker*}${MANAGE_MODULES##*docker}"
     for module in ${MANAGE_MODULES}
     do
         echo "Start install $module ..."
@@ -64,9 +65,15 @@ install_func(){
     fi
 }
 
+Offline_Prepare(){
+    Echo_Info "Prepare install rainbond offline."
+    ./scripts/prepare_install.sh $1
+}
+
 help_func(){
     echo "help:"
     echo "check   --- check cmd "
+    echo "offline --- work in offline env cmd"
     echo "install --- install cmd "
     echo "dev     --- ignore check install cmd "
     echo ""
@@ -81,6 +88,9 @@ case $1 in
     ;;
     dev)
         check_func force && init_config && install_func ${@:2}
+    ;;
+    offline)
+        Offline_Prepare offline && init_config offline && install_func offline
     ;;
     *)
         help_func

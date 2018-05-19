@@ -59,7 +59,8 @@ net-tools \
 telnet \
 rsync \
 lvm2 \
-git )
+git \
+salt-minion )
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
@@ -87,6 +88,9 @@ if [ "$SYS_NAME" == "centos" ];then
     bash-completion )
 
     # centos salt repo
+    #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+
+    if [[ $1 != "offline" ]];then
     cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
@@ -96,6 +100,7 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
+    fi
 
 # debian and ubuntu
 else
@@ -262,14 +267,18 @@ local l1=" ^" \
 REG_Check(){
     uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
     iip=$( Read_Sls_File inet-ip ./install/pillar/ )
-    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
+    #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
+    [[ $1 != "offline" ]] && \
+    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip || return 0
 }
 
 REG_Status(){
     uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
     iip=$( Read_Sls_File inet-ip ./install/pillar/ )
     domain=$( Read_Sls_File domain /srv/pillar/ )
-    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
+    #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
+    [[ $1 != "offline" ]] && \
+    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain || return 0
 }
 
 # Name     : Check_net_card
