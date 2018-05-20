@@ -176,7 +176,7 @@ rainbond-modules:
     version: 3.5
   rbd-lb: 
     image: rainbond/rbd-lb
-    version: 3.5-new
+    version: 3.5
   rbd-mq: 
     image: rainbond/rbd-mq
     version: 3.5
