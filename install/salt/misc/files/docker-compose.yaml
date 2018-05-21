@@ -36,17 +36,19 @@ services:
     image: rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
     container_name: rbd-eventlog
     environment:
-      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
-      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
-      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
-      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
-      MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
-      CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
     volumes:
     - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
     - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     - /grdata/downloads/log:/grdata/logs
+    command:
+    - --cluster.bind.ip={{ pillar['inet-ip'] }}
+    - --db.type=mysql
+    - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
+    - --discover.etcd.addr=http://{{ pillar['inet-ip'] }}:2379
+    - --eventlog.bind.ip={{ pillar['inet-ip'] }}
+    - --websocket.bind.ip={{ pillar['inet-ip'] }}
+    - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
     logging:
       driver: json-file
       options:
