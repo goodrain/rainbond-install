@@ -5,6 +5,10 @@
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 DOCKER_VERSION="1.12.6,1526e3f"
+YQBIN="./scripts/yq"
+GLOBAL_SLS="./rainbond.sls"
+SALT_VER="stable 2017.7.5"
+SALT_REPO="mirrors.ustc.edu.cn/salt"
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
@@ -297,6 +301,14 @@ Write_Sls_File(){
   fi
   
   echo "$key: $value" >> $path/goodrain.sls
+}
+
+Write_Sls(){
+    key=$1
+    value=$2
+    slsfile=${3:-$GLOBAL_SLS}
+    isExist=$( $YQBIN r $slsfile $key )
+    
 }
 
 # Name   : Read_Sls_File

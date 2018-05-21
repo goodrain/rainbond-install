@@ -10,17 +10,18 @@
 Init_system(){
   hostname manage01
   echo "manage01" > /etc/hostname
-  Write_Sls_File  hostname "$DEFAULT_HOSTNAME"
+  $YQBIN w $GLOBAL_SLS hostname "$DEFAULT_HOSTNAME"
 
   LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   
-  Write_Sls_File rbd-version "$RBD_VERSION"
-  Write_Sls_File inet-ip $DEFAULT_LOCAL_IP
+  $YQBIN w $GLOBAL_SLS rbd-version "$RBD_VERSION"
+  $YQBIN w $GLOBAL_SLS master-ip $DEFAULT_LOCAL_IP
+  
   if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
-    Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
+    $YQBIN w $GLOBAL_SLS public-ip "${DEFAULT_PUBLIC_IP}"
   else
-    Write_Sls_File public-ip ""
+    $YQBIN w $GLOBAL_SLS public-ip ""
   fi
 
   # reset /etc/hosts
@@ -39,7 +40,8 @@ Get_Rainbond_Install_Path(){
 
   Echo_Info "[$DEFAULT_INSTALL_PATH] is used to installation rainbond."
 
-  Write_Sls_File rbd-path $DEFAULT_INSTALL_PATH 
+  $YQBIN w $GLOBAL_SLS rbd-path "$DEFAULT_INSTALL_PATH"
+
 }
 
 # Name   : Install_Base_Pkg
@@ -49,8 +51,13 @@ Install_Base_Pkg(){
   $Cache_PKG
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 
-  Echo_Info "update localtime"
-  ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
+  #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
+  if [[ $1 != "offline" ]];then
+    Echo_Info "update localtime"
+    ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
+  else
+    return 0
+  fi
 }
 
 # Name   : Write_Config
@@ -64,7 +71,7 @@ Write_Config(){
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
   # Config region info
-  Write_Sls_File rbd-tag "cloudbang"
+  Write_Sls_File rbd-tag "rainbond"
   # Get dns info
   Write_Sls_File dns "$dns_value"
   # Get cli info
