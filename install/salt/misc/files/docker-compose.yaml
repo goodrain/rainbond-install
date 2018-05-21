@@ -227,12 +227,13 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-  prometheus:
-    image: rainbond/prometheus:v2.0.0
-    container_name: prometheus
+  rbd-prometheus:
+    image: rainbond/prometheus:v2.1.0
+    container_name: rbd-prometheus
+    user: "200"
     volumes:
-    - /grdata/services/prometheus/data:/prometheusdata
-    - {{ pillar['rbd-path'] }}/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    - /grdata/services/rbd-prometheus/data:/prometheusdata
+    - {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
     logging:
       driver: json-file

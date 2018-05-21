@@ -1,7 +1,9 @@
 prometheus-yml:
   file.managed:
     - source: salt://prometheus/prom/prometheus.yml
-    - name: {{ pillar['rbd-path'] }}/etc/prometheus/prometheus.yml
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml
+    - user: rain
+    - group: rain
     - template: jinja
     - makedirs: Ture
 
@@ -12,9 +14,11 @@ docker-pull-prom-image:
 
 create-prom-data:
   file.directory:
-   - name: /grdata/services/prometheus/data
+   - name: /grdata/services/rbd-prometheus/data
    - makedirs: True
-   - mode: 777
+   - user: rain
+   - group: rain
+   - mode: 755
 
 prom-upstart:
   cmd.run:
