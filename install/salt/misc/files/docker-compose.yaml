@@ -45,6 +45,7 @@ services:
       CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
     volumes:
     - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
+    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     - /grdata/downloads/log:/grdata/logs
     logging:
       driver: json-file

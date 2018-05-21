@@ -5,11 +5,7 @@ DOMAIN_UUID={{ grains['uuid'] }}
 DOMAIN_LOG={{ pillar['rbd-path'] }}/.domain.log
 DOMAIN_API="http://domain.grapps.cn/domain"
 
-if [ -f "/tmp/.goodrain" ];then
-    DOMAIN_TYPE="True"
-else
-    DOMAIN_TYPE="False"
-fi
+DOMAIN_TYPE=1
 
 grep "domain" /srv/pillar/custom.sls
 if [[ $? -ne 0 ]];then

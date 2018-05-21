@@ -291,5 +291,5 @@ run && Echo_Ok
 # config salt
 Install_Salt && Echo_Ok
 
-Echo_Info "REG Check info ..."
-REG_Check && Echo_Ok
+#Echo_Info "REG Check info ..."
+#REG_Check && Echo_Ok

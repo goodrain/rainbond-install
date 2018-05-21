@@ -20,6 +20,7 @@ OSS_PATH="repo/ctl/3.5"
 DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
+DOMAIN_API="http://domain.grapps.cn/domain"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="init \
@@ -270,7 +271,11 @@ REG_Status(){
     uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
     iip=$( Read_Sls_File inet-ip ./install/pillar/ )
     domain=$( Read_Sls_File domain /srv/pillar/ )
-    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
+    if [[ "$domain" =~ "grapps" ]];then
+        curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=0\&domain=$domain
+    else
+        echo ""
+    fi
 }
 
 # Name     : Check_net_card
