@@ -16,13 +16,13 @@
 # debug
 [[ $DEBUG ]] && set -x
 
-. scripts/common.sh
+. scripts/common.sh $6
 
 init_func(){
     Echo_Info "Init compute node config."
     if [ "$1" = "single" ];then
         echo $@
-        if [ "$#" -ne 4 ];then
+        if [ "$#" -ne 4 -a "$#" -ne 5 ];then
             Echo_Error "need 4 args\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd>"
         fi
         grep "$2" /etc/salt/roster > /dev/null
@@ -48,7 +48,14 @@ EOF
         Echo_Error "not support ${1:-null}"
     fi
     Echo_Info "change hostname"
+    #judgment below uses for offline env : exec compute_offline.sls ( changed by guox 2018.5.21 ).
+    if [[ "$5" == "offline" ]];then
+    scp -r /root/rainbond-install/install/pkgs 172.16.0.211:/root
+    scp /etc/yum.repos.d/rainbond_local.repo 172.16.0.211:/etc/yum.repos.d
+    salt-ssh -i -E "compute" state.sls init.compute_offline
+    else
     salt-ssh -i -E "compute" state.sls init.compute
+    fi
 }
 
 check_func(){

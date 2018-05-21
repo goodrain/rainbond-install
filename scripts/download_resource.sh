@@ -122,7 +122,7 @@ help_func(){
 }
 
 #==================================Main=================================================================================
-case $1 in
+case "$1" in
   pkg)
     Echo_Info "begin to prepare the repos···"
     Prepare_env && Echo_Ok

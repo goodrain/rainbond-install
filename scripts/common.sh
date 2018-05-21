@@ -92,7 +92,7 @@ if [ "$SYS_NAME" == "centos" ];then
     # centos salt repo
     #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
 
-    if [[ $1 != "offline" ]];then
+    if [[ "$1" != "offline" ]];then
     cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
@@ -280,7 +280,7 @@ REG_Status(){
     iip=$( Read_Sls_File inet-ip ./install/pillar/ )
     domain=$( Read_Sls_File domain /srv/pillar/ )
     #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
-    if [[ $1 != "offline" ]];then
+    if [[ "$1" != "offline" ]];then
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
     fi
 }
