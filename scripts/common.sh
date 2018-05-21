@@ -86,17 +86,6 @@ if [ "$SYS_NAME" == "centos" ];then
     dstat iproute \
     bash-completion )
 
-    # centos salt repo
-    cat > /etc/yum.repos.d/salt-repo.repo << END
-[saltstack]
-name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
-baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
-skip_if_unavailable=True
-gpgcheck=0
-enabled=1
-enabled_metadata=1
-END
-
 # debian and ubuntu
 else
     DNS_INFO="dns-nameservers"
@@ -110,13 +99,6 @@ else
     dnsutils \
     python-pip \
     apt-transport-https )
-
-    # debian salt repo
-    cat > /etc/apt/sources.list.d/salt.list << END
-deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
-END
-
-wget -q -O - https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - 
 
 fi
 
