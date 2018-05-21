@@ -5,19 +5,13 @@
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 DOCKER_VERSION="1.12.6,1526e3f"
-SALT_VER="stable 2017.7.5"
-SALT_REPO="mirrors.ustc.edu.cn/salt"
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
 STORAGE_PATH="/grdata"
 LOG_DIR="logs"
-CHECK_LOG="check.log"
 SALT_LOG="install_salt.log"
 DEFAULT_HOSTNAME="manage01"
-OSS_DOMAIN="https://dl.repo.goodrain.com"
-OSS_PATH="repo/ctl/3.5"
-DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
