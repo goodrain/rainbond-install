@@ -13,8 +13,6 @@ SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 DEFAULT_INSTALL_PATH="/opt/rainbond"
 STORAGE_PATH="/grdata"
-LOG_DIR="logs"
-SALT_LOG="install_salt.log"
 DEFAULT_HOSTNAME="manage01"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
@@ -240,15 +238,15 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
-    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
+    uid=$( Read_Sls_File reg-uuid )
+    iip=$( Read_Sls_File master-ip )
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
-    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
-    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
-    domain=$( Read_Sls_File domain /srv/pillar/ )
+    uid=$( Read_Sls_File reg-uuid  )
+    iip=$( Read_Sls_File master-ip  )
+    domain=$( Read_Sls_File domain )
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
 }
 
@@ -292,32 +290,22 @@ Install_PKG(){
 # Name   : Write_Sls_File
 # Args   : key,valume,(path)
 Write_Sls_File(){
-  key=$1
-  value=$2
-  path=${3:-$PILLAR_DIR}
-  hasKey=$(grep $key $path/goodrain.sls)
-  if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $path/goodrain.sls
-  fi
-  
-  echo "$key: $value" >> $path/goodrain.sls
-}
-
-Write_Sls(){
     key=$1
     value=$2
     slsfile=${3:-$GLOBAL_SLS}
     isExist=$( $YQBIN r $slsfile $key )
-    
+    if [ "$isExist" == "" ];then
+        $YQBIN w -i $slsfile $key $value
+    fi
 }
 
-# Name   : Read_Sls_File
+# Name   : Read_Sls
 # Args   : key,(path)
 # Return : volume
 Read_Sls_File(){
     key=$1
-    path=${2:-$PILLAR_DIR}
-    grep $key ${path}/goodrain.sls | awk '{print $2}'
+    slsfile=${2:-$GLOBAL_SLS}
+    $YQBIN r $slsfile $key
 }
 
 

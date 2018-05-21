@@ -11,7 +11,7 @@ nfs_client:
 /etc/fstab:
   file.append:
     - text:
-      - "{{ pillar['inet-ip'] }}:/grdata /grdata nfs rw 0 0"
+      - "{{ pillar['master-ip'] }}:/grdata /grdata nfs rw 0 0"
     - require:
       - pkg: nfs_client
 

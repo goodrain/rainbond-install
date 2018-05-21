@@ -5,7 +5,7 @@ pull_cfssl_image:
 
 check_or_create_certificates:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl:dev') }} kip {{ pillar['inet-ip'] }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl:dev') }} kip {{ pillar['master-ip'] }}
     - unless:
       - ls /srv/salt/kubernetes/server/install/ssl/*.pem
       - ls /srv/salt/kubernetes/server/install/ssl/*.csr

@@ -15,9 +15,6 @@
 [[ $DEBUG ]] && set -x
 . scripts/common.sh
 
-[ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
-[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls || echo "" > $PILLAR_DIR/goodrain.sls
-
  # trap program exit
 trap 'Exit_Clear; exit' SIGINT SIGHUP
 clear

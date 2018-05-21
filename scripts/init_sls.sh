@@ -8,21 +8,17 @@
 # Args   : hostname
 # Return : 0|!0
 Init_system(){
-  hostname manage01
-  echo "manage01" > /etc/hostname
-  $YQBIN w $GLOBAL_SLS hostname "$DEFAULT_HOSTNAME"
+
+  MASTER_HOSTNAME=$(Read_Sls_File hostname)
+  hostname $MASTER_HOSTNAME
+  echo $MASTER_HOSTNAME > /etc/hostname
 
   LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   
-  $YQBIN w $GLOBAL_SLS rbd-version "$RBD_VERSION"
-  $YQBIN w $GLOBAL_SLS master-ip $DEFAULT_LOCAL_IP
+  Write_Sls_File master-ip $DEFAULT_LOCAL_IP
   
-  if [ ! -z "$DEFAULT_PUBLIC_IP" ];then
-    $YQBIN w $GLOBAL_SLS public-ip "${DEFAULT_PUBLIC_IP}"
-  else
-    $YQBIN w $GLOBAL_SLS public-ip ""
-  fi
+  Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
 
   # reset /etc/hosts
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
@@ -30,17 +26,11 @@ Init_system(){
   # config hostname to hosts
   Write_Host "${DEFAULT_LOCAL_IP}" "${DEFAULT_HOSTNAME}"
 
-  return 0
-}
+  # Get current directory
+  Write_Sls_File install-script-path "$PWD"
 
-# Name   : Get_Rainbond_Install_Path
-# Args   : NULL
-# Return : 0|!0
-Get_Rainbond_Install_Path(){
-
-  Echo_Info "[$DEFAULT_INSTALL_PATH] is used to installation rainbond."
-
-  $YQBIN w $GLOBAL_SLS rbd-path "$DEFAULT_INSTALL_PATH"
+  # Get dns info
+  Write_Sls_File dns "$dns_value"
 
 }
 
@@ -60,27 +50,6 @@ Install_Base_Pkg(){
   fi
 }
 
-# Name   : Write_Config
-# Args   : null
-# Return : 0|!0
-Write_Config(){
-  
-  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
-  # Config rbd-version
-  Write_Sls_File rbd-version "${RBD_VERSION}"
-  # Get current directory
-  Write_Sls_File install-script-path "$PWD"
-  # Config region info
-  Write_Sls_File rbd-tag "rainbond"
-  # Get dns info
-  Write_Sls_File dns "$dns_value"
-  # Get cli info
-  Write_Sls_File cli-image "rainbond/static:allcli_v3.5"
-}
-
-
-
-
 
 # -----------------------------------------------------------------------------
 # init database configure
@@ -91,15 +60,10 @@ db_init() {
 DB_USER=write
 DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
 
-    cat > ${PILLAR_DIR}/db.sls <<EOF
-database:
-  mysql:
-    image: rainbond/rbd-db:3.5
-    host: ${DEFAULT_LOCAL_IP}
-    port: 3306
-    user: ${DB_USER}
-    pass: ${DB_PASS}
-EOF
+Write_Sls_File database.mysql.host ${DEFAULT_LOCAL_IP}
+Write_Sls_File database.mysql.user ${DB_USER}
+Write_Sls_File database.mysql.pass ${DB_PASS}
+
 }
 
 # -----------------------------------------------------------------------------
@@ -107,37 +71,13 @@ EOF
 
 etcd(){
 
-cat > ${PILLAR_DIR}/etcd.sls <<EOF
-etcd:
-  server:
-    image: rainbond/etcd:v3.2.13
-    enabled: true
-    bind:
-      host: ${DEFAULT_LOCAL_IP}
-    token: $(uuidgen)
-    members:
-    - host: ${DEFAULT_LOCAL_IP}
-      name: manage01
-      port: 2379
-  proxy:
-    image: rainbond/etcd:v3.2.13
-    enabled: true
-EOF
+Write_Sls_File etcd.server.bind.host ${DEFAULT_LOCAL_IP}
+Write_Sls_File etcd.server.token $(uuidgen)
+Write_Sls_File etcd.server.members[0].host ${DEFAULT_LOCAL_IP}
+Write_Sls_File etcd.server.members[0].name ${MASTER_HOSTNAME}
+
 }
 
-# -----------------------------------------------------------------------------
-# init kubernetes configure
-kubernetes(){
-cat > ${PILLAR_DIR}/kubernetes.sls <<EOF
-kubernetes:
-  server:
-    cfssl_image: rainbond/cfssl:dev
-    kubecfg_image: rainbond/kubecfg:dev
-    api_image: rainbond/kube-apiserver:v1.6.4
-    manager: rainbond/kube-controller-manager:v1.6.4
-    schedule: rainbond/kube-scheduler:v1.6.4
-EOF
-}
 
 # -----------------------------------------------------------------------------
 # init network-calico configure
@@ -154,32 +94,11 @@ calico(){
         CALICO_NET=172.16.0.0/16
     fi
 
+  Write_Sls_File network.calico.bind ${DEFAULT_LOCAL_IP}
+  Write_Sls_File network.calico.net ${CALICO_NET}
 
-cat > ${PILLAR_DIR}/network.sls <<EOF
-network:
-  calico:
-    image: rainbond/calico-node:v2.4.1
-    enabled: true
-    bind: ${DEFAULT_LOCAL_IP}
-    net: ${CALICO_NET}
-EOF
 }
 
-# -----------------------------------------------------------------------------
-# init plugins configure
-plugins(){
-cat > ${PILLAR_DIR}/plugins.sls <<EOF
-plugins:
-  core:
-    api:
-      image: rainbond/rbd-api
-EOF
-}
-
-custom_config(){
-  # Todo
-  echo ""
-}
 
 # -----------------------------------------------------------------------------
 # init top configure
@@ -200,10 +119,7 @@ EOF
 run(){
     db_init
     etcd
-    kubernetes
     calico
-    plugins
-    custom_config
     write_top
 }
 
@@ -233,7 +149,7 @@ Install_Salt(){
     || Echo_Error "Failed to install salt,see rainbond-install/${LOG_DIR}/${SALT_LOG} for more information."
   fi
 
-  inet_ip=$(Read_Sls_File "inet-ip" )
+  inet_ip=$(Read_Sls_File "master-ip" )
 
 cat > /etc/salt/roster <<EOF
 manage01:
@@ -283,12 +199,6 @@ Install_Base_Pkg && Echo_Ok
 
 Echo_Info "Init system config ..."
 Init_system && Echo_Ok
-
-Echo_Info "Configing installation path ..."
-Get_Rainbond_Install_Path  && Echo_Ok
-
-Echo_Info "Writing configuration ..."
-Write_Config && Echo_Ok
 
 Echo_Info "Init config ..."
 run && Echo_Ok

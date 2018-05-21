@@ -1,1 +1,1 @@
-LOCAL_IP={{ pillar['inet-ip'] }}
+LOCAL_IP={{ pillar['master-ip'] }}

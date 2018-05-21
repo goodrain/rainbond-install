@@ -7,7 +7,7 @@ docker exec rbd-db mysql -e "use console;source /root/init.sql;"
 {% if pillar['public-ip'] %}
 IP={{ pillar['public-ip'] }}
 {% else %}
-IP={{ pillar['inet-ip'] }}
+IP={{ pillar['master-ip'] }}
 {% endif %}
 
 DOMAIN={{ pillar['domain'] }}

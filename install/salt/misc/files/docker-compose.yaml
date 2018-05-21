@@ -7,12 +7,12 @@ services:
     - KUBEURL=http://127.0.0.1:8181
     - FORWARD={{ pillar['dns'] }},114.114.114.114
     - SKYDNS_DOMAIN=goodrain.me
-    - RECORD_1=goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_2=lang.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_3=maven.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_4=console.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_5=region.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_6=kubeapi.goodrain.me:{{ pillar['inet-ip'] }}
+    - RECORD_1=goodrain.me:{{ pillar['master-ip'] }}
+    - RECORD_2=lang.goodrain.me:{{ pillar['master-ip'] }}
+    - RECORD_3=maven.goodrain.me:{{ pillar['master-ip'] }}
+    - RECORD_4=console.goodrain.me:{{ pillar['master-ip'] }}
+    - RECORD_5=region.goodrain.me:{{ pillar['master-ip'] }}
+    - RECORD_6=kubeapi.goodrain.me:{{ pillar['master-ip'] }}
     logging:
       driver: json-file
       options:
@@ -42,7 +42,7 @@ services:
       MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
-      CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
+      CLUSTER_BIND_IP: {{ pillar['master-ip'] }}
     volumes:
     - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
     - /grdata/downloads/log:/grdata/logs
@@ -147,7 +147,7 @@ services:
     volumes:
     - /usr/local/bin/kubectl:/usr/bin/kubectl
     - /root/.kube:/root/.kube
-    command: --hostIP={{ pillar['inet-ip'] }}
+    command: --hostIP={{ pillar['master-ip'] }}
     logging:
       driver: json-file
       options:

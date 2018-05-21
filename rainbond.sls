@@ -6,14 +6,15 @@
 # more information: http://mikefarah.github.io/yq/
 rbd-version: 3.5
 rbd-path: /opt/rainbond
-inet-ip: 
+master-hostname: manage01
+master-ip: 
 public-ip: 
-# master-hostname: 
-hostname: manage01
 domain: xxx.goodrain.org
 install-script-path: 
 rbd-tag: rainbond
+reg-uuid:
 dns: 114.114.114.114
+cli-image: rainbond/static:allcli_v3.5
 
 rbd-pkgs:
   manage:
@@ -49,10 +50,10 @@ database:
   mysql:
     image: rainbond/rbd-db
     version: 3.5
-    host: 172.16.0.210
+    host: 
     port: 3306
-    user: write
-    pass: aab8a509
+    user: 
+    pass: 
 
 # etcd
 etcd:
@@ -61,11 +62,11 @@ etcd:
     version: v3.2.13
     enabled: true
     bind:
-      host: 172.16.0.210
-    token: 9fd3739a-6b7c-4fa8-804c-862c129addf5
+      host: 
+    token: 
     members:
-    - host: 172.16.0.210
-      name: manage01
+    - host: 
+      name: 
       port: 2379
   proxy:
     image: rainbond/etcd

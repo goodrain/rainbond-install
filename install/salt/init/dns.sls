@@ -1,7 +1,7 @@
 # add records to /etc/hosts file
 
 # get master(manage01) ip address
-{% set hostip = pillar['inet-ip'] %}
+{% set hostip = pillar['master-ip'] %}
 
 rbd-repo-domain:
   host.present:
