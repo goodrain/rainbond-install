@@ -66,8 +66,10 @@ install_func(){
 }
 
 Offline_Prepare(){
+    if [ ! -f $OFFLINE_FILE ];then
     Echo_Info "Prepare install rainbond offline."
-    ./scripts/prepare_install.sh $1
+    ./scripts/prepare_install.sh $1 && touch $OFFLINE_FILE
+    fi
 }
 
 help_func(){

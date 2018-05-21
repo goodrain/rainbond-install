@@ -279,6 +279,7 @@ EOF
 Define_Domain(){
   #judgment below uses for offline env : define domain name by user ( changed by guox 2018.5.18 ).
   if [[ $1 == "offline" ]];then
+    Echo_Info "Configure custom domain name"
     read -p "Please input your custom domain: "  Doman_Name
     echo "domain: $Doman_Name" > /srv/pillar/custom.sls
   fi

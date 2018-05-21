@@ -60,7 +60,8 @@ telnet \
 rsync \
 lvm2 \
 git \
-salt-minion )
+salt-minion \
+nfs-utils)
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
@@ -74,6 +75,7 @@ DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{pri
 DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
 DNS_SERVER="114.114.114.114"
 INIT_FILE="./.initialized"
+OFFLINE_FILE="./.offlineprepared"
 
 # redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
@@ -268,8 +270,9 @@ REG_Check(){
     uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
     iip=$( Read_Sls_File inet-ip ./install/pillar/ )
     #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
-    [[ $1 != "offline" ]] && \
-    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip || return 0
+    if [[ $1 != "offline" ]];then
+    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
+    fi
 }
 
 REG_Status(){
@@ -277,8 +280,9 @@ REG_Status(){
     iip=$( Read_Sls_File inet-ip ./install/pillar/ )
     domain=$( Read_Sls_File domain /srv/pillar/ )
     #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
-    [[ $1 != "offline" ]] && \
-    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain || return 0
+    if [[ $1 != "offline" ]];then
+    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
+    fi
 }
 
 # Name     : Check_net_card
