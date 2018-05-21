@@ -60,7 +60,8 @@ telnet \
 rsync \
 lvm2 \
 git \
-salt-minion )
+salt-minion \
+nfs-utils )
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
