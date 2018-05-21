@@ -159,6 +159,7 @@ services:
     image: rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
     container_name: rbd-app-ui
     environment:
+      MANAGE_SECRET_KEY: {{ pillar['secretkey'] }}
       REGION_TAG: {{ pillar['rbd-tag'] }}
       MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
       MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}

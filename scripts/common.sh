@@ -59,6 +59,7 @@ net-tools \
 telnet \
 rsync \
 lvm2 \
+pwgen \
 git )
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')

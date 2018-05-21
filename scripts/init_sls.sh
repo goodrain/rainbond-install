@@ -59,6 +59,7 @@ Install_Base_Pkg(){
 Write_Config(){
   
   dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
+  secretkey=$(pwgen 32 1)
   # Config rbd-version
   Write_Sls_File rbd-version "${RBD_VERSION}"
   # Get current directory
@@ -69,6 +70,7 @@ Write_Config(){
   Write_Sls_File dns "$dns_value"
   # Get cli info
   Write_Sls_File cli-image "rainbond/static:allcli_v3.6"
+  Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
 }
 
 
