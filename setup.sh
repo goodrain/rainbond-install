@@ -32,6 +32,9 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
+        [ -f $MAIN_CONFIG ] && rm -f $MAIN_CONFIG
+        cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
+        
         ./scripts/init_sls.sh && touch $INIT_FILE
     fi
 }

@@ -108,8 +108,8 @@ network:
     image: rainbond/calico-node
     version: v2.4.1
     enabled: true
-    bind: 172.16.0.210
-    net: 10.0.0.0/16
+    bind: 
+    net: 
 
 #proxy
 proxy:
@@ -124,7 +124,7 @@ proxy:
     version: latest
   pause:
     image: rainbond/pause-amd64
-    version: 3.0
+    version: '3.0'
   builder:
     image: rainbond/builder
     version: latest
