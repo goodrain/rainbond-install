@@ -24,7 +24,7 @@ create-prom-data:
 
 prom-upstart:
   cmd.run:
-    - name: dc-compose up -d prometheus
-    - unless: check_compose prometheus
+    - name: dc-compose up -d rbd-prometheus
+    - unless: check_compose rbd-prometheus
     - require:
       - file: create-prom-data

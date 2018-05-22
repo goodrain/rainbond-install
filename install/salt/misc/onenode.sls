@@ -1,9 +1,5 @@
 {% set CFSSLIMG = salt['pillar.get']('kubernetes:cfssl:image') -%}
 {% set CFSSLVER = salt['pillar.get']('kubernetes:cfssl:version') -%}
-{% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
-{% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
-{% set CLIIMG = salt['pillar.get']('rainbond-modules:cli:image') -%}
-{% set CLIVER = salt['pillar.get']('rainbond-modules:cli:version') -%}
 
 pull_cfssl_image:
   cmd.run:
@@ -19,6 +15,8 @@ check_or_create_certificates:
     - require:
       - cmd: pull_cfssl_image
 
+{% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
+{% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 pull_kubecfg_image:
   cmd.run:
     - name: docker pull {{ KUBECFGIMG }}:{{ KUBECFGVER }}
@@ -41,6 +39,8 @@ rsync_kube-proxy_kubeconfig:
     - require:
       - cmd: check_or_create_kubeconfig
 
+{% set CLIIMG = salt['pillar.get']('kubernetes:static:image') -%}
+{% set CLIVER = salt['pillar.get']('kubernetes:static:version') -%}
 pull_static_image:
   cmd.run:
     - name: docker pull {{ CLIIMG }}:{{ CLIVER }}

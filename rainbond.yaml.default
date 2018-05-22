@@ -21,8 +21,6 @@ dns:
   current: 
   master: 223.5.5.5
   slave: 223.6.6.6
-    
-cli-image: rainbond/static:allcli_v3.5
 
 rbd-pkgs:
   manage:
@@ -167,6 +165,6 @@ rainbond-modules:
   rbd-app-ui: 
     image: rainbond/rbd-app-ui
     version: 3.5
-  prometheus: 
+  rbd-prometheus: 
     image: rainbond/prometheus
     version: v2.1.0

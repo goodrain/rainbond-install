@@ -3,9 +3,17 @@
 [[ $DEBUG ]] && set -x
 
 # ================================Global ENV ================================
-RBD_VERSION=$(cat ./VERSION 2> /dev/null)
+
 YQBIN="./scripts/yq"
 MAIN_CONFIG="./rainbond.yaml"
+
+Read_Sls_File(){
+    key=$1
+    slsfile=${2:-$MAIN_CONFIG}
+    $YQBIN r $slsfile $key
+}
+
+RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 INSTALL_TYPE=$(Read_Sls_File install-type)
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
@@ -276,17 +284,8 @@ Write_Sls_File(){
     slsfile=${3:-$MAIN_CONFIG}
     isExist=$( $YQBIN r $slsfile $key )
     if [ "$isExist" == "null" ];then
-        $YQBIN w -i $slsfile $key $value
+        $YQBIN w -i $slsfile $key "$value"
     fi
-}
-
-# Name   : Read_Sls
-# Args   : key,(path)
-# Return : volume
-Read_Sls_File(){
-    key=$1
-    slsfile=${2:-$MAIN_CONFIG}
-    $YQBIN r $slsfile $key
 }
 
 
