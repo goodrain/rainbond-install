@@ -143,8 +143,8 @@ Install_Salt(){
     $Cache_PKG > /dev/null
 
     # install salt
-    Install_PKG "$SALT_PKGS" 2>&1 > ${LOG_DIR}/${SALT_LOG} \
-    || Echo_Error "Failed to install salt,see rainbond-install/${LOG_DIR}/${SALT_LOG} for more information."
+    Install_PKG "$SALT_PKGS" \
+    || Echo_Error "Failed to install $SALT_PKGS !!!"
   fi
 
   inet_ip=$(Read_Sls_File "master-private-ip" )

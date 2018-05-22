@@ -1,7 +1,10 @@
+{% set REGISTRYIMG = salt['pillar.get']('rainbond-modules:rbd-registry:image') -%}
+{% set REGISTRYVER = salt['pillar.get']('rainbond-modules:rbd-registry:version') -%}
+
 docker-pull-hub-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-registry:2.3.1
-    - unless: docker inspect rainbond/rbd-registry:2.3.1
+    - name: docker pull {{ REGISTRYIMG }}:{{ REGISTRYVER }}
+    - unless: docker inspect {{ REGISTRYIMG }}:{{ REGISTRYVER }}
 
 hub-upstart:
   cmd.run:

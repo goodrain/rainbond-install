@@ -1,3 +1,5 @@
+{% set P8SIMG = salt['pillar.get']('rainbond-modules:rbd-prometheus:image') -%}
+{% set P8SVER = salt['pillar.get']('rainbond-modules:rbd-prometheus:version') -%}
 prometheus-yml:
   file.managed:
     - source: salt://prometheus/prom/prometheus.yml
@@ -9,8 +11,8 @@ prometheus-yml:
 
 docker-pull-prom-image:
   cmd.run:
-    - name: docker pull rainbond/prometheus:v2.0.0
-    - unless: docker inspect rainbond/prometheus:v2.0.0
+    - name: docker pull {{ P8SIMG }}:{{ P8SVER }}
+    - unless: docker inspect {{ P8SIMG }}:{{ P8SVER }}
 
 create-prom-data:
   file.directory:

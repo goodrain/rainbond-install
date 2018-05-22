@@ -1,17 +1,20 @@
+{% set PLUGTCMIMG = salt['pillar.get']('proxy:plugins:image') -%}
+{% set PLUGTCMVER = salt['pillar.get']('proxy:plugins:version') -%}
+
 docker-pull-plugins:
   cmd.run:
-    - name: docker pull rainbond/plugins:tcm
-    - unless: docker inspect rainbond/plugins:tcm
+    - name: docker pull {{ PLUGTCMIMG }}:{{ PLUGTCMVER }}
+    - unless: docker inspect {{ PLUGTCMIMG }}:{{ PLUGTCMVER }}
     
 plugins-tag:
   cmd.run:
-    - name: docker tag rainbond/plugins:tcm goodrain.me/tcm
-    - unless: docker inspect goodrain.me/tcm
+    - name: docker tag {{ PLUGTCMIMG }}:{{ PLUGTCMVER }} goodrain.me/{{ PLUGTCMVER }}
+    - unless: docker inspect goodrain.me/{{ PLUGTCMVER }}
     - require:
       - cmd: docker-pull-plugins
 
 plugins-push:
   cmd.run:
-    - name: docker push goodrain.me/tcm
+    - name: docker push goodrain.me/{{ PLUGTCMVER }}
     - require:
       - cmd: plugins-tag

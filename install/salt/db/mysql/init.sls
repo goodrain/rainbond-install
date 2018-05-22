@@ -1,7 +1,13 @@
+{% set DBIMG = salt['pillar.get']('database:mysql:image') -%}
+{% set DBVER = salt['pillar.get']('database:mysql:version') -%}
+{% set DBPORT = salt['pillar.get']('database:mysql:port') -%}
+{% set DBUSER = salt['pillar.get']('database:mysql:user') -%}
+{% set DBPASS = salt['pillar.get']('database:mysql:pass') -%}
+
 docker-pull-db-image:
   cmd.run:
-    - name: docker pull {{ pillar.database.mysql.get('image', 'rainbond/rbd-db:3.5') }}
-    - unless: docker inspect {{ pillar.database.mysql.get('image', 'rainbond/rbd-db:3.5') }}
+    - name: docker pull {{ DBIMG }}:{{ DBVER }}
+    - unless: docker inspect {{ DBIMG }}:{{ DBVER }}
 
 my.cnf:
   file.managed:
@@ -37,8 +43,8 @@ waiting_for_db:
 
 create_mysql_admin:
   cmd.run:
-    - name: docker exec rbd-db mysql -e "grant all on *.* to '{{ pillar['database']['mysql']['user'] }}'@'%' identified by '{{ pillar['database']['mysql']['pass'] }}' with grant option; flush privileges";docker exec rbd-db mysql -e "delete from mysql.user where user=''; flush privileges"
-    - unless: docker exec rbd-db mysql -u {{ pillar['database']['mysql']['user'] }} -P {{ pillar['database']['mysql']['port'] }} -p{{ pillar['database']['mysql']['pass'] }} -e "select user,host,grant_priv from mysql.user where user={{ pillar['database']['mysql']['user'] }}"
+    - name: docker exec rbd-db mysql -e "grant all on *.* to '{{ DBUSER }}'@'%' identified by '{{ DBPASS }}' with grant option; flush privileges";docker exec rbd-db mysql -e "delete from mysql.user where user=''; flush privileges"
+    - unless: docker exec rbd-db mysql -u {{ DBUSER }} -P {{ DBPORT }} -p{{ DBPASS }} -e "select user,host,grant_priv from mysql.user where user={{ DBUSER }}"
     - require:
       - cmd: waiting_for_db
     

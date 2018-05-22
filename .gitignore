@@ -1,3 +1,5 @@
 # offline directory
 install/imgs/*.gz
 install/pkgs/*.rpm
+
+rainbond.yaml

@@ -23,7 +23,7 @@ key_pub:
 {% else %}
 
 ssh_dir:
-  file.managed:
+  file.directory:
     - name: /root/.ssh
     - user: root
     - group: root

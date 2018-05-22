@@ -5,7 +5,7 @@
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 YQBIN="./scripts/yq"
-GLOBAL_SLS="./rainbond.sls"
+MAIN_CONFIG="./rainbond.yaml"
 INSTALL_TYPE=$(Read_Sls_File install-type)
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
@@ -273,9 +273,9 @@ Install_PKG(){
 Write_Sls_File(){
     key=$1
     value=$2
-    slsfile=${3:-$GLOBAL_SLS}
+    slsfile=${3:-$MAIN_CONFIG}
     isExist=$( $YQBIN r $slsfile $key )
-    if [ "$isExist" == "" ];then
+    if [ "$isExist" == "null" ];then
         $YQBIN w -i $slsfile $key $value
     fi
 }
@@ -285,7 +285,7 @@ Write_Sls_File(){
 # Return : volume
 Read_Sls_File(){
     key=$1
-    slsfile=${2:-$GLOBAL_SLS}
+    slsfile=${2:-$MAIN_CONFIG}
     $YQBIN r $slsfile $key
 }
 

@@ -7,8 +7,8 @@ make_domain_prepare:
 
 make_domain:
   cmd.run:
-  {% if pillar['public-ip'] %}
-    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['public-ip'] }}
+  {% if pillar['master-public-ip'] %}
+    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['master-public-ip'] }}
   {% else %}
     - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['master-private-ip'] }}
   {% endif %}
@@ -24,10 +24,6 @@ update_systeminfo:
   cmd.run:
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh
 
-check_domain:
-  cmd.run:
-    - name:  echo "domain not found"
-    - unless: grep "domain" /srv/pillar/goodrain.sls
 
 rsync_update_domain:
   file.managed:
