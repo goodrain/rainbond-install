@@ -6,14 +6,22 @@
 # more information: http://mikefarah.github.io/yq/
 rbd-version: 3.5
 rbd-path: /opt/rainbond
+install-type: online
 master-hostname: manage01
-master-ip: 
-public-ip: 
-domain: xxx.goodrain.org
+master-private-ip: 
+master-public-ip: 
+domain: 
 install-script-path: 
 rbd-tag: rainbond
 reg-uuid:
-dns: 114.114.114.114
+docker:
+  version: 1.12.6,1526e3f
+
+dns:
+  current: 
+  master: 223.5.5.5
+  slave: 223.6.6.6
+    
 cli-image: rainbond/static:allcli_v3.5
 
 rbd-pkgs:

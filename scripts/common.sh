@@ -4,16 +4,11 @@
 
 # ================================Global ENV ================================
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
-DOCKER_VERSION="1.12.6,1526e3f"
 YQBIN="./scripts/yq"
 GLOBAL_SLS="./rainbond.sls"
-SALT_VER="stable 2017.7.5"
-SALT_REPO="mirrors.ustc.edu.cn/salt"
+INSTALL_TYPE=$(Read_Sls_File install-type)
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
-DEFAULT_INSTALL_PATH="/opt/rainbond"
-STORAGE_PATH="/grdata"
-DEFAULT_HOSTNAME="manage01"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
@@ -67,13 +62,10 @@ MEM_LIMIT=4
 
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
-DNS_SERVER="114.114.114.114"
 INIT_FILE="./.initialized"
 
 # redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
-    DNS_INFO="^DNS"
-    NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
     Cache_PKG="$INSTALL_BIN makecache fast -q"
     PKG_BIN="rpm -qi"
@@ -82,10 +74,17 @@ if [ "$SYS_NAME" == "centos" ];then
     dstat iproute \
     bash-completion )
 
+    # Configure repo mirrors
+    function Config_Repo(){
+        # centos base repo
+        if [ ! -f /etc/yum.repos.d/CentOS-Base.repo.org ];then
+            mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.org
+            cp ./install/repo/centos/7/*.repo /etc/yum.repos.d/
+        fi
+    }
+
 # debian and ubuntu
 else
-    DNS_INFO="dns-nameservers"
-    NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt-get"
     Cache_PKG="$INSTALL_BIN update -y -q"
     PKG_BIN="dpkg -l"
@@ -95,6 +94,11 @@ else
     dnsutils \
     python-pip \
     apt-transport-https )
+
+    function Config_Repo(){
+        # debian base repo
+        echo ""
+    }
 
 fi
 
@@ -239,38 +243,15 @@ local l1=" ^" \
 
 REG_Check(){
     uid=$( Read_Sls_File reg-uuid )
-    iip=$( Read_Sls_File master-ip )
+    iip=$( Read_Sls_File master-private-ip )
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
 }
 
 REG_Status(){
     uid=$( Read_Sls_File reg-uuid  )
-    iip=$( Read_Sls_File master-ip  )
+    iip=$( Read_Sls_File master-private-ip  )
     domain=$( Read_Sls_File domain )
     curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
-}
-
-# Name     : Check_net_card
-# Args     : $1=network config file,$2=ipaddress,$3=dnsinfo
-# Return   : 
-Check_net_card(){
-  net_file=$1
-  ipaddr=$2
-  
-  if [ -f $net_file ];then
-    isStatic=$(grep "static" $net_file | grep -v "#")
-    isIPExist=$(grep "$ipaddr" $net_file | grep -v "#")
-    isDNSExist=$(grep "$DNS_INFO" $net_file | grep -v "#")
-    
-    if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
-      Echo_Error "There is no static ip in $net_file"
-    fi
-    if [ "$isDNSExist" != "" ];then
-      Echo_Error "The DNS shouldn't config in $net_file"
-    fi
-  else
-    Echo_Error "There is no network config file."
-  fi
 }
 
 Write_Host(){

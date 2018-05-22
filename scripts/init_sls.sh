@@ -8,41 +8,45 @@
 # Args   : hostname
 # Return : 0|!0
 Init_system(){
-
-  MASTER_HOSTNAME=$(Read_Sls_File hostname)
-  hostname $MASTER_HOSTNAME
-  echo $MASTER_HOSTNAME > /etc/hostname
-
+  # configure ip address
   LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
-  
-  Write_Sls_File master-ip $DEFAULT_LOCAL_IP
-  
-  Write_Sls_File public-ip "${DEFAULT_PUBLIC_IP}"
+  Write_Sls_File master-private-ip $DEFAULT_LOCAL_IP
+  Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
 
+  # configure hostname and hosts
   # reset /etc/hosts
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
-
-  # config hostname to hosts
-  Write_Host "${DEFAULT_LOCAL_IP}" "${DEFAULT_HOSTNAME}"
+  MASTER_HOSTNAME=$(Read_Sls_File master-hostname)
+  hostname $MASTER_HOSTNAME
+  echo $MASTER_HOSTNAME > /etc/hostname
+  Write_Host "${DEFAULT_LOCAL_IP}" "${MASTER_HOSTNAME}"
 
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
 
-  # Get dns info
-  Write_Sls_File dns "$dns_value"
-
+  # Get dns and write global dns info
+  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
+  Write_Sls_File dns.current "$dns_value"
 }
 
 # Name   : Install_Base_Pkg
 # Args   : NULL
 # Return : 0|!0
 Install_Base_Pkg(){
+  # Configure repo mirror
+  if [ "$INSTALL_TYPE" != "offline" ];then
+    Config_Repo
+  fi
+
+  # make repo cache
   $Cache_PKG
+
+  # install pkgs
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 
   #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
-  if [[ $1 != "offline" ]];then
+  if [[ "$INSTALL_TYPE" != "offline" ]];then
     Echo_Info "update localtime"
     ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
   else
@@ -106,13 +110,7 @@ write_top(){
 cat > ${PILLAR_DIR}/top.sls <<EOF
 base:
   '*':
-    - custom
-    - goodrain
-    - etcd
-    - network
-    - kubernetes
-    - db
-    - plugins
+    - rainbond
 EOF
 }
 
@@ -149,7 +147,7 @@ Install_Salt(){
     || Echo_Error "Failed to install salt,see rainbond-install/${LOG_DIR}/${SALT_LOG} for more information."
   fi
 
-  inet_ip=$(Read_Sls_File "master-ip" )
+  inet_ip=$(Read_Sls_File "master-private-ip" )
 
 cat > /etc/salt/roster <<EOF
 manage01:
@@ -173,6 +171,7 @@ EOF
   [ -d /srv/pillar ] && rm /srv/pillar -rf
   cp -rp $PWD/install/salt /srv/
   cp -rp $PWD/install/pillar /srv/
+  cp -rp $PWD/rainbond.yaml /srv/pillar/rainbond.sls
 
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok

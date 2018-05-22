@@ -10,7 +10,7 @@ make_domain:
   {% if pillar['public-ip'] %}
     - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['public-ip'] }}
   {% else %}
-    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['master-ip'] }}
+    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['master-private-ip'] }}
   {% endif %}
     - unless:  grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
 
