@@ -81,5 +81,10 @@ help_func(){
 #  Local_Repo && Docker_Run && Load_Image && Echo_Ok
 #;;
 #esac
-
-Local_Repo && Docker_Run && Load_Image && Echo_Ok
+case "$1" in
+  compute)
+    Docker_Run && Echo_Ok
+  ;;
+  *)
+    Local_Repo && Docker_Run && Load_Image && Echo_Ok
+  ;;

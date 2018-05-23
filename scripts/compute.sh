@@ -48,11 +48,12 @@ EOF
         Echo_Error "not support ${1:-null}"
     fi
     Echo_Info "change hostname"
-    #judgment below uses for offline env : exec compute_offline.sls ( changed by guox 2018.5.21 ).
+    #judgment below uses for offline env : init compute node offline ( changed by guox 2018.5.22 ).
     if [[ "$5" == "offline" ]];then
-    scp -r /root/rainbond-install/install/pkgs 172.16.0.211:/root
-    scp /etc/yum.repos.d/rainbond_local.repo 172.16.0.211:/etc/yum.repos.d
-    salt-ssh -i -E "compute" state.sls init.compute_offline
+      salt-ssh -i -E 'compute' -r "mkdir -p ~/rainbond-install/install"
+      scp -r /root/rainbond-install/install/pkgs $3:/root/rainbond-install/install
+      scp /etc/yum.repos.d/rainbond_local.repo $3:/etc/yum.repos.d
+      salt-ssh -i -E "compute" state.sls init.compute_offline
     else
     salt-ssh -i -E "compute" state.sls init.compute
     fi
@@ -67,7 +68,15 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-    salt-ssh -i -E "compute" state.sls minions.install
+    #judgment below uses for offline env : do not install salt-minion through internet ( changed by guox 2018.5.18 ).
+    if [ "$1" != "offline" ];then
+      salt-ssh -i -E "compute" state.sls minions.install
+      #del docker from ${COMPUTE_MODULES} : do not install docker through internet
+      Compute_Modules=${COMPUTE_MODULES} | sed 's/docker//g'
+      export COMPUTE_MODULES=$Compute_Modules
+    else
+      salt-ssh -i -E "compute" state.sls minions.install_offline
+    fi
     sleep 12
     Echo_Info "waiting for salt-minions start"
     for module in ${COMPUTE_MODULES}
@@ -108,7 +117,7 @@ case $1 in
     #    check_func force && install_compute_func
     #;;
     install)
-        install_compute_func
+        install_compute_func $1
     ;;
     *)
         help_func

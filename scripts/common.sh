@@ -26,12 +26,12 @@ MANAGE_MODULES="init \
 storage \
 docker \
 misc \
+grbase \
 etcd \
 network \
 kubernetes.server \
 node \
 db \
-grbase \
 plugins \
 proxy \
 prometheus \

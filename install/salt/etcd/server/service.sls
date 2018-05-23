@@ -5,6 +5,13 @@ pull-etcd-image:
     - name: docker pull {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
     - unless: docker inspect {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
 
+etcd-tag:
+  cmd.run:
+    - name: docker tag rainbond/etcd:v3.2.13 goodrain.me/etcd:v3.2.13
+    - unless: docker inspect goodrain.me/etcd:v3.2.13
+    - require:
+      - cmd: pull-etcd-image
+
 etcd-env:
   file.managed:
     - source: salt://etcd/install/envs/etcd.sh

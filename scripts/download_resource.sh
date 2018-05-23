@@ -80,7 +80,7 @@ Download_Image(){
     etcd=(server)
     kubernetes=(cfssl kubecfg api static manager schedule)
     network=(calico)
-    proxy=(plugins runner adapter builder)
+    proxy=(plugins runner pause adapter builder)
     for Moudles in ${rbd_moudles[@]} ${database[@]} ${etcd[@]} ${kubernetes[@]} ${network[@]} ${proxy[@]}
       do
         Img=$( ./scripts/yq r rainbond.sls *.$Moudles.image | grep -v null | awk '{print $2}')
@@ -89,8 +89,6 @@ Download_Image(){
         Gzp_Name=$( echo $Img | sed 's/\//_/g' )_$Ver
         docker pull $Rbd_Img && docker save $Rbd_Img | gzip > $PWD/install/imgs/$Gzp_Name.gz
       done
-#yq会将3.0处理为3，这会导致rainbond/pause-amd64:3.0无法正常拉取，故单独处理
-    docker pull rainbond/pause-amd64:3.0 && docker save rainbond/pause-amd64:3.0 | gzip > $PWD/install/imgs/rainbond_pause-amd64_3.0.gz
 }
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------

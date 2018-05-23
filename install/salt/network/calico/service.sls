@@ -1,7 +1,23 @@
+{% if grains['id'] == 'manage01' %}
 pull-calico-image:
   cmd.run:
     - name: docker pull {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
     - unless: docker inspect {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
+
+calico-tag:
+  cmd.run:
+    - name: docker tag rainbond/calico-node:v2.4.1 goodrain.me/calico-node:v2.4.1
+    - unless: docker inspect goodrain.me/calico-node:v2.4.1
+    - require:
+      - cmd: pull-calico-image
+
+{% else %}
+pull-calico-image:
+  cmd.run:
+    - name: docker pull {{ pillar.network.calico.get('image', 'goodrain.me/calico-node:v2.4.1') }}
+    - unless: docker inspect {{ pillar.network.calico.get('image', 'goodrain.me/calico-node:v2.4.1') }}
+{% endif %}
+
 
 calico-env:
   file.managed:

@@ -143,7 +143,7 @@ proxy:
     version: latest
   pause:
     image: rainbond/pause-amd64
-    version: 3.0
+    version: '3.0'
   builder:
     image: rainbond/builder
     version: latest
@@ -152,41 +152,41 @@ proxy:
 rainbond-modules:
   rbd-api:
     image: rainbond/rbd-api
-    version: 3.5
+    version: '3.5'
   rbd-dns:       
     image: rainbond/rbd-dns
-    version: 3.5
+    version: '3.5'
   rbd-registry: 
     image: rainbond/rbd-registry
-    version: 2.3.1
+    version: '2.3.1'
   rbd-repo: 
     image: rainbond/rbd-repo
-    version: 3.5
+    version: '3.5'
   rbd-worker: 
     image: rainbond/rbd-worker
-    version: 3.5
+    version: '3.5'
   rbd-eventlog: 
     image: rainbond/rbd-eventlog
-    version: 3.5
+    version: '3.5'
   rbd-entrance: 
     image: rainbond/rbd-entrance
-    version: 3.5
+    version: '3.5'
   rbd-chaos: 
     image: rainbond/rbd-chaos
-    version: 3.5
+    version: '3.5'
   rbd-lb: 
     image: rainbond/rbd-lb
-    version: 3.5
+    version: '3.5'
   rbd-mq: 
     image: rainbond/rbd-mq
-    version: 3.5
+    version: '3.5'
   rbd-webcli: 
     image: rainbond/rbd-webcli
-    version: 3.5
+    version: '3.5'
   rbd-app-ui: 
     image: rainbond/rbd-app-ui
-    version: 3.5
+    version: '3.5'
   prometheus: 
     image: rainbond/prometheus
-    version: v2.0.0
+    version: 'v2.0.0'
     

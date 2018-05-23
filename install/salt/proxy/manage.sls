@@ -69,3 +69,11 @@ builder-push-image:
     - name: docker push goodrain.me/builder
     - require:
       - cmd: builder-tag
+
+etcd-push-image:
+  cmd.run:
+    - name: docker push goodrain.me/etcd:v3.2.13
+
+calico-push-image:
+  cmd.run:
+    - name: docker push goodrain.me/calico-node:v2.4.1

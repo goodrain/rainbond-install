@@ -2,7 +2,7 @@
 
 pull-etcd-proxy-image:
   cmd.run:
-    - name: docker pull {{ pillar.etcd.proxy.get('image', 'rainbond/etcd:v3.2.13') }}
+    - name: docker pull {{ pillar.etcd.proxy.get('image', 'goodrain.me/etcd:v3.2.13') }}
 
 etcd-proxy-env:
   file.managed:
