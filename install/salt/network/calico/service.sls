@@ -1,7 +1,10 @@
+{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
+{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+
 pull-calico-image:
   cmd.run:
-    - name: docker pull {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
-    - unless: docker inspect {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
+    - name: docker pull {{ CALICOIMG }}:{{ CALICOVER }}
+    - unless: docker inspect {{ CALICOIMG }}:{{ CALICOVER }}
 
 calico-env:
   file.managed:

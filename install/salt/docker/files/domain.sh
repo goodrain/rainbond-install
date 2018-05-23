@@ -1,5 +1,6 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 DOMAIN_IP=$1
 DOMAIN_UUID={{ grains['uuid'] }}
 DOMAIN_LOG={{ pillar['rbd-path'] }}/.domain.log
@@ -21,3 +22,9 @@ if [[ $? -ne 0 ]];then
 else
     echo "domain exist"
 fi
+=======
+wilddomain=$(cat {{ pillar['rbd-path'] }}/.domain.log)
+echo "wild-domain: $wilddomain"
+
+sed -i -r  "s/(domain: ).*/\1$wilddomain/" /srv/pillar/rainbond.sls
+>>>>>>> reconsitution

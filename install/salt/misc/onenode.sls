@@ -1,25 +1,30 @@
+{% set CFSSLIMG = salt['pillar.get']('kubernetes:cfssl:image') -%}
+{% set CFSSLVER = salt['pillar.get']('kubernetes:cfssl:version') -%}
+
 pull_cfssl_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl:dev') }}
-    - unless: docker inspect rainbond/cfssl:dev
+    - name: docker pull {{ CFSSLIMG }}:{{ CFSSLVER }}
+    - unless: docker inspect {{ CFSSLIMG }}:{{ CFSSLVER }}
 
 check_or_create_certificates:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ pillar.kubernetes.server.get('cfssl_image', 'rainbond/cfssl:dev') }} kip {{ pillar['inet-ip'] }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ CFSSLIMG }}:{{ CFSSLVER }} kip {{ pillar['master-private-ip'] }}
     - unless:
       - ls /srv/salt/kubernetes/server/install/ssl/*.pem
       - ls /srv/salt/kubernetes/server/install/ssl/*.csr
     - require:
       - cmd: pull_cfssl_image
 
+{% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
+{% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 pull_kubecfg_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg:dev') }}
-    - unless: docker inspect rainbond/kubecfg:dev
+    - name: docker pull {{ KUBECFGIMG }}:{{ KUBECFGVER }}
+    - unless: docker inspect {{ KUBECFGIMG }}:{{ KUBECFGVER }}
 
 check_or_create_kubeconfig:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg:dev') }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ KUBECFGIMG }}:{{ KUBECFGVER }}
     - unless: ls /srv/salt/kubernetes/server/install/kubecfg/*.kubeconfig
     - require:
       - cmd: pull_kubecfg_image
@@ -34,14 +39,25 @@ rsync_kube-proxy_kubeconfig:
     - require:
       - cmd: check_or_create_kubeconfig
 
+{% set CLIIMG = salt['pillar.get']('kubernetes:static:image') -%}
+{% set CLIVER = salt['pillar.get']('kubernetes:static:version') -%}
 pull_static_image:
   cmd.run:
+<<<<<<< HEAD
     - name: docker pull {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }}
     - unless: docker inspect rainbond/static:allcli_v3.6
 
 prepare_cli_tools:
   cmd.run:
     - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }} tar zxf /pkg.tgz -C /sysdir
+=======
+    - name: docker pull {{ CLIIMG }}:{{ CLIVER }}
+    - unless: docker inspect {{ CLIIMG }}:{{ CLIVER }}
+
+prepare_cli_tools:
+  cmd.run:
+    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ CLIIMG }}:{{ CLIVER }} tar zxf /pkg.tgz -C /sysdir
+>>>>>>> reconsitution
     - require:
       - cmd: pull_static_image
     - unless:
@@ -55,7 +71,6 @@ prepare_cli_tools:
       - test -f /srv/salt/misc/file/cni/bin/calico
       - test -f /srv/salt/misc/file/cni/bin/calico-ipam
       - test -f /srv/salt/misc/file/cni/bin/loopback
-
 
 {% if pillar.domain is defined %}
 compose_file:

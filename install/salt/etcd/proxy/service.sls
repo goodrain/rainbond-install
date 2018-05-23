@@ -1,8 +1,10 @@
 {% if pillar.etcd.proxy.enabled %}
-
+{% set ETCDPROXYIMG = salt['pillar.get']('etcd:proxy:image') -%}
+{% set ETCDPROXYVER = salt['pillar.get']('etcd:proxy:version') -%}
 pull-etcd-proxy-image:
   cmd.run:
-    - name: docker pull {{ pillar.etcd.proxy.get('image', 'rainbond/etcd:v3.2.13') }}
+    - name: docker pull {{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
+    - unless: docker inspect {{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
 
 etcd-proxy-env:
   file.managed:

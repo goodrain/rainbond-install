@@ -1,9 +1,10 @@
 {% if pillar.etcd.server.enabled %}
-
+{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
+{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
 pull-etcd-image:
   cmd.run:
-    - name: docker pull {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
-    - unless: docker inspect {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
+    - name: docker pull {{ ETCDIMG }}:{{ ETCDVER }}
+    - unless: docker inspect {{ ETCDIMG }}:{{ ETCDVER }}
 
 etcd-env:
   file.managed:

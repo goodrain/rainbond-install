@@ -1,3 +1,6 @@
+{% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
+{% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
+
 kubelet-script:
   file.managed:
     - source: salt://kubernetes/node/install/scripts/start-kubelet.sh
@@ -65,20 +68,20 @@ kubelet-cni-bin:
 
 pull-pause-img:
   cmd.run:
-    - name: docker pull rainbond/pause-amd64:3.0
-    - unless: docker inspect rainbond/pause-amd64:3.0
+    - name: docker pull {{ PAUSEIMG }}:{{ PAUSEVER }}
+    - unless: docker inspect {{ PAUSEIMG }}:{{ PAUSEVER }}
 
 rename-pause-img:
   cmd.run: 
-    - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
-    - unless: docker inspect goodrain.me/pause-amd64:3.0
+    - name: docker tag {{ PAUSEIMG }}:{{ PAUSEVER }} goodrain.me/pause-amd64:{{ PAUSEVER }}
+    - unless: docker inspect goodrain.me/pause-amd64:{{ PAUSEVER }}
     - require:
       - cmd: pull-pause-img
 {% else %}
 pull-pause-img:
   cmd.run:
-    - name: docker pull goodrain.me/pause-amd64:3.0
-    - unless: docker inspect goodrain.me/pause-amd64:3.0
+    - name: docker pull goodrain.me/pause-amd64:{{ PAUSEVER }}
+    - unless: docker inspect goodrain.me/pause-amd64:{{ PAUSEVER }}
 {% endif %}
 
 kubelet:
