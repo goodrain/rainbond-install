@@ -43,21 +43,12 @@ rsync_kube-proxy_kubeconfig:
 {% set CLIVER = salt['pillar.get']('kubernetes:static:version') -%}
 pull_static_image:
   cmd.run:
-<<<<<<< HEAD
-    - name: docker pull {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }}
-    - unless: docker inspect rainbond/static:allcli_v3.6
-
-prepare_cli_tools:
-  cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }} tar zxf /pkg.tgz -C /sysdir
-=======
     - name: docker pull {{ CLIIMG }}:{{ CLIVER }}
     - unless: docker inspect {{ CLIIMG }}:{{ CLIVER }}
 
 prepare_cli_tools:
   cmd.run:
     - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ CLIIMG }}:{{ CLIVER }} tar zxf /pkg.tgz -C /sysdir
->>>>>>> reconsitution
     - require:
       - cmd: pull_static_image
     - unless:

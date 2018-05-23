@@ -249,21 +249,14 @@ REG_Check(){
 }
 
 REG_Status(){
-<<<<<<< HEAD
-    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
-    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
-    domain=$( Read_Sls_File domain /srv/pillar/ )
+    uid=$( Read_Sls_File reg-uuid )
+    iip=$( Read_Sls_File master-private-ip )
+    domain=$( Read_Sls_File domain )
     if [[ "$domain" =~ "grapps" ]];then
         curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=0\&domain=$domain
     else
         echo ""
     fi
-=======
-    uid=$( Read_Sls_File reg-uuid  )
-    iip=$( Read_Sls_File master-private-ip  )
-    domain=$( Read_Sls_File domain )
-    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
->>>>>>> reconsitution
 }
 
 Write_Host(){

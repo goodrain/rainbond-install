@@ -44,7 +44,6 @@ Install_Base_Pkg(){
   # install pkgs
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 
-<<<<<<< HEAD
 # Name   : Write_Config
 # Args   : null
 # Return : 0|!0
@@ -57,13 +56,12 @@ Write_Config(){
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
   # Config region info
-  Write_Sls_File rbd-tag "cloudbang"
+  Write_Sls_File rbd-tag "rainbond"
   # Get dns info
   Write_Sls_File dns "$dns_value"
   # Get cli info
-  Write_Sls_File cli-image "rainbond/static:allcli_v3.6"
   Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
-=======
+
   #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
   if [[ "$INSTALL_TYPE" != "offline" ]];then
     Echo_Info "update localtime"
@@ -71,7 +69,6 @@ Write_Config(){
   else
     return 0
   fi
->>>>>>> reconsitution
 }
 
 

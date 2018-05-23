@@ -4,7 +4,7 @@
 # read:           ./scripts/yq r t.yml etcd.server.members[0].name
 # write/update:   ./scripts/yq w t.yml etcd.server.members[0].name compute01
 # more information: http://mikefarah.github.io/yq/
-rbd-version: 3.5
+rbd-version: 3.6
 rbd-path: /opt/rainbond
 install-type: online
 master-hostname: manage01
@@ -12,8 +12,11 @@ master-private-ip:
 master-public-ip: 
 domain: 
 install-script-path: 
+public-image-domain: rainbond
+private-image-domain: goodrain.me
 rbd-tag: rainbond
 reg-uuid:
+secretkey: 
 docker:
   version: 1.12.6,1526e3f
 
@@ -55,7 +58,7 @@ rbd-pkgs:
 database:
   mysql:
     image: rainbond/rbd-db
-    version: 3.5
+    version: 3.6
     host: 
     port: 3306
     user: 
@@ -89,7 +92,7 @@ kubernetes:
     version: dev
   static:
     image: rainbond/static
-    version: allcli_v3.5
+    version: allcli_v3.6
   api:
     image: rainbond/kube-apiserver
     version: v1.6.4
@@ -131,40 +134,40 @@ proxy:
 rainbond-modules:
   rbd-api:
     image: rainbond/rbd-api
-    version: 3.5
+    version: 3.6
   rbd-dns:       
     image: rainbond/rbd-dns
-    version: 3.5
+    version: 3.6
   rbd-registry: 
     image: rainbond/rbd-registry
     version: 2.3.1
   rbd-repo: 
     image: rainbond/rbd-repo
-    version: 3.5
+    version: 3.6
   rbd-worker: 
     image: rainbond/rbd-worker
-    version: 3.5
+    version: 3.6
   rbd-eventlog: 
     image: rainbond/rbd-eventlog
-    version: 3.5
+    version: 3.6
   rbd-entrance: 
     image: rainbond/rbd-entrance
-    version: 3.5
+    version: 3.6
   rbd-chaos: 
     image: rainbond/rbd-chaos
-    version: 3.5
+    version: 3.6
   rbd-lb: 
     image: rainbond/rbd-lb
-    version: 3.5
+    version: 3.6
   rbd-mq: 
     image: rainbond/rbd-mq
-    version: 3.5
+    version: 3.6
   rbd-webcli: 
     image: rainbond/rbd-webcli
-    version: 3.5
+    version: 3.6
   rbd-app-ui: 
     image: rainbond/rbd-app-ui
-    version: 3.5
+    version: 3.6
   rbd-prometheus: 
     image: rainbond/prometheus
     version: v2.1.0
