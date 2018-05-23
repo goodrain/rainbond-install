@@ -4,8 +4,8 @@ DOMAIN_IP=$1
 DOMAIN_UUID={{ grains['uuid'] }}
 DOMAIN_LOG={{ pillar['rbd-path'] }}/.domain.log
 DOMAIN_API="http://domain.grapps.cn/domain"
-
-DOMAIN_TYPE=1
+AUTH={{ pillar['secretkey'] }}
+DOMAIN_TYPE=False
 
 grep "domain" /srv/pillar/custom.sls
 if [[ $? -ne 0 ]];then
