@@ -13,6 +13,11 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
+
+MAIN_CONFIG="./rainbond.yaml"
+
+[ ! -f $MAIN_CONFIG ] && cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
+
 . scripts/common.sh
 
  # trap program exit
@@ -32,8 +37,7 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
-        [ -f $MAIN_CONFIG ] && rm -f $MAIN_CONFIG
-        cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
+
         
         ./scripts/init_sls.sh && touch $INIT_FILE
     fi

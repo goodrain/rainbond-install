@@ -4,6 +4,9 @@
 
 [[ $DEBUG ]] && set -x
 
+INSTALL_TYPE=$(Read_Sls_File install-type)
+
+
 # Name   : Get_Hostname and version
 # Args   : hostname
 # Return : 0|!0
@@ -34,10 +37,6 @@ Init_system(){
 # Args   : NULL
 # Return : 0|!0
 Install_Base_Pkg(){
-  # Configure repo mirror
-  if [ "$INSTALL_TYPE" != "offline" ];then
-    Config_Repo
-  fi
 
   # make repo cache
   $Cache_PKG

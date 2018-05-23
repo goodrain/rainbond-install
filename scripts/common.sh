@@ -5,16 +5,7 @@
 # ================================Global ENV ================================
 
 YQBIN="./scripts/yq"
-MAIN_CONFIG="./rainbond.yaml"
-
-Read_Sls_File(){
-    key=$1
-    slsfile=${2:-$MAIN_CONFIG}
-    $YQBIN r $slsfile $key
-}
-
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
-INSTALL_TYPE=$(Read_Sls_File install-type)
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 PILLAR_DIR="./install/pillar"
@@ -288,6 +279,13 @@ Write_Sls_File(){
     fi
 }
 
+# Name   : Read_Sls_File
+# Args   : key,valume,(path)
+Read_Sls_File(){
+    key=$1
+    slsfile=${2:-$MAIN_CONFIG}
+    $YQBIN r $slsfile $key
+}
 
 # Clear the job and data when  exit the program
 Exit_Clear() {
