@@ -253,7 +253,7 @@ REG_Status(){
     iip=$( Read_Sls_File master-private-ip )
     domain=$( Read_Sls_File domain )
     if [[ "$domain" =~ "grapps" ]];then
-        curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=0\&domain=$domain
+        curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
     else
         echo ""
     fi
