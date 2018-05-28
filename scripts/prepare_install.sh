@@ -88,3 +88,4 @@ case "$1" in
   *)
     Local_Repo && Docker_Run && Load_Image && Echo_Ok
   ;;
+esac

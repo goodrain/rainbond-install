@@ -12,6 +12,12 @@
 #       LICENSE: Apache 2.0
 #       CREATED: 07/04/2018 10:49:37 AM
 #======================================================================================================================
+#
+#           ADD: $6 : offline
+#   DESCRIPTION: add a parameter  offline in $6 ,it is use for install a compute node without internet. 
+#
+#
+#======================================================================================================================
 
 # debug
 [[ $DEBUG ]] && set -x
@@ -23,7 +29,7 @@ init_func(){
     if [ "$1" = "single" ];then
         echo $@
         if [ "$#" -ne 4 -a "$#" -ne 5 ];then
-            Echo_Error "need 4 args\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd>"
+            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd> [offline]"
         fi
         grep "$2" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
@@ -71,10 +77,12 @@ install_compute_func(){
     #judgment below uses for offline env : do not install salt-minion through internet ( changed by guox 2018.5.18 ).
     if [ "$1" != "offline" ];then
       salt-ssh -i -E "compute" state.sls minions.install
+    else
       #del docker from ${COMPUTE_MODULES} : do not install docker through internet
       Compute_Modules=${COMPUTE_MODULES} | sed 's/docker//g'
       export COMPUTE_MODULES=$Compute_Modules
-    else
+      #install docker without internet
+      . scripts/prepare_install.sh compute
       salt-ssh -i -E "compute" state.sls minions.install_offline
     fi
     sleep 12
@@ -117,7 +125,7 @@ case $1 in
     #    check_func force && install_compute_func
     #;;
     install)
-        install_compute_func $1
+        install_compute_func $6
     ;;
     *)
         help_func
