@@ -34,28 +34,29 @@ rsync_kube-proxy_kubeconfig:
     - require:
       - cmd: check_or_create_kubeconfig
 
-pull_static_image:
+pull_k8s_cni_image:
   cmd.run:
-    - name: docker pull {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }}
-    - unless: docker inspect rainbond/static:allcli_v3.6
+    - name: docker pull {{ pillar.get('k8s-cni-image', 'rainbond/cni:k8s_v3.6') }}
+    - unless: docker inspect {{ pillar.get('k8s-cni-image', 'rainbond/cni:k8s_v3.6') }}
 
-prepare_cli_tools:
+prepare_k8s_cni_tools:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('cli-image', 'rainbond/static:allcli_v3.6') }} tar zxf /pkg.tgz -C /sysdir
+    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('k8s-cni-image', 'rainbond/cni:k8s_v3.6') }} tar zxf /pkg.tgz -C /sysdir
     - require:
-      - cmd: pull_static_image
+      - cmd: pull_k8s_cni_image
     - unless:
       - test -f /srv/salt/misc/file/bin/calicoctl
       - test -f /srv/salt/misc/file/bin/docker-compose
       - test -f /srv/salt/misc/file/bin/etcdctl
-      - test -f /srv/salt/misc/file/bin/grctl
       - test -f /srv/salt/misc/file/bin/kubectl
       - test -f /srv/salt/misc/file/bin/kubelet
-      - test -f /srv/salt/misc/file/bin/node
       - test -f /srv/salt/misc/file/cni/bin/calico
       - test -f /srv/salt/misc/file/cni/bin/calico-ipam
       - test -f /srv/salt/misc/file/cni/bin/loopback
 
+prepare_rbd_cni_tools:
+  cmd.run:
+    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ pillar.get('rbd-cni-image', 'rainbond/cni:rbd_v3.6') }} tar zxf /pkg.tgz -C /sysdir
 
 {% if pillar.domain is defined %}
 compose_file:

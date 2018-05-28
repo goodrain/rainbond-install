@@ -15,7 +15,8 @@ install-script-path:
 rbd-tag: rainbond
 dns: 114.114.114.114
 rbd-images:
-  allcli: rainbond/static:allcli_v3.6
+  k8s-cni-image: rainbond/cni:k8s_v3.6
+  rbd-cni-image: rainbond/cni:rbd_v3.6
   calico-node: rainbond/calico-node:v2.4.1
   rbd-db: rainbond/rbd-db:3.6
   etcd: rainbond/etcd:v3.2.13
@@ -32,7 +33,8 @@ rbd-pkgs:
   compute:
     - salt-minion
 
-cli-image: rainbond/static:allcli_v3.6
+k8s-cni-image: rainbond/cni:k8s_v3.6
+rbd-cni-image: rainbond/cni:rbd_v3.6
 
 # rbd-db
 database:

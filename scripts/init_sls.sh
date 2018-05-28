@@ -69,7 +69,8 @@ Write_Config(){
   # Get dns info
   Write_Sls_File dns "$dns_value"
   # Get cli info
-  Write_Sls_File cli-image "rainbond/static:allcli_v3.6"
+  Write_Sls_File k8s-cni-image "rainbond/cni:k8s_v3.6"
+  Write_Sls_File rbd-cni-image "rainbond/cni:rbd_v3.6"
   Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
 }
 
