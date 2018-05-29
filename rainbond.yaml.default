@@ -93,6 +93,9 @@ kubernetes:
   static:
     image: rainbond/static
     version: allcli_v3.6
+  cni:
+    image: rainbond/cni
+    version: k8s_v3.6
   api:
     image: rainbond/kube-apiserver
     version: v1.6.4
@@ -171,3 +174,6 @@ rainbond-modules:
   rbd-prometheus: 
     image: rainbond/prometheus
     version: v2.1.0
+  rbd-cni:
+    image: rainbond/cni
+    version: rbd_v3.6
