@@ -125,7 +125,7 @@ case $1 in
     #    check_func force && install_compute_func
     #;;
     install)
-        install_compute_func $6
+        install_compute_func $2
     ;;
     *)
         help_func

@@ -57,7 +57,7 @@ EOF
 Load_Image(){
     for Tar in $( ls -l $PWD/install/imgs/*.gz | awk '{print $9}' )
       do 
-        docker load -i $Tar
+        docker load -i -q $Tar
       done
 }
 

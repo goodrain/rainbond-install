@@ -9,6 +9,7 @@ update_local_pkg_cache:
 install_req_pkgs:
   pkg.installed:
     - pkgs:
+	  - nfs-utils
       - ntpdate
       - lsof
       - htop 

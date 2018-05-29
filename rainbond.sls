@@ -51,7 +51,7 @@ rbd-pkgs:
     - nfs-common
     - glusterfs-server
     - tar
-    - ntpdate
+    - ntp
     - wget
     - curl
     - tree

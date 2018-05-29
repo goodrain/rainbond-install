@@ -39,7 +39,7 @@ gpgcheck=1
 gpgkey=https://repo.saltstack.com/yum/redhat/\$releasever/\$basearch/latest/SALTSTACK-GPG-KEY.pub
        https://repo.saltstack.com/yum/redhat/\$releasever/\$basearch/latest/base/RPM-GPG-KEY-CentOS-7
 EOF
-    yum install centos-release-gluster -y 2>&1>/dev/null
+    yum install centos-release-gluster epel-release -y 2>&1>/dev/null
     yum makecache 2>&1>/dev/null
 }
 

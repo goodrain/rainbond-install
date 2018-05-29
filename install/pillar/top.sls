@@ -1,6 +1,7 @@
 base:
   '*':
-    - system_info
+    - custom
+    - goodrain
     - etcd
     - network
     - kubernetes

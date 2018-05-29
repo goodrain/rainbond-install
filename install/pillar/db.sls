@@ -1,7 +1,7 @@
 database:
   mysql:
     image: rainbond/rbd-db:3.5
-    host: 172.16.0.169
+    host: 10.211.55.4
     port: 3306
-    user: write12306
-    pass: 12345678
+    user: write
+    pass: e310b1ad

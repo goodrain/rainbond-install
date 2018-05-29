@@ -258,7 +258,7 @@ EOF
 
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
-#judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+  #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
   [[ "$1" != "offline" ]] && salt-ssh "*" state.sls salt.setup --state-output=mixed
 
   systemctl restart salt-master
@@ -274,6 +274,7 @@ EOF
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done
+  Echo_Ok
 }
 
 Define_Domain(){
