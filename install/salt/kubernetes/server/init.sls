@@ -70,7 +70,7 @@ kube-cfg-rsync-grdata:
 
 kube-ssl-rsync-grdata:
   file.recurse:
-    - source: salt://
+    - source: salt://kubernetes/server/install/ssl
     - name: /grdata/services/k8s/ssl
     - makedirs: Ture
 
@@ -82,7 +82,7 @@ kube-cfg-rsync:
 
 kube-apiserver:
   service.running:
-    - enable: True
+    - enable: Ture
     - watch:
       - file: k8s-conf
       - file: kube-ssl-rsync
@@ -98,7 +98,7 @@ kube-apiserver:
 
 kube-controller-manager:
   service.running:
-    - enable: True
+    - enable: Ture
     - watch:
       - file: k8s-conf
       - file: kube-ssl-rsync
@@ -115,7 +115,7 @@ kube-controller-manager:
 
 kube-scheduler:
   service.running:
-    - enable: True
+    - enable: Ture
     - watch:
       - file: k8s-conf
       - file: kube-ssl-rsync
