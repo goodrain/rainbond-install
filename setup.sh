@@ -13,10 +13,12 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
-. scripts/common.sh
 
-[ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
-[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls || echo "" > $PILLAR_DIR/goodrain.sls
+export MAIN_CONFIG="rainbond.yaml"
+
+[ ! -f $MAIN_CONFIG ] && cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
+
+. scripts/common.sh
 
  # trap program exit
 trap 'Exit_Clear; exit' SIGINT SIGHUP
@@ -35,6 +37,8 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
+
+        
         ./scripts/init_sls.sh && touch $INIT_FILE
     fi
 }

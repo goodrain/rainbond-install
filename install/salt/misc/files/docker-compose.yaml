@@ -1,18 +1,18 @@
 version: '2.1'
 services:
   rbd-dns:
-    image: rainbond/rbd-dns:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     container_name: rbd-dns
     environment:
     - KUBEURL=http://127.0.0.1:8181
-    - FORWARD={{ pillar['dns'] }},114.114.114.114
+    - FORWARD={{ pillar.dns.get('current','223.5.5.5') }},{{ pillar.dns.slave }}
     - SKYDNS_DOMAIN=goodrain.me
-    - RECORD_1=goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_2=lang.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_3=maven.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_4=console.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_5=region.goodrain.me:{{ pillar['inet-ip'] }}
-    - RECORD_6=kubeapi.goodrain.me:{{ pillar['inet-ip'] }}
+    - RECORD_1=goodrain.me:{{ pillar['master-private-ip'] }}
+    - RECORD_2=lang.goodrain.me:{{ pillar['master-private-ip'] }}
+    - RECORD_3=maven.goodrain.me:{{ pillar['master-private-ip'] }}
+    - RECORD_4=console.goodrain.me:{{ pillar['master-private-ip'] }}
+    - RECORD_5=region.goodrain.me:{{ pillar['master-private-ip'] }}
+    - RECORD_6=kubeapi.goodrain.me:{{ pillar['master-private-ip'] }}
     logging:
       driver: json-file
       options:
@@ -21,7 +21,7 @@ services:
     network_mode: host
     restart: always
   rbd-hub:
-    image: rainbond/rbd-registry:2.3.1
+    image: {{ pillar['rainbond-modules']['rbd-registry']['image'] }}:{{ pillar['rainbond-modules']['rbd-registry']['version'] }}
     container_name: rbd-hub
     volumes:
     - /grdata/services/registry/:/var/lib/registry
@@ -33,7 +33,7 @@ services:
     network_mode: host
     restart: always
   rbd-eventlog:
-    image: rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     container_name: rbd-eventlog
     environment:
       K8S_MASTER: http://127.0.0.1:8181
@@ -42,12 +42,12 @@ services:
     - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     - /grdata/downloads/log:/grdata/logs
     command:
-    - --cluster.bind.ip={{ pillar['inet-ip'] }}
+    - --cluster.bind.ip={{ pillar['master-private-ip'] }}
     - --db.type=mysql
     - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
-    - --discover.etcd.addr=http://{{ pillar['inet-ip'] }}:2379
-    - --eventlog.bind.ip={{ pillar['inet-ip'] }}
-    - --websocket.bind.ip={{ pillar['inet-ip'] }}
+    - --discover.etcd.addr=http://{{ pillar['master-private-ip'] }}:2379
+    - --eventlog.bind.ip={{ pillar['master-private-ip'] }}
+    - --websocket.bind.ip={{ pillar['master-private-ip'] }}
     - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
     logging:
       driver: json-file
@@ -57,7 +57,7 @@ services:
     network_mode: host
     restart: always
   rbd-entrance:
-    image: rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     container_name: rbd-entrance
     logging:
       driver: json-file
@@ -78,7 +78,7 @@ services:
     - --log-level=info
     - --etcd-endpoints http://127.0.0.1:2379
   rbd-api:
-    image: rainbond/rbd-api:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
     container_name: rbd-api
     environment:
       REGION_TAG: {{ pillar['rbd-tag'] }}
@@ -99,7 +99,7 @@ services:
     network_mode: host
     restart: always
   rbd-chaos:
-    image: rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     container_name: rbd-chaos
     command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     environment:
@@ -119,7 +119,7 @@ services:
     network_mode: host
     restart: always
   rbd-lb:
-    image: rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
     container_name: rbd-lb
     environment:
       DEFAULT_PORT: 80
@@ -134,7 +134,7 @@ services:
     network_mode: host
     restart: always
   rbd-mq:
-    image: rainbond/rbd-mq:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
     container_name: rbd-mq
     command: --log-level=debug
     logging:
@@ -145,12 +145,12 @@ services:
     network_mode: host
     restart: always
   rbd-webcli:
-    image: rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
     container_name: rbd-webcli
     volumes:
     - /usr/local/bin/kubectl:/usr/bin/kubectl
     - /root/.kube:/root/.kube
-    command: --hostIP={{ pillar['inet-ip'] }}
+    command: --hostIP={{ pillar['master-private-ip'] }}
     logging:
       driver: json-file
       options:
@@ -159,7 +159,7 @@ services:
     network_mode: host
     restart: always
   rbd-app-ui:
-    image: rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
     container_name: rbd-app-ui
     environment:
       MANAGE_SECRET_KEY: {{ pillar['secretkey'] }}
@@ -181,7 +181,7 @@ services:
     restart: always
 {% if grains['id'] == "manage01" %}
   rbd-db:
-    image: rainbond/rbd-db:{{ pillar['rbd-version'] }}
+    image: {{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
     container_name: rbd-db
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -196,7 +196,7 @@ services:
     network_mode: host
     restart: always
   rbd-worker:
-    image: rainbond/rbd-worker:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
     container_name: rbd-worker
     environment:
       MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
@@ -220,7 +220,7 @@ services:
     network_mode: host
     restart: always
   rbd-repo:
-    image: rainbond/rbd-repo:{{ pillar['rbd-version'] }}
+    image: {{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
     container_name: rbd-repo
     volumes:
     - /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
@@ -231,12 +231,13 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-  prometheus:
-    image: rainbond/prometheus:v2.0.0
-    container_name: prometheus
+  rbd-prometheus:
+    image: {{ pillar['rainbond-modules']['rbd-prometheus']['image'] }}:{{ pillar['rainbond-modules']['rbd-prometheus']['version'] }}
+    container_name: rbd-prometheus
+    user: "200"
     volumes:
-    - /grdata/services/prometheus/data:/prometheusdata
-    - {{ pillar['rbd-path'] }}/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    - /grdata/services/rbd-prometheus/data:/prometheusdata
+    - {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
     logging:
       driver: json-file
