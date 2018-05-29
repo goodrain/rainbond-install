@@ -59,7 +59,7 @@ k8s-conf:
 
 kube-ssl-rsync:
   file.recurse:
-    - source: salt://
+    - source: salt://kubernetes/server/install/ssl
     - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
 
 kube-cfg-rsync-grdata:
