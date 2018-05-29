@@ -41,7 +41,7 @@ rsync_kube-proxy_kubeconfig:
 
 {% set K8SCNIIMG = salt['pillar.get']('kubernetes:cni:image') -%}
 {% set K8SCNIVER = salt['pillar.get']('kubernetes:cni:version') -%}
-pull_static_image:
+pull_k8s_cni_image:
   cmd.run:
     - name: docker pull {{ K8SCNIIMG }}:{{ K8SCNIVER }}
     - unless: docker inspect {{ K8SCNIIMG }}:{{ K8SCNIVER }}
