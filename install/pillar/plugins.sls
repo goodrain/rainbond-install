@@ -1,4 +1,4 @@
 plugins:
   core:
     api:
-      image: rainbond/rbd-api
+      image: goodrain.me/rbd-api
