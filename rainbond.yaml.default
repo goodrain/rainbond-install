@@ -90,9 +90,6 @@ kubernetes:
   kubecfg:
     image: rainbond/kubecfg
     version: dev
-  static:
-    image: rainbond/static
-    version: allcli_v3.6
   cni:
     image: rainbond/cni
     version: k8s_v3.6
