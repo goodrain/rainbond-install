@@ -40,7 +40,7 @@ gpgkey=https://repo.saltstack.com/yum/redhat/\$releasever/\$basearch/latest/SALT
        https://repo.saltstack.com/yum/redhat/\$releasever/\$basearch/latest/base/RPM-GPG-KEY-CentOS-7
 EOF
     yum install centos-release-gluster epel-release -y 2>&1>/dev/null
-    yum makecache 2>&1>/dev/null
+    yum makecache fast 2>&1>/dev/null
 }
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ Download_Image(){
     etcd=(server)
     kubernetes=(cfssl kubecfg api static manager schedule)
     network=(calico)
-    proxy=(plugins runner pause adapter builder)
+    proxy=(plugins runner adapter builder)
     for Moudles in ${rbd_moudles[@]} ${database[@]} ${etcd[@]} ${kubernetes[@]} ${network[@]} ${proxy[@]}
       do
         Img=$( ./scripts/yq r rainbond.sls *.$Moudles.image | grep -v null | awk '{print $2}')
@@ -89,6 +89,7 @@ Download_Image(){
         Gzp_Name=$( echo $Img | sed 's/\//_/g' )_$Ver
         docker pull $Rbd_Img && docker save $Rbd_Img | gzip > $PWD/install/imgs/$Gzp_Name.gz
       done
+    docker pull rainbond/pause-amd64:3.0 | gzip > $PWD/install/imgs/rainbond_pause-amd64_3.0.gz
 }
 
 #---  FUNCTION  -------------------------------------------------------------------------------------------------------

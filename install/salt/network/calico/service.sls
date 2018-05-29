@@ -11,6 +11,12 @@ calico-tag:
     - require:
       - cmd: pull-calico-image
 
+calico-push:
+  cmd.run:
+    - name: docker push goodrain.me/calico-node:v2.4.1
+    - require:
+      - cmd: calico-tag
+
 {% else %}
 pull-calico-image:
   cmd.run:

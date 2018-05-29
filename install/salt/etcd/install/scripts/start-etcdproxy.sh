@@ -6,7 +6,7 @@ exec /usr/bin/docker \
   --restart=always \
   --net=host \
   --name etcd-proxy \
-  rainbond/etcd:v3.2.13 \
+  goodrain.me/etcd:v3.2.13 \
   /usr/local/bin/etcd \
   grpc-proxy start \
   --endpoints=$MASTER_IP \

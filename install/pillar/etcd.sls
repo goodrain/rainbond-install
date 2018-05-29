@@ -10,5 +10,5 @@ etcd:
       name: manage01
       port: 2379
   proxy:
-    image: rainbond/etcd:v3.2.13
+    image: goodrain.me/etcd:v3.2.13
     enabled: true

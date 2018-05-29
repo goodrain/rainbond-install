@@ -2,6 +2,11 @@ update_compute_hostname:
   cmd.run:
     - name: hostname {{ grains['id'] }}; echo "{{ grains['id'] }}" > /etc/hostname
 
+sync_pkg:
+  file.directory:
+    - name: ~/rainbond-install/install
+    - mkdirs: True
+
 update_local_pkg_cache:
   cmd.run:
     - name: yum makecache fast
@@ -9,7 +14,7 @@ update_local_pkg_cache:
 install_req_pkgs:
   pkg.installed:
     - pkgs:
-	  - nfs-utils
+	    - nfs-utils
       - ntpdate
       - lsof
       - htop 

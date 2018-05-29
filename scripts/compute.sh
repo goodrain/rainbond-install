@@ -59,7 +59,7 @@ EOF
       salt-ssh -i -E 'compute' -r "mkdir -p ~/rainbond-install/install"
       scp -r /root/rainbond-install/install/pkgs $3:/root/rainbond-install/install
       scp /etc/yum.repos.d/rainbond_local.repo $3:/etc/yum.repos.d
-      salt-ssh -i -E "compute" state.sls init.compute_offline
+      salt-ssh -i -E "compute" state.sls offline.compute_offline
     else
     salt-ssh -i -E "compute" state.sls init.compute
     fi
@@ -79,11 +79,12 @@ install_compute_func(){
       salt-ssh -i -E "compute" state.sls minions.install
     else
       #del docker from ${COMPUTE_MODULES} : do not install docker through internet
-      Compute_Modules=${COMPUTE_MODULES} | sed 's/docker//g'
-      export COMPUTE_MODULES=$Compute_Modules
+      #Compute_Modules=${COMPUTE_MODULES} | sed 's/docker//g'
+      #export COMPUTE_MODULES=$Compute_Modules
       #install docker without internet
-      . scripts/prepare_install.sh compute
-      salt-ssh -i -E "compute" state.sls minions.install_offline
+      #salt-ssh -i -E "compute" -r "yum install -y gr-docker-engine"
+      salt-ssh -i -E "compute" state.sls offline.install_offline
+      salt -E "compute" state.sls offline.docker_offline
     fi
     sleep 12
     Echo_Info "waiting for salt-minions start"

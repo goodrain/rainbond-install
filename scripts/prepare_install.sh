@@ -57,7 +57,7 @@ EOF
 Load_Image(){
     for Tar in $( ls -l $PWD/install/imgs/*.gz | awk '{print $9}' )
       do 
-        docker load -i -q $Tar
+        docker load -qi $Tar
       done
 }
 
@@ -81,11 +81,4 @@ help_func(){
 #  Local_Repo && Docker_Run && Load_Image && Echo_Ok
 #;;
 #esac
-case "$1" in
-  compute)
-    Docker_Run && Echo_Ok
-  ;;
-  *)
-    Local_Repo && Docker_Run && Load_Image && Echo_Ok
-  ;;
-esac
+Local_Repo && Docker_Run && Load_Image && Echo_Ok

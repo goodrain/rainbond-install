@@ -12,6 +12,12 @@ etcd-tag:
     - require:
       - cmd: pull-etcd-image
 
+etcd-push:
+  cmd.run:
+    - name: docker push goodrain.me/etcd:v3.2.13
+    - require:
+      - cmd: etcd-tag
+
 etcd-env:
   file.managed:
     - source: salt://etcd/install/envs/etcd.sh
