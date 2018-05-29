@@ -11,7 +11,7 @@ calico-env:
     - source: salt://network/calico/install/envs/calico.sh
     - name: {{ pillar['rbd-path'] }}/envs/calico.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
     - mode: 644
     - user: root
     - group: root
@@ -20,7 +20,7 @@ calico-script:
   file.managed:
     - source: salt://network/calico/install/scripts/start-calico.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-calico.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -51,7 +51,7 @@ init.calico:
   file.managed:
     - name: {{ pillar['rbd-path'] }}/bin/init.calico
     - source: salt://network/calico/install/run/init.calico
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root

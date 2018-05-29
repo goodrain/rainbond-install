@@ -11,7 +11,7 @@ etcd-proxy-env:
     - source: salt://etcd/install/envs/etcd-proxy.sh
     - name: {{ pillar['rbd-path'] }}/envs/etcd-proxy.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
     - mode: 644
     - user: root
     - group: root
@@ -20,7 +20,7 @@ etcd-proxy-script:
   file.managed:
     - source: salt://etcd/install/scripts/start-etcdproxy.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root

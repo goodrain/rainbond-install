@@ -11,7 +11,7 @@ make_domain:
     - name: {{ pillar['rbd-path'] }}/bin/domain.sh
     - template: jinja
     - mode: 755
-    - makedirs: Ture
+    - makedirs: True
   cmd.run:
   {% if pillar['master-public-ip'] %}
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-public-ip'] }}
@@ -25,7 +25,7 @@ rsync_update_domain:
     - name: {{ pillar['rbd-path'] }}/bin/.domain.sh
     - template: jinja
     - mode: 755
-    - makedirs: Ture
+    - makedirs: True
 
 refresh_domain:
   cmd.run:

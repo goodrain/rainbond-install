@@ -7,7 +7,7 @@ prometheus-yml:
     - user: rain
     - group: rain
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 docker-pull-prom-image:
   cmd.run:

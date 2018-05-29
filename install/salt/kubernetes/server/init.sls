@@ -24,7 +24,7 @@ k8s-api-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-apiserver.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kube-apiserver.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -34,7 +34,7 @@ k8s-manager-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-controller-manager.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kube-controller-manager.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -44,7 +44,7 @@ k8s-scheduler-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-scheduler.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kube-scheduler.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -54,7 +54,7 @@ k8s-conf:
   file.managed:
     - source: salt://kubernetes/server/install/custom.conf
     - name: {{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
 
 /etc/systemd/system:
@@ -73,13 +73,13 @@ kube-cfg-rsync-grdata:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
     - name: /grdata/services/k8s/kubecfg
-    - makedirs: Ture
+    - makedirs: True
 
 kube-ssl-rsync-grdata:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl
     - name: /grdata/services/k8s/ssl
-    - makedirs: Ture
+    - makedirs: True
 
 
 kube-cfg-rsync:
@@ -140,7 +140,7 @@ kube-local:
   file.managed:
     - source: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig
     - name: /root/.kube/config
-    - makedirs: Ture
+    - makedirs: True
     - mode: 600
     - user: root
     - group: root

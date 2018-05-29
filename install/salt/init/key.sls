@@ -27,7 +27,7 @@ ssh_dir:
     - name: /root/.ssh
     - user: root
     - group: root
-    - makedirs: Ture
+    - makedirs: True
     - mode: 700
 
 key_cp:
@@ -37,7 +37,7 @@ key_cp:
     - user: root
     - group: root
     - mode: 600
-    - makedirs: Ture
+    - makedirs: True
     - unless: test -f /tmp/id_rsa.pub
   cmd.run:
     - name: cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys
@@ -54,7 +54,7 @@ key_rsa_ssh:
     - user: root
     - group: root
     - mode: 600
-    - makedirs: Ture
+    - makedirs: True
 
 key_rsa_buider:
   file.managed:
@@ -63,7 +63,7 @@ key_rsa_buider:
     - user: root
     - group: root
     - mode: 600
-    - makedirs: Ture
+    - makedirs: True
 
 key_pub_ssh:
   file.managed:
@@ -72,7 +72,7 @@ key_pub_ssh:
     - user: root
     - group: root
     - mode: 600
-    - makedirs: Ture
+    - makedirs: True
 
 key_pub_builder:
   file.managed:
@@ -81,7 +81,7 @@ key_pub_builder:
     - user: root
     - group: root
     - mode: 600
-    - makedirs: Ture
+    - makedirs: True
 
 key_config:
   file.managed:
@@ -90,5 +90,5 @@ key_config:
     - user: root
     - group: root
     - mode: 600
-    - makedirs: Ture
+    - makedirs: True
 {% endif %}

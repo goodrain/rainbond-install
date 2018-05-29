@@ -13,13 +13,13 @@ my.cnf:
   file.managed:
     - source: salt://db/mysql/files/my.cnf
     - name: {{ pillar['rbd-path'] }}/etc/rbd-db/my.cnf
-    - makedirs: Ture
+    - makedirs: True
 
 charset.cnf:
   file.managed:
     - source: salt://db/mysql/files/charset.cnf
     - name: {{ pillar['rbd-path'] }}/etc/rbd-db/conf.d/charset.cnf
-    - makedirs: Ture
+    - makedirs: True
 
 db-upstart:
   cmd.run:

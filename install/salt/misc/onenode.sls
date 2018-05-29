@@ -72,6 +72,6 @@ compose_file:
   file.managed:
      - source: salt://misc/files/docker-compose.yaml
      - name: {{ pillar['rbd-path'] }}/docker-compose.yaml
-     - makedirs: Ture
+     - makedirs: True
      - template: jinja
 {% endif %}

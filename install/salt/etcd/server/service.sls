@@ -11,7 +11,7 @@ etcd-env:
     - source: salt://etcd/install/envs/etcd.sh
     - name: {{ pillar['rbd-path'] }}/envs/etcd.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
     - mode: 644
     - user: root
     - group: root
@@ -20,7 +20,7 @@ etcd-script:
   file.managed:
     - source: salt://etcd/install/scripts/start-etcd.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-etcd.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root

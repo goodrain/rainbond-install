@@ -5,7 +5,7 @@ kubelet-script:
   file.managed:
     - source: salt://kubernetes/node/install/scripts/start-kubelet.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kubelet.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -15,7 +15,7 @@ kubelet-env:
   file.managed:
     - source: salt://kubernetes/node/install/envs/kubelet.sh
     - name: {{ pillar['rbd-path'] }}/envs/kubelet.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -25,7 +25,7 @@ k8s-custom-conf:
   file.managed:
     - source: salt://kubernetes/node/install/custom.conf
     - name: {{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
 
 kubelet-ssl-rsync:
@@ -43,7 +43,7 @@ kubelet-cni:
     - source: salt://kubernetes/node/install/cni
     - name: {{ pillar['rbd-path'] }}/etc/cni/
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 kubelet-cni-bin:
   file.recurse:
@@ -52,7 +52,7 @@ kubelet-cni-bin:
     - file_mode: '0755'
     - user: root
     - group: root
-    - makedirs: Ture
+    - makedirs: True
 
 /etc/systemd/system/kubelet.service:
   file.managed:

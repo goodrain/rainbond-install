@@ -86,13 +86,13 @@ default_http_conf:
     - source: salt://plugins/data/proxy.conf
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 proxy_site_ssl:
   file.recurse:
     - source: salt://proxy/ssl/goodrain.me
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
-    - makedirs: Ture
+    - makedirs: True
 
 lb-upstart:
   cmd.run:
