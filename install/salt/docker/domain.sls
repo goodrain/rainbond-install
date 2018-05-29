@@ -13,7 +13,7 @@ make_domain:
     - mode: 755
     - makedirs: Ture
   cmd.run:
-  {% if pillar['public-ip'] %}
+  {% if pillar['master-public-ip'] %}
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-public-ip'] }}
   {% else %}
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-private-ip'] }}

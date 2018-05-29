@@ -14,7 +14,7 @@
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
 
-MAIN_CONFIG="./rainbond.yaml"
+export MAIN_CONFIG="rainbond.yaml"
 
 [ ! -f $MAIN_CONFIG ] && cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
 

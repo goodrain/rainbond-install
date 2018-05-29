@@ -43,6 +43,7 @@ Install_Base_Pkg(){
 
   # install pkgs
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
+}
 
 # Name   : Write_Config
 # Args   : null
@@ -221,6 +222,3 @@ run && Echo_Ok
 
 # config salt
 Install_Salt && Echo_Ok
-
-#Echo_Info "REG Check info ..."
-#REG_Check && Echo_Ok
