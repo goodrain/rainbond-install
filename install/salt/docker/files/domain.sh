@@ -13,8 +13,8 @@ curl -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$A
 
 if [[ "$wilddomain" == *grapps.cn ]];then
     echo "wild-domain: $wilddomain"
-    sed -i -r  "s/(domain: ).*/\1$wilddomain/" /srv/pillar/rainbond.sls
+    sed -i -r  "s/(^domain: ).*/\1$wilddomain/" /srv/pillar/rainbond.sls
 else
     echo "not generate, will use example"
-    sed -i -r  "s/(domain: ).*/\paas.example.com/" /srv/pillar/rainbond.sls
+    sed -i -r  "s/(^domain: ).*/\paas.example.com/" /srv/pillar/rainbond.sls
 fi

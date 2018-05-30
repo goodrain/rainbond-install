@@ -5,6 +5,7 @@
 # ================================Global ENV ================================
 
 YQBIN="./scripts/yq"
+MAIN_SLS="/srv/pillar/rainbond.sls"
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
@@ -249,9 +250,9 @@ REG_Check(){
 }
 
 REG_Status(){
-    uid=$( Read_Sls_File reg-uuid )
-    iip=$( Read_Sls_File master-private-ip )
-    domain=$( Read_Sls_File domain )
+    uid=$( Read_Sls_File reg-uuid $MAIN_SLS )
+    iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
+    domain=$( Read_Sls_File domain $MAIN_SLS )
     if [[ "$domain" =~ "grapps" ]];then
         curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
     else

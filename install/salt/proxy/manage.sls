@@ -21,7 +21,7 @@ push-plugin-tcm:
 pull-plugin-mesh:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/plugins:mesh_plugin
-    - unless: docker inspect {{PUBOMAIN}}/plugins:mesh_plugin
+    - unless: docker inspect {{PUBDOMAIN}}/plugins:mesh_plugin
 
 retag-plugin-mesh:
   cmd.run:
