@@ -205,7 +205,7 @@ EOF
     sleep 1
     uuid=$(timeout 3 salt "*" grains.get uuid | grep '-' | awk '{print $1}')
     [ ! -z $uuid ] && (
-      Write_Sls_File reg-uuid "$uuid"
+      Write_Sls_File reg-uuid "$uuid" $MAIN_SLS
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done

@@ -29,8 +29,8 @@ eventlog-upstart:
       - cmd: docker-pull-eventlog-image
 
 #==================== rbd-entrance ====================
-{% set ENTRANCEIMG = salt['pillar.get']('rainbond-modules:rbd-eventlog:image') -%}
-{% set ENTRANCEVER = salt['pillar.get']('rainbond-modules:rbd-eventlog:version') -%}
+{% set ENTRANCEIMG = salt['pillar.get']('rainbond-modules:rbd-entrance:image') -%}
+{% set ENTRANCEVER = salt['pillar.get']('rainbond-modules:rbd-entrance:version') -%}
 docker-pull-entrance-image:
   cmd.run:
     - name: docker pull {{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
