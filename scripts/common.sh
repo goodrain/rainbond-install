@@ -76,14 +76,16 @@ if [ "$SYS_NAME" == "centos" ];then
     dstat iproute \
     bash-completion )
 
-    # Configure repo mirrors
-    function Config_Repo(){
-        # centos base repo
-        if [ ! -f /etc/yum.repos.d/CentOS-Base.repo.org ];then
-            mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.org
-            cp ./install/repo/centos/7/*.repo /etc/yum.repos.d/
-        fi
-    }
+    # centos salt repo
+    cat > /etc/yum.repos.d/salt-repo.repo << END
+[saltstack]
+name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
+baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
+skip_if_unavailable=True
+gpgcheck=0
+enabled=1
+enabled_metadata=1
+END
 
 # debian and ubuntu
 else
@@ -97,10 +99,10 @@ else
     python-pip \
     apt-transport-https )
 
-    function Config_Repo(){
-        # debian base repo
-        echo ""
-    }
+    # debian salt repo
+    cat > /etc/apt/sources.list.d/salt.list << END
+deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
+END
 
 fi
 
