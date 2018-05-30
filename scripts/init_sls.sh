@@ -31,6 +31,18 @@ Init_system(){
   # Get dns and write global dns info
   dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
   Write_Sls_File dns.current "$dns_value"
+
+  # generate secretkey
+  secretkey=$(pwgen 32 1)
+  Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
+
+  #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
+  if [[ "$INSTALL_TYPE" != "offline" ]];then
+    Echo_Info "update localtime"
+    ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
+  else
+    return 0
+  fi
 }
 
 # Name   : Install_Base_Pkg
@@ -44,34 +56,6 @@ Install_Base_Pkg(){
   # install pkgs
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 }
-
-# Name   : Write_Config
-# Args   : null
-# Return : 0|!0
-Write_Config(){
-  
-  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
-  secretkey=$(pwgen 32 1)
-  # Config rbd-version
-  Write_Sls_File rbd-version "${RBD_VERSION}"
-  # Get current directory
-  Write_Sls_File install-script-path "$PWD"
-  # Config region info
-  Write_Sls_File rbd-tag "rainbond"
-  # Get dns info
-  Write_Sls_File dns "$dns_value"
-  # Get cli info
-  Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
-
-  #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
-  if [[ "$INSTALL_TYPE" != "offline" ]];then
-    Echo_Info "update localtime"
-    ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
-  else
-    return 0
-  fi
-}
-
 
 # -----------------------------------------------------------------------------
 # init database configure
