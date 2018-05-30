@@ -74,15 +74,10 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-    #judgment below uses for offline env : do not install salt-minion through internet ( changed by guox 2018.5.18 ).
+    #judgment below uses for offline env : do not install salt-minion docker through internet ( changed by guox 2018.5.18 ).
     if [ "$1" != "offline" ];then
       salt-ssh -i -E "compute" state.sls minions.install
     else
-      #del docker from ${COMPUTE_MODULES} : do not install docker through internet
-      #Compute_Modules=${COMPUTE_MODULES} | sed 's/docker//g'
-      #export COMPUTE_MODULES=$Compute_Modules
-      #install docker without internet
-      #salt-ssh -i -E "compute" -r "yum install -y gr-docker-engine"
       salt-ssh -i -E "compute" state.sls offline.install_offline
       salt-ssh -i -E "compute" state.sls offline.docker_offline
     fi
@@ -105,10 +100,10 @@ install_compute_func(){
 help_func(){
     Echo_Info "help"
     Echo_Info "init"
-    echo "args: single <hostname> <ip>  <password/key-path>"
+    echo "args: single <hostname> <ip>  <password/key-path> [offline]"
     echo "args: multi <ip.txt path> <password/key-path>"
     Echo_Info "check"
-    Echo_Info "install"
+    Echo_Info "install [offline]"
 }
 
 case $1 in
