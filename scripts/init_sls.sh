@@ -65,10 +65,11 @@ db_init() {
 ## Generate random user & password
 DB_USER=write
 DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
+DB_TYPE=$(Read_Sls_File database.type)
 
-Write_Sls_File database.mysql.host ${DEFAULT_LOCAL_IP}
-Write_Sls_File database.mysql.user ${DB_USER}
-Write_Sls_File database.mysql.pass ${DB_PASS}
+Write_Sls_File database.$DB_TYPE.host ${DEFAULT_LOCAL_IP}
+Write_Sls_File database.$DB_TYPE.user ${DB_USER}
+Write_Sls_File database.$DB_TYPE.pass ${DB_PASS}
 
 }
 
