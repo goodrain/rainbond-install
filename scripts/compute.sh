@@ -84,7 +84,7 @@ install_compute_func(){
       #install docker without internet
       #salt-ssh -i -E "compute" -r "yum install -y gr-docker-engine"
       salt-ssh -i -E "compute" state.sls offline.install_offline
-      salt -E "compute" state.sls offline.docker_offline
+      salt-ssh -i -E "compute" state.sls offline.docker_offline
     fi
     sleep 12
     Echo_Info "waiting for salt-minions start"
