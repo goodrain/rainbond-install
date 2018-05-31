@@ -2,3 +2,6 @@
 install/imgs/*.gz
 install/pkgs/*
 tools
+.initialized
+LOCAL_IP
+rainbond.yaml

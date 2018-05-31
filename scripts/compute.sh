@@ -35,11 +35,11 @@ init_func(){
         if [ "$?" -ne 0 ];then
             cat >> /etc/salt/roster <<EOF
 $2:
-  host: $3 
-  user: root         
-  passwd: $4  
+  host: $3
+  user: root
+  passwd: $4
   sudo: True
-  port: 22         
+  port: 22
 EOF
         grep "$3" /etc/hosts > /dev/null
         [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
@@ -56,9 +56,9 @@ EOF
     Echo_Info "change hostname"
     #judgment below uses for offline env : init compute node offline ( changed by guox 2018.5.22 ).
     if [[ "$5" == "offline" ]];then
-      salt-ssh -i "$2" state.sls offline.minion
+        salt-ssh -i "$2" state.sls offline.minion
     else
-    salt-ssh -i "$2" state.sls init.compute
+        salt-ssh -i "$2" state.sls init.compute
     fi
 }
 
@@ -79,6 +79,7 @@ install_compute_func(){
     else
       salt -E "compute" state.sls offline
     fi
+    
     for module in ${COMPUTE_MODULES}
     do
         Echo_Info "Start install $module ..."
