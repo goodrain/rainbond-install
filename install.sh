@@ -15,7 +15,7 @@
 
 [[ $DEBUG ]] && set -x
 
-STABLE_VER="3.6"
+STABLE_VER="3.5"
 PKG_URL="https://pkg.rainbond.com/releases"
 STABLE_PKG="v${STABLE_VER}/rainbond-install-${STABLE_VER}.tar.gz"
 
