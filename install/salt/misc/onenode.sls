@@ -29,16 +29,6 @@ check_or_create_kubeconfig:
     - require:
       - cmd: pull_kubecfg_image
 
-rsync_kube-proxy_kubeconfig:
-  file.directory:
-    - name: /grdata/kubernetes
-    - makedirs: True
-  cmd.run:
-    - name: cp -a /srv/salt/kubernetes/server/install/kubecfg/kube-proxy.kubeconfig /grdata/kubernetes/kube-proxy.kubeconfig
-    - unless: ls /grdata/kubernetes/kube-proxy.kubeconfig
-    - require:
-      - cmd: check_or_create_kubeconfig
-
 {% set K8SCNIIMG = salt['pillar.get']('kubernetes:cni:image') -%}
 {% set K8SCNIVER = salt['pillar.get']('kubernetes:cni:version') -%}
 pull_k8s_cni_image:

@@ -56,6 +56,7 @@ rbd-pkgs:
 
 # rbd-db
 database:
+  type: cockroachdb
   mysql:
     image: rainbond/rbd-db
     version: 3.6
@@ -63,6 +64,14 @@ database:
     port: 3306
     user: 
     pass: 
+  cockroachdb:
+    image: cockroachdb/cockroach
+    version: v2.0.2
+    host: 
+    port: 26257
+    user: 
+    pass: 
+
 
 # etcd
 etcd:

@@ -31,6 +31,18 @@ Init_system(){
   # Get dns and write global dns info
   dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
   Write_Sls_File dns.current "$dns_value"
+
+  # generate secretkey
+  secretkey=$(pwgen 32 1)
+  Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
+
+  #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
+  if [[ "$INSTALL_TYPE" != "offline" ]];then
+    Echo_Info "update localtime"
+    ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
+  else
+    return 0
+  fi
 }
 
 # Name   : Install_Base_Pkg
@@ -45,34 +57,6 @@ Install_Base_Pkg(){
   Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
 }
 
-# Name   : Write_Config
-# Args   : null
-# Return : 0|!0
-Write_Config(){
-  
-  dns_value=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}' | head -1)
-  secretkey=$(pwgen 32 1)
-  # Config rbd-version
-  Write_Sls_File rbd-version "${RBD_VERSION}"
-  # Get current directory
-  Write_Sls_File install-script-path "$PWD"
-  # Config region info
-  Write_Sls_File rbd-tag "rainbond"
-  # Get dns info
-  Write_Sls_File dns "$dns_value"
-  # Get cli info
-  Write_Sls_File secretkey "${secretkey:-auv2aequ1dahj9GameeGam9fei8Kohng}"
-
-  #judgment below uses for offline env : do not exec ntp cmd ( changed by guox 2018.5.18 ).
-  if [[ "$INSTALL_TYPE" != "offline" ]];then
-    Echo_Info "update localtime"
-    ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
-  else
-    return 0
-  fi
-}
-
-
 # -----------------------------------------------------------------------------
 # init database configure
 
@@ -81,10 +65,11 @@ db_init() {
 ## Generate random user & password
 DB_USER=write
 DB_PASS=$(echo $((RANDOM)) | base64 | md5sum | cut -b 1-8)
+DB_TYPE=$(Read_Sls_File database.type)
 
-Write_Sls_File database.mysql.host ${DEFAULT_LOCAL_IP}
-Write_Sls_File database.mysql.user ${DB_USER}
-Write_Sls_File database.mysql.pass ${DB_PASS}
+Write_Sls_File database.$DB_TYPE.host ${DEFAULT_LOCAL_IP}
+Write_Sls_File database.$DB_TYPE.user ${DB_USER}
+Write_Sls_File database.$DB_TYPE.pass ${DB_PASS}
 
 }
 
@@ -205,7 +190,7 @@ EOF
     sleep 1
     uuid=$(timeout 3 salt "*" grains.get uuid | grep '-' | awk '{print $1}')
     [ ! -z $uuid ] && (
-      Write_Sls_File reg-uuid "$uuid"
+      Write_Sls_File reg-uuid "$uuid" $MAIN_SLS
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done
