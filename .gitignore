@@ -1,6 +1,8 @@
 download/
 logs/
-
+install/imgs/*.gz
+install/pkgs/*.rpm
+install/pkgs/repodata
 # docker
 
 install/salt/docker/deb/
