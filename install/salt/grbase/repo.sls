@@ -1,7 +1,10 @@
+{% set REPOIMG = salt['pillar.get']('rainbond-modules:rbd-repo:image') -%}
+{% set REPOVER = salt['pillar.get']('rainbond-modules:rbd-repo:version') -%}
+
 docker-pull-repo-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-repo:{{ pillar["rbd-version"] }}
-    - unless: docker inspect rainbond/rbd-repo:{{ pillar["rbd-version"] }}
+    - name: docker pull {{ REPOIMG }}:{{ REPOVER }}
+    - unless: docker inspect {{ REPOIMG }}:{{ REPOVER }}
 
 repo-upstart:
   cmd.run:

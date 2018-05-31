@@ -1,8 +1,20 @@
 #!/bin/bash
-grep "domain" /srv/pillar/custom.sls
-if [[ $? -ne 0 ]];then
-    echo " " >> /srv/pillar/custom.sls
-    echo "domain: $(cat {{ pillar['rbd-path'] }}/.domain.log)" >> /srv/pillar/custom.sls
+
+DOMAIN_IP=$1
+DOMAIN_UUID={{ grains['uuid'] }}
+DOMAIN_LOG={{ pillar['rbd-path'] }}/.domain.log
+DOMAIN_API="http://domain.grapps.cn/domain"
+AUTH={{ pillar['secretkey'] }}
+DOMAIN_TYPE=False
+
+curl -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/new > $DOMAIN_LOG
+
+[ -f $DOMAIN_LOG ] && wilddomain=$(cat $DOMAIN_LOG )
+
+if [[ "$wilddomain" == *grapps.cn ]];then
+    echo "wild-domain: $wilddomain"
+    sed -i -r  "s/(^domain: ).*/\1$wilddomain/" /srv/pillar/rainbond.sls
 else
-    echo "domain exist"
+    echo "not generate, will use example"
+    sed -i -r  "s/(^domain: ).*/\paas.example.com/" /srv/pillar/rainbond.sls
 fi

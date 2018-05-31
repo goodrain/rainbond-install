@@ -107,7 +107,7 @@ function init_sys(){
 # 根据参数配置roster、检查目标机器的环境、写入compute.sls
 run
 
-Master_ip=$(grep "inet-ip" ../install/pillar/goodrain.sls  | awk '{print$2}')
+Master_ip=$(grep "master-private-ip" ../install/pillar/goodrain.sls  | awk '{print$2}')
 Node_name=$(cat /etc/salt/roster | tail -n 4 | head -1 | awk -F ':' '{print$1}')
 # 安装salt-minion
 install_minion

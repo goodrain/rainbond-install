@@ -1,17 +1,24 @@
+{% set APIIMG = salt['pillar.get']('kubernetes:api:image') -%}
+{% set APIVER = salt['pillar.get']('kubernetes:api:version') -%}
+{% set CTLMGEIMG = salt['pillar.get']('kubernetes:manager:image') -%}
+{% set CTLMGEVER = salt['pillar.get']('kubernetes:manager:version') -%}
+{% set SDLIMG = salt['pillar.get']('kubernetes:schedule:image') -%}
+{% set SDLVER = salt['pillar.get']('kubernetes:schedule:version') -%}
+
 pull_api_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
+    - name: docker pull {{ APIIMG }}:{{ APIVER }}
+    - unless: docker inspect {{ APIIMG }}:{{ APIVER }}
 
 pull_manager_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
+    - name: docker pull {{ CTLMGEIMG }}:{{ APIVER }}
+    - unless: docker inspect {{ CTLMGEIMG }}:{{ APIVER }}
 
 pull_schedule_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
+    - name: docker pull {{ SDLIMG }}:{{ SDLVER }}
+    - unless: docker inspect {{ SDLIMG }}:{{ SDLVER }}
 
 k8s-api-script:
   file.managed:

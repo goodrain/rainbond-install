@@ -13,7 +13,6 @@ services:
     - RECORD_4=console.goodrain.me:{{ pillar['master-private-ip'] }}
     - RECORD_5=region.goodrain.me:{{ pillar['master-private-ip'] }}
     - RECORD_6=kubeapi.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_7=repo.goodrain.me:{{ pillar['master-private-ip'] }}
     logging:
       driver: json-file
       options:
@@ -44,8 +43,8 @@ services:
     - /grdata/downloads/log:/grdata/logs
     command:
     - --cluster.bind.ip={{ pillar['master-private-ip'] }}
-    - --db.type=mysql
-    - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
+    - --db.type=cockroachdb
+    - --db.url=postgresql://{{ pillar['database']['cockroachdb']['user'] }}@{{ pillar['database']['cockroachdb']['host'] }}:{{ pillar['database']['cockroachdb']['port'] }}/region?sslmode=disable
     - --discover.etcd.addr=http://{{ pillar['master-private-ip'] }}:2379
     - --eventlog.bind.ip={{ pillar['master-private-ip'] }}
     - --websocket.bind.ip={{ pillar['master-private-ip'] }}
@@ -91,7 +90,7 @@ services:
     - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     - {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
-    command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    command: --log-level=debug --db-type=cockroachdb --mysql="postgresql://{{ pillar['database']['cockroachdb']['user'] }}@{{ pillar['database']['cockroachdb']['host'] }}:{{ pillar['database']['cockroachdb']['port'] }}/region?sslmode=disable"
     logging:
       driver: json-file
       options:
@@ -102,7 +101,7 @@ services:
   rbd-chaos:
     image: {{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     container_name: rbd-chaos
-    command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    command: --log-level=debug --db-type=cockroachdb --mysql="postgresql://{{ pillar['database']['cockroachdb']['user'] }}@{{ pillar['database']['cockroachdb']['host'] }}:{{ pillar['database']['cockroachdb']['port'] }}/region?sslmode=disable"
     environment:
     - SOURCE_DIR=/cache/source
     - CACHE_DIR=/cache
@@ -126,7 +125,6 @@ services:
       DEFAULT_PORT: 80
       HTTP_SUFFIX_URL: {{ pillar['domain'] }}
     volumes:
-    - {{ pillar['install-script-path'] }}:{{ pillar['install-script-path'] }}
     - {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
     - {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
     logging:
@@ -183,14 +181,12 @@ services:
     network_mode: host
     restart: always
 {% if grains['id'] == "manage01" %}
-  rbd-db:
-    image: {{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
-    container_name: rbd-db
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+  rbd-crhdb:
+    image: cockroachdb/cockroach:v2.0.2
+    container_name: rbd-crhdb
     volumes:
-    - {{ pillar['rbd-path'] }}/data/rbd-db:/data
-    - {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
+      - /opt/rainbond/data/rbd-crhdb:/cockroach/cockroach-data
+    command: start --insecure
     logging:
       driver: json-file
       options:
@@ -202,19 +198,16 @@ services:
     image: {{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
     container_name: rbd-worker
     environment:
-      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
-      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
-      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
-      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
-      MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
       CUR_NET: calico
       EX_DOMAIN: {{ pillar['domain'] }}
     volumes:
     - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - /grdata:/grdata
-    command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
-      --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    command: 
+    - --log-level=info 
+    - --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
+    - --db-type=cockroachdb --mysql="postgresql://{{ pillar['database']['cockroachdb']['user'] }}@{{ pillar['database']['cockroachdb']['host'] }}:{{ pillar['database']['cockroachdb']['port'] }}/region?sslmode=disable"
     logging:
       driver: json-file
       options:

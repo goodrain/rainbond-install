@@ -1,9 +1,10 @@
 {% if pillar.etcd.server.enabled %}
-
+{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
+{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
 pull-etcd-image:
   cmd.run:
-    - name: docker pull {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
-    - unless: docker inspect {{ pillar.etcd.server.get('image', 'rainbond/etcd:v3.2.13') }}
+    - name: docker pull {{ ETCDIMG }}:{{ ETCDVER }}
+    - unless: docker inspect {{ ETCDIMG }}:{{ ETCDVER }}
 
 etcd-tag:
   cmd.run:
@@ -17,7 +18,7 @@ etcd-env:
     - source: salt://etcd/install/envs/etcd.sh
     - name: {{ pillar['rbd-path'] }}/envs/etcd.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
     - mode: 644
     - user: root
     - group: root
@@ -26,7 +27,7 @@ etcd-script:
   file.managed:
     - source: salt://etcd/install/scripts/start-etcd.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-etcd.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
