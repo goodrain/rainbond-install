@@ -126,6 +126,7 @@ services:
       HTTP_SUFFIX_URL: {{ pillar['domain'] }}
     volumes:
     - {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
+    - {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
     logging:
       driver: json-file
       options:
