@@ -14,8 +14,8 @@ calico-tag:
 {% else %}
 pull-calico-image:
   cmd.run:
-    - name: docker pull {{ pillar.network.calico.get('image', 'goodrain.me/calico-node:v2.4.1') }}
-    - unless: docker inspect {{ pillar.network.calico.get('image', 'goodrain.me/calico-node:v2.4.1') }}
+    - name: docker pull {{ pillar.network.calico-compute.get('image', 'goodrain.me/calico-node:v2.4.1') }}
+    - unless: docker inspect {{ pillar.network.calico-compute.get('image', 'goodrain.me/calico-node:v2.4.1') }}
 {% endif %}
 
 

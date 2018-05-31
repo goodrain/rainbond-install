@@ -19,7 +19,7 @@ pull_kubecfg_image:
 
 check_or_create_kubeconfig:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg:dev') }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ pillar.kubernetes.server.get('kubecfg_image', 'rainbond/kubecfg:dev') }}
     - unless: ls /srv/salt/kubernetes/server/install/kubecfg/*.kubeconfig
     - require:
       - cmd: pull_kubecfg_image

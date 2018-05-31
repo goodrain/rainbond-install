@@ -7,3 +7,4 @@ base:
     - kubernetes
     - db
     - plugins
+    - offline

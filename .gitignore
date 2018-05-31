@@ -1,3 +1,4 @@
 # offline directory
 install/imgs/*.gz
 install/pkgs/*
+tools

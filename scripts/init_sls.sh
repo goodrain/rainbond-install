@@ -117,7 +117,7 @@ etcd:
       name: manage01
       port: 2379
   proxy:
-    image: rainbond/etcd:v3.2.13
+    image: goodrain.me/etcd:v3.2.13
     enabled: true
 EOF
 }
@@ -159,6 +159,9 @@ network:
     enabled: true
     bind: ${DEFAULT_LOCAL_IP}
     net: ${CALICO_NET}
+  calico-compute:
+    image: goodrain.me/calico-node:v2.4.1
+    enable: true
 EOF
 }
 
@@ -274,7 +277,6 @@ EOF
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
   done
-  Echo_Ok
 }
 
 Define_Domain(){

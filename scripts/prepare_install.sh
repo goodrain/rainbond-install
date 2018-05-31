@@ -55,10 +55,11 @@ EOF
 #================================Load docker images======================================================================
 
 Load_Image(){
-    for Tar in $( ls -l $PWD/install/imgs/*.gz | awk '{print $9}' )
+    Echo_Info "loading docker images"
+    while read line 
       do 
-        docker load -qi $Tar
-      done
+        docker load -qi ./insatll/imgs/$line
+      done < ./install/imgs/img_list.ls 
 }
 
 help_func(){
