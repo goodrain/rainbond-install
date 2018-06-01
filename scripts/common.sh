@@ -74,7 +74,8 @@ if [ "$SYS_NAME" == "centos" ];then
     SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
-    bash-completion )
+    bash-completion \ 
+    epel-release )
 
     # centos salt repo
     cat > /etc/yum.repos.d/salt-repo.repo << END
