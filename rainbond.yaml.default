@@ -56,7 +56,7 @@ rbd-pkgs:
 
 # rbd-db
 database:
-  type: cockroachdb
+  type: mysql
   mysql:
     image: rainbond/rbd-db
     version: 3.6
