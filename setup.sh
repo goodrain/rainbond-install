@@ -13,10 +13,6 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
-<<<<<<< HEAD
-. scripts/common.sh "$1"
-=======
->>>>>>> v3.6
 
 export MAIN_CONFIG="rainbond.yaml"
 
@@ -41,13 +37,7 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
-<<<<<<< HEAD
-        ./scripts/init_sls.sh $1 && touch $INIT_FILE
-=======
-
-        
         ./scripts/init_sls.sh && touch $INIT_FILE
->>>>>>> v3.6
     fi
 }
 
