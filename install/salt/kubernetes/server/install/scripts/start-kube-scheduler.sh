@@ -14,5 +14,5 @@ exec /usr/bin/docker \
   --net=host \
   --name kube-scheduler \
   --volume={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:{{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg \
-  rainbond/kube-scheduler:v1.6.4 \
+  {{ pillar.public-image-domain }}/{{pillar.kubernetes.schedule.image}}:{{pillar.kubernetes.schedule.version}} \
   $KUBE_SCHEDULER_OPTS

@@ -1,37 +1,40 @@
 {% if grains['id'] == "manage01" %}
+{% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
+{% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
+{% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 pull-plugin-tcm:
   cmd.run:
-    - name: docker pull {{ PUBDOMAIN }}/plugins:tcm
+    - name: docker pull {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
 
 retag-plugin-tcm:
   cmd.run:
-    - name: docker tag {{ PUBDOMAIN }}/plugins:tcm {{ PRIDOMAIN }}/tcm
+    - name: docker tag {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}} {{ PRIDOMAIN }}/{{TCMTAG}}
     - require:
         - cmd: pull-plugin-tcm
 
 
 push-plugin-tcm:
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/tcm
+    - name: docker push {{PRIDOMAIN}}/{{TCMTAG}}
     - require:
         - cmd: retag-plugin-tcm
 
 pull-plugin-mesh:
   cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/plugins:mesh_plugin
-    - unless: docker inspect {{PUBDOMAIN}}/plugins:mesh_plugin
+    - name: docker pull {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
+    - unless: docker inspect {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
 
 retag-plugin-mesh:
   cmd.run:
-    - name: docker tag {{PUBDOMAIN}}/plugins:mesh_plugin {{PRIDOMAIN}}/mesh_plugin
+    - name: docker tag {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}} {{PRIDOMAIN}}/{{MESHTAG}}
     - require:
         - cmd: pull-plugin-mesh
 
 push-plugin-mesh:
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/mesh_plugin
+    - name: docker push {{PRIDOMAIN}}/{{MESHTAG}}
     - require:
         - cmd: retag-plugin-mesh
 
@@ -44,14 +47,14 @@ runner-pull-image:
 
 runner-tag:
   cmd.run:
-    - name: docker tag {{ RUNNERIMG }}:{{ RUNNERVER }} {{PRIDOMAIN}}/runner:{{ RUNNERVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/runner:{{ RUNNERVER }}
+    - name: docker tag {{ RUNNERIMG }}:{{ RUNNERVER }} {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
     - require:
         - cmd: runner-pull-image
 
 runner-push-image:
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/runner:{{ RUNNERVER }}
+    - name: docker push {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
     - require:
         - cmd: runner-tag
 
@@ -59,19 +62,19 @@ runner-push-image:
 {% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
 adapter-pull-image:
   cmd.run:
-    - name: docker pull {{ ADAPTERIMG }}:{{ ADAPTERVER }}
-    - unless: docker inspect {{ ADAPTERIMG }}:{{ ADAPTERVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }}
 
 adapter-tag:
   cmd.run:
-    - name: docker tag {{ ADAPTERIMG }}:{{ ADAPTERVER }} {{PRIDOMAIN}}/adapter:{{ ADAPTERVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/adapter:{{ ADAPTERVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }} {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
     - require:
         - cmd: adapter-pull-image
 
 adapter-push-image:    
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/adapter:{{ ADAPTERVER }}
+    - name: docker push {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
     - require:
         - cmd: adapter-tag
 
@@ -79,19 +82,19 @@ adapter-push-image:
 {% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
 pause-pull-image:
   cmd.run:
-    - name: docker pull {{ PAUSEIMG }}:{{ PAUSEVER }}
-    - unless: docker inspect {{ PAUSEIMG }}:{{ PAUSEVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 
 pause-tag:
   cmd.run:
-    - name: docker tag {{ PAUSEIMG }}:{{ PAUSEVER }} {{PRIDOMAIN}}/pause-amd64:{{ PAUSEVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/pause-amd64:{{ PAUSEVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }} {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
     - require:
         - cmd: pause-pull-image
 
 pause-push-image:
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/pause-amd64:{{ PAUSEVER }}
+    - name: docker push {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
     - require:
         - cmd: pause-tag
 
@@ -99,28 +102,28 @@ pause-push-image:
 {% set BUILDERVER = salt['pillar.get']('proxy:builder:version') -%}
 builder-pull-image:
   cmd.run:
-    - name: docker pull {{ BUILDERIMG }}:{{ BUILDERVER }}
-    - unless: docker inspect {{ BUILDERIMG }}:{{ BUILDERVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
 
 builder-tag:  
   cmd.run:
-    - name: docker tag {{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/builder:{{ BUILDERVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/builder:{{ BUILDERVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
         - cmd: builder-pull-image
 
 builder-push-image:    
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/builder:{{ BUILDERVER }}
+    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
         - cmd: builder-tag
 
 {% else %}
 builder-mpull-image:    
   cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/builder
+    - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}
 
 pause-mpull-image:
   cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/pause-amd64:3.0
+    - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{PAUSEVER}}
 {% endif %}

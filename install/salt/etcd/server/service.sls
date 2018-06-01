@@ -1,15 +1,18 @@
 {% if pillar.etcd.server.enabled %}
 {% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
 {% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 pull-etcd-image:
   cmd.run:
-    - name: docker pull {{ ETCDIMG }}:{{ ETCDVER }}
-    - unless: docker inspect {{ ETCDIMG }}:{{ ETCDVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
 
 etcd-tag:
   cmd.run:
-    - name: docker tag rainbond/etcd:v3.2.13 goodrain.me/etcd:v3.2.13
-    - unless: docker inspect goodrain.me/etcd:v3.2.13
+    - name: docker tag {{PUBDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}} {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
     - require:
       - cmd: pull-etcd-image
 

@@ -3,11 +3,12 @@
 {% set DBPORT = salt['pillar.get']('database:mysql:port') -%}
 {% set DBUSER = salt['pillar.get']('database:mysql:user') -%}
 {% set DBPASS = salt['pillar.get']('database:mysql:pass') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 
 docker-pull-db-image:
   cmd.run:
-    - name: docker pull {{ DBIMG }}:{{ DBVER }}
-    - unless: docker inspect {{ DBIMG }}:{{ DBVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ DBIMG }}:{{ DBVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ DBIMG }}:{{ DBVER }}
 
 my.cnf:
   file.managed:

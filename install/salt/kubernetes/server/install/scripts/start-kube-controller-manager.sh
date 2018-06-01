@@ -20,5 +20,5 @@ exec /usr/bin/docker \
   --net=host \
   --name kube-controller-manager \
   --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes \
-  rainbond/kube-controller-manager:v1.6.4 \
+  {{ pillar.public-image-domain }}/{{pillar.kubernetes.manager.image}}:{{pillar.kubernetes.manager.version}} \
   $KUBE_CONTROLLER_MANAGER_OPTS
