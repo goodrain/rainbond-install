@@ -254,7 +254,6 @@ REG_Check(){
     uid=$( Read_Sls_File reg-uuid )
     iip=$( Read_Sls_File master-private-ip )
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
-    fi
 }
 
 REG_Status(){
