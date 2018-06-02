@@ -182,9 +182,6 @@ EOF
   #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
   [[ "$1" != "offline" ]] && salt-ssh "*" state.sls salt.setup --state-output=mixed
 
-  systemctl restart salt-master
-  systemctl restart salt-minion
-
   Echo_Info "Waiting to start salt."
   for ((i=1;i<=10;i++ )); do
     echo -e -n "."

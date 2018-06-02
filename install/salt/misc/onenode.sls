@@ -12,8 +12,8 @@ check_or_create_certificates:
   cmd.run:
     - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }} kip {{ pillar['master-private-ip'] }}
     - unless:
-      - ls /srv/salt//*.pem
-      - ls /srv/salt//*.csr
+      - ls /srv/salt/kubernetes/server/install/ssl/*.pem
+      - ls /srv/salt/kubernetes/server/install/ssl/*.csr
     - require:
       - cmd: pull_cfssl_image
 

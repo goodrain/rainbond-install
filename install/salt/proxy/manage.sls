@@ -4,13 +4,16 @@
 {% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 pull-plugin-tcm:
   cmd.run:
     - name: docker pull {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
+    - unless: docker inspect {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
 
 retag-plugin-tcm:
   cmd.run:
     - name: docker tag {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}} {{ PRIDOMAIN }}/{{TCMTAG}}
+    - unless: docker inspect {{ PRIDOMAIN }}/{{TCMTAG}}
     - require:
         - cmd: pull-plugin-tcm
 
@@ -29,6 +32,7 @@ pull-plugin-mesh:
 retag-plugin-mesh:
   cmd.run:
     - name: docker tag {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}} {{PRIDOMAIN}}/{{MESHTAG}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{MESHTAG}}
     - require:
         - cmd: pull-plugin-mesh
 
@@ -42,12 +46,12 @@ push-plugin-mesh:
 {% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
 runner-pull-image:
   cmd.run:
-    - name: docker pull {{ RUNNERIMG }}:{{ RUNNERVER }}
-    - unless: docker inspect {{ RUNNERIMG }}:{{ RUNNERVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }}
 
 runner-tag:
   cmd.run:
-    - name: docker tag {{ RUNNERIMG }}:{{ RUNNERVER }} {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }} {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
     - unless: docker inspect {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
     - require:
         - cmd: runner-pull-image
@@ -68,7 +72,7 @@ adapter-pull-image:
 adapter-tag:
   cmd.run:
     - name: docker tag {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }} {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
-    - unless: docker inspect {{PUBDOMAIN}}/{{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
     - require:
         - cmd: adapter-pull-image
 

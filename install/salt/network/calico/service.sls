@@ -16,13 +16,6 @@ calico-tag:
     - require:
       - cmd: pull-calico-image
 
-push-calico-image:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
-    - require:
-      - cmd: calico-tag
-
-
 {% else %}
 pull-calico-image:
   cmd.run:
