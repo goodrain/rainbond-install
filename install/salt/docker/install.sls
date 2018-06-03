@@ -22,11 +22,27 @@ docker-mirrors:
 docker-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}
+    {% if pillar['install-type']=="offline" %}
+      {% if grains['id']=="manage01" %}
+    - humanname: local_repo
+    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs
+    - enabled: 1
+    - gpgcheck: 0
+      {% else %}
+    - humanname: local_repo
+    - baseurl: http://repo.goodrain.me/
+    - enabled: 1
+    - gpgcheck: 0
+      {% endif %}
+    #online
+    {% else %}
     - humanname: Goodrain CentOS-$releasever - for x86_64
     - baseurl: http://repo.goodrain.com/centos/$releasever/3.5/$basearch
     - enabled: 1
     - gpgcheck: 1
     - gpgkey: http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
+    {% endif %}
+  # debain or ubuntu
   {% else %}
     - name: deb http://repo.goodrain.com/debian/9 3.5 main
     - file: /etc/apt/sources.list.d/docker.list

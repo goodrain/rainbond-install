@@ -59,8 +59,7 @@ net-tools \
 telnet \
 rsync \
 lvm2 \
-git \
-salt-minion \
+git  \
 nfs-utils)
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')

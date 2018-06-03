@@ -42,8 +42,6 @@ init_config(){
 install_func(){
     fail_num=0
     Echo_Info "will install manage node."
-#judgment below uses for offline env : del docker from MANAGE_MODULES ( changed by guox 2018.5.18 ).
-    [[ "$@" == "offline" ]] && export MANAGE_MODULES="${MANAGE_MODULES%%docker*}${MANAGE_MODULES##*docker}"
     for module in ${MANAGE_MODULES}
     do
         echo "Start install $module ..."

@@ -67,6 +67,10 @@ Write_Config(){
   Write_Sls_File rbd-version "${RBD_VERSION}"
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
+  # judgement for offline
+  if [ "$1" == "offline" ];then
+  Write_Sls_File install-type offline
+  fi
   # Config region info
   Write_Sls_File rbd-tag "cloudbang"
   # Get dns info
@@ -159,7 +163,7 @@ network:
     enabled: true
     bind: ${DEFAULT_LOCAL_IP}
     net: ${CALICO_NET}
-  calico-compute:
+  compute:
     image: goodrain.me/calico-node:v2.4.1
     enable: true
 EOF
@@ -262,7 +266,7 @@ EOF
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
   #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
-  [[ "$1" != "offline" ]] && salt-ssh "*" state.sls salt.setup --state-output=mixed
+   salt-ssh "*" state.sls salt.setup --state-output=mixed
 
   systemctl restart salt-master
   systemctl restart salt-minion
@@ -298,7 +302,7 @@ Echo_Info "Configing installation path ..."
 Get_Rainbond_Install_Path  && Echo_Ok
 
 Echo_Info "Writing configuration ..."
-Write_Config && Echo_Ok
+Write_Config $1 && Echo_Ok
 
 Echo_Info "Init config ..."
 run && Echo_Ok

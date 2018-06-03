@@ -58,7 +58,7 @@ Load_Image(){
     Echo_Info "loading docker images"
     while read line 
       do 
-        docker load -qi ./insatll/imgs/$line
+        docker load -qi ./install/imgs/$line
       done < ./install/imgs/img_list.ls 
 }
 

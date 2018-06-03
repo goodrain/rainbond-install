@@ -13,8 +13,8 @@
 #       CREATED: 07/04/2018 10:49:37 AM
 #======================================================================================================================
 #
-#           ADD: $6 : offline
-#   DESCRIPTION: add a parameter  offline in $6 ,it is use for install a compute node without internet. 
+#           ADD:  offline
+#   DESCRIPTION: add a parameter  offline  ,it is use for install a compute node without internet. 
 #
 #
 #======================================================================================================================
@@ -22,7 +22,8 @@
 # debug
 [[ $DEBUG ]] && set -x
 
-. scripts/common.sh $6
+. scripts/common.sh
+COMPUTE_ID="$3"
 
 init_func(){
     Echo_Info "Init compute node config."
@@ -53,13 +54,9 @@ EOF
     else
         Echo_Error "not support ${1:-null}"
     fi
+
     Echo_Info "change hostname"
-    #judgment below uses for offline env : init compute node offline ( changed by guox 2018.5.22 ).
-    if [[ "$5" == "offline" ]];then
-        salt-ssh -i "$2" state.sls offline.minion
-    else
-        salt-ssh -i "$2" state.sls init.compute
-    fi
+    salt-ssh -i ${COMPUTE_ID} state.sls init.compute
 }
 
 check_func(){
@@ -71,19 +68,14 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-    #judgment below uses for offline env : do not install salt-minion through internet ( changed by guox 2018.5.31 ).
-    if [ "$1" != "offline" ];then
-      salt-ssh -i -E "compute" state.sls minions.install
+      salt-ssh -i ${COMPUTE_ID} state.sls minions.install
       sleep 12
       Echo_Info "waiting for salt-minions start"
-    else
-      salt -E "compute" state.sls offline
-    fi
     
     for module in ${COMPUTE_MODULES}
     do
         Echo_Info "Start install $module ..."
-        if ! (salt -E "compute" state.sls $module);then
+        if ! (salt ${COMPUTE_ID} state.sls $module);then
             ((fail_num+=1))
             break
         fi
@@ -97,10 +89,13 @@ install_compute_func(){
 help_func(){
     Echo_Info "help"
     Echo_Info "init"
-    echo "args: single <hostname> <ip>  <password/key-path> [offline]"
+    echo "args: single <hostname> <ip>  <password/key-path>"
     echo "args: multi <ip.txt path> <password/key-path>"
     Echo_Info "check"
-    Echo_Info "install [offline]"
+    Echo_Info "install"
+    Echo_Info "offline"
+    echo "args: single <hostname> <ip>  <password/key-path>"
+
 }
 
 case $1 in
@@ -118,7 +113,10 @@ case $1 in
     #    check_func force && install_compute_func
     #;;
     install)
-        install_compute_func $2 $3
+        install_compute_func $2 
+    ;;
+    offline)
+        init_func ${@:2} && install_compute_func ${@:2}
     ;;
     *)
         help_func
