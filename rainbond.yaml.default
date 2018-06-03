@@ -11,7 +11,7 @@ master-hostname: manage01
 master-private-ip: 
 master-public-ip: 
 domain: 
-install-script-path: /root/rainbond-install
+install-script-path: 
 oss-repo-url: https://dl.goodrain.com
 public-image-domain: rainbond
 private-image-domain: goodrain.me
