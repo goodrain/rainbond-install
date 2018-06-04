@@ -11,7 +11,7 @@ SALT_PKGS="salt-ssh"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
-DOMAIN_API="http://domain.grapps.cn/domain"
+DOMAIN_API="http://domain.grapps.cn"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="init \
@@ -75,6 +75,7 @@ if [ "$SYS_NAME" == "centos" ];then
     SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
+    epel-release \
     bash-completion )
 
     # centos salt repo
@@ -250,18 +251,12 @@ local l1=" ^" \
     echo >&2
 }
 
-REG_Check(){
-    uid=$( Read_Sls_File reg-uuid )
-    iip=$( Read_Sls_File master-private-ip )
-    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
-}
-
 REG_Status(){
     uid=$( Read_Sls_File reg-uuid $MAIN_SLS )
     iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
     domain=$( Read_Sls_File domain $MAIN_SLS )
     if [[ "$domain" =~ "grapps" ]];then
-        curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
+        curl --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
     else
         echo ""
     fi

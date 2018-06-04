@@ -1,7 +1,7 @@
 #!/bin/bash
 #======================================================================================================================
 #
-#          FILE: setup.sh
+#          FILE: install_salt.sh
 #
 #   DESCRIPTION: Install
 #
@@ -10,9 +10,11 @@
 #     COPYRIGHT: (c) 2018 by the Goodrain Delivery Team.
 #
 #       LICENSE: Apache 2.0
-#       CREATED: 03/30/2018 10:49:37 AM
+#       CREATED: 06/04/2018 11:59:37 PM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
+
+cd ../
 
 export MAIN_CONFIG="rainbond.yaml"
 
@@ -66,36 +68,8 @@ install_func(){
     fi
 }
 
-Offline_Prepare(){
-    if [ ! -f $OFFLINE_FILE ];then
-    Echo_Info "Prepare install rainbond offline."
-    ./scripts/prepare_install.sh && touch $OFFLINE_FILE
-    fi
-}
-
-help_func(){
-    echo "help:"
-    echo "check   --- check cmd "
-    echo "offline --- work in offline env cmd"
-    echo "install --- install cmd "
-    echo "dev     --- ignore check install cmd "
-    echo ""
-}
-
 case $1 in
-    check)
-        check_func ${@:2} && init_config
-    ;;
-    install)
-        check_func && init_config && install_func ${@:2}
-    ;;
-    dev)
-        check_func force && init_config && install_func ${@:2}
-    ;;
-    offline)
-        Offline_Prepare && init_config offline && install_func offline
-    ;;
     *)
-        help_func
+        check_func force && init_config
     ;;
 esac
