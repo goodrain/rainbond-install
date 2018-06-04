@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. scripts/common.sh
+. scripts/common.sh "$1"
 
 [[ $DEBUG ]] && set -x
 
@@ -176,13 +176,11 @@ EOF
   cp -rp $PWD/install/pillar /srv/
   cp -rp $PWD/rainbond.yaml /srv/pillar/rainbond.sls
 
+
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
-
-  salt-ssh "*" state.sls salt.setup --state-output=mixed
-
-  systemctl restart salt-master
-  systemctl restart salt-minion
+  #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+  [[ "$1" != "offline" ]] && salt-ssh "*" state.sls salt.setup --state-output=mixed
 
   Echo_Info "Waiting to start salt."
   for ((i=1;i<=10;i++ )); do
@@ -196,8 +194,17 @@ EOF
   done
 }
 
+Define_Domain(){
+  #judgment below uses for offline env : define domain name by user ( changed by guox 2018.5.18 ).
+  if [[ $1 == "offline" ]];then
+    Echo_Info "Configure custom domain name"
+    read -p "Please input your custom domain: "  Doman_Name
+    echo "domain: $Doman_Name" > /srv/pillar/custom.sls
+  fi
+}
+
 Echo_Info "Install Base Package ..."
-Install_Base_Pkg && Echo_Ok
+Install_Base_Pkg $1 && Echo_Ok
 
 Echo_Info "Init system config ..."
 Init_system && Echo_Ok

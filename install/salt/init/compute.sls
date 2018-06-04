@@ -12,10 +12,6 @@ epel-repo:
     - gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
     - gpgcheck: 1
 
-update_local_pkg_cache:
-  cmd.run:
-    - name: yum makecache fast
-
 {% else %}
 update_local_pkg_cache:
   cmd.run:

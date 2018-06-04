@@ -1,5 +1,7 @@
 {% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
 {% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 kubelet-script:
   file.managed:
@@ -68,20 +70,20 @@ kubelet-cni-bin:
 
 pull-pause-img:
   cmd.run:
-    - name: docker pull {{ PAUSEIMG }}:{{ PAUSEVER }}
-    - unless: docker inspect {{ PAUSEIMG }}:{{ PAUSEVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 
 rename-pause-img:
   cmd.run: 
-    - name: docker tag {{ PAUSEIMG }}:{{ PAUSEVER }} goodrain.me/pause-amd64:{{ PAUSEVER }}
-    - unless: docker inspect goodrain.me/pause-amd64:{{ PAUSEVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }} {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
     - require:
       - cmd: pull-pause-img
 {% else %}
 pull-pause-img:
   cmd.run:
-    - name: docker pull goodrain.me/pause-amd64:{{ PAUSEVER }}
-    - unless: docker inspect goodrain.me/pause-amd64:{{ PAUSEVER }}
+    - name: docker pull {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 {% endif %}
 
 kubelet:

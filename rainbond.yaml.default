@@ -4,7 +4,7 @@
 # read:           ./scripts/yq r t.yml etcd.server.members[0].name
 # write/update:   ./scripts/yq w t.yml etcd.server.members[0].name compute01
 # more information: http://mikefarah.github.io/yq/
-rbd-version: 3.6
+rbd-version: 3.5
 rbd-path: /opt/rainbond
 install-type: online
 master-hostname: manage01
@@ -58,14 +58,14 @@ rbd-pkgs:
 database:
   type: mysql
   mysql:
-    image: rainbond/rbd-db
-    version: 3.6
+    image: rbd-db
+    version: 3.5
     host: 
     port: 3306
     user: 
     pass: 
   cockroachdb:
-    image: cockroachdb/cockroach
+    image: cockroach
     version: v2.0.2
     host: 
     port: 26257
@@ -76,7 +76,7 @@ database:
 # etcd
 etcd:
   server:
-    image: rainbond/etcd
+    image: etcd
     version: v3.2.13
     enabled: true
     bind:
@@ -87,99 +87,104 @@ etcd:
       name: 
       port: 2379
   proxy:
-    image: rainbond/etcd
+    image: etcd
     version: v3.2.13
     enabled: true
 
 # kubernetes
 kubernetes:
   cfssl:
-    image: rainbond/cfssl
+    image: cfssl
     version: dev
   kubecfg:
-    image: rainbond/kubecfg
+    image: kubecfg
     version: dev
   cni:
-    image: rainbond/cni
-    version: k8s_v3.6
+    image: cni
+    version: k8s_v3.5
   api:
-    image: rainbond/kube-apiserver
+    image: kube-apiserver
     version: v1.6.4
   manager:
-    image: rainbond/kube-controller-manager
+    image: kube-controller-manager
     version: v1.6.4
   schedule:
-    image: rainbond/kube-scheduler
+    image: kube-scheduler
     version: v1.6.4
 
 # network
 network:
   calico:
-    image: rainbond/calico-node
+    image: calico-node
     version: v2.4.1
     enabled: true
     bind: 
     net: 
 
+# plugins
+plugins:
+  image: plugins
+  tcm:
+    tag: tcm
+  mesh:
+    tag: mesh
+
 #proxy
 proxy:
   runner:
-    image: rainbond/runner
+    image: runner
     version: latest
-  plugins:
-    image: rainbond/plugins
-    version: tcm
   adapter:
-    image: rainbond/adapter
+    image: adapter
     version: latest
   pause:
-    image: rainbond/pause-amd64
+    image: pause-amd64
     version: '3.0'
   builder:
-    image: rainbond/builder
+    image: builder
     version: latest
 
-# plugins
+# rainbond components
 rainbond-modules:
   rbd-api:
-    image: rainbond/rbd-api
-    version: 3.6
+    image: rbd-api
+    version: 3.5
   rbd-dns:       
-    image: rainbond/rbd-dns
-    version: 3.6
+    image: rbd-dns
+    version: 3.5
   rbd-registry: 
-    image: rainbond/rbd-registry
+    image: rbd-registry
     version: 2.3.1
   rbd-repo: 
-    image: rainbond/rbd-repo
-    version: 3.6
+    image: rbd-repo
+    version: 3.5
   rbd-worker: 
-    image: rainbond/rbd-worker
-    version: 3.6
+    image: rbd-worker
+    version: 3.5
   rbd-eventlog: 
-    image: rainbond/rbd-eventlog
-    version: 3.6
+    image: rbd-eventlog
+    version: 3.5
   rbd-entrance: 
-    image: rainbond/rbd-entrance
-    version: 3.6
+    image: rbd-entrance
+    version: 3.5
   rbd-chaos: 
-    image: rainbond/rbd-chaos
-    version: 3.6
+    image: rbd-chaos
+    version: 3.5
   rbd-lb: 
-    image: rainbond/rbd-lb
-    version: 3.6
+    image: rbd-lb
+    version: 3.5
   rbd-mq: 
-    image: rainbond/rbd-mq
-    version: 3.6
+    image: rbd-mq
+    version: 3.5
   rbd-webcli: 
-    image: rainbond/rbd-webcli
-    version: 3.6
+    image: rbd-webcli
+    version: 3.5
   rbd-app-ui: 
-    image: rainbond/rbd-app-ui
-    version: 3.6
+    image: rbd-app-ui
+    version: 3.5
   rbd-prometheus: 
-    image: rainbond/prometheus
+    image: prometheus
     version: v2.1.0
   rbd-cni:
-    image: rainbond/cni
-    version: rbd_v3.6
+    image: cni
+    version: rbd_v3.5

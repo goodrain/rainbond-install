@@ -1,10 +1,13 @@
 #==================== rbd-worker ====================
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 {% set WORKERIMG = salt['pillar.get']('rainbond-modules:rbd-worker:image') -%}
 {% set WORKERVER = salt['pillar.get']('rainbond-modules:rbd-worker:version') -%}
+
 docker-pull-worker-image:
   cmd.run:
-    - name: docker pull {{ WORKERIMG }}:{{ WORKERVER }}
-    - unless: docker inspect {{ WORKERIMG }}:{{ WORKERVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ WORKERIMG }}:{{ WORKERVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ WORKERIMG }}:{{ WORKERVER }}
 
 worker-upstart:
   cmd.run:
@@ -18,8 +21,8 @@ worker-upstart:
 {% set EVLOGVER = salt['pillar.get']('rainbond-modules:rbd-eventlog:version') -%}
 docker-pull-eventlog-image:
   cmd.run:
-    - name: docker pull {{ EVLOGIMG }}:{{ EVLOGVER }}
-    - unless: docker inspect {{ EVLOGIMG }}:{{ EVLOGVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ EVLOGIMG }}:{{ EVLOGVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ EVLOGIMG }}:{{ EVLOGVER }}
 
 eventlog-upstart:
   cmd.run:
@@ -33,8 +36,8 @@ eventlog-upstart:
 {% set ENTRANCEVER = salt['pillar.get']('rainbond-modules:rbd-entrance:version') -%}
 docker-pull-entrance-image:
   cmd.run:
-    - name: docker pull {{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
-    - unless: docker inspect {{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
 
 entrance-upstart:
   cmd.run:
@@ -48,8 +51,8 @@ entrance-upstart:
 {% set APIVER = salt['pillar.get']('rainbond-modules:rbd-api:version') -%}
 docker-pull-api-image:
   cmd.run:
-    - name: docker pull {{ APIIMG }}:{{ APIVER }}
-    - unless: docker inspect {{ APIIMG }}:{{ APIVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
 api-upstart:
   cmd.run:
@@ -63,8 +66,8 @@ api-upstart:
 {% set CHAOSVER = salt['pillar.get']('rainbond-modules:rbd-chaos:version') -%}
 docker-pull-chaos-image:
   cmd.run:
-    - name: docker pull {{ CHAOSIMG }}:{{ CHAOSVER }}
-    - unless: docker inspect {{ CHAOSIMG }}:{{ CHAOSVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ CHAOSIMG }}:{{ CHAOSVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CHAOSIMG }}:{{ CHAOSVER }}
 
 chaos-upstart:
   cmd.run:
@@ -78,8 +81,8 @@ chaos-upstart:
 {% set LBVER = salt['pillar.get']('rainbond-modules:rbd-lb:version') -%}
 docker-pull-lb-image:
   cmd.run:
-    - name: docker pull {{ LBIMG }}:{{ LBVER }}
-    - unless: docker inspect {{ LBIMG }}:{{ LBVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
 
 default_http_conf:
   file.managed:
@@ -118,8 +121,8 @@ lb-restart:
 {% set MQVER = salt['pillar.get']('rainbond-modules:rbd-mq:version') -%}
 docker-pull-mq-image:
   cmd.run:
-    - name: docker pull {{ MQIMG }}:{{ MQVER }}
-    - unless: docker inspect {{ MQIMG }}:{{ MQVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ MQIMG }}:{{ MQVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ MQIMG }}:{{ MQVER }}
 
 mq-upstart:
   cmd.run:
@@ -133,8 +136,8 @@ mq-upstart:
 {% set WEBCLIVER = salt['pillar.get']('rainbond-modules:rbd-webcli:version') -%}
 docker-pull-webcli-image:
   cmd.run:
-    - name: docker pull {{ WEBCLIIMG }}:{{ WEBCLIVER }}
-    - unless: docker inspect {{ WEBCLIIMG }}:{{ WEBCLIVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ WEBCLIIMG }}:{{ WEBCLIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ WEBCLIIMG }}:{{ WEBCLIVER }}
 
 webcli-upstart:
   cmd.run:
@@ -148,8 +151,8 @@ webcli-upstart:
 {% set APPUIVER = salt['pillar.get']('rainbond-modules:rbd-app-ui:version') -%}
 docker-pull-app-ui-image:
   cmd.run:
-    - name: docker pull {{ APPUIIMG }}:{{ APPUIVER }}
-    - unless: docker inspect {{ APPUIIMG }}:{{ APPUIVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ APPUIIMG }}:{{ APPUIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APPUIIMG }}:{{ APPUIVER }}
 
 app-ui-logs:
   cmd.run:

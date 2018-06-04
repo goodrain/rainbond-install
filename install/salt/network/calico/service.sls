@@ -1,10 +1,28 @@
 {% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
 {% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
+{% if grains['id'] == 'manage01' %}
 pull-calico-image:
   cmd.run:
-    - name: docker pull {{ CALICOIMG }}:{{ CALICOVER }}
-    - unless: docker inspect {{ CALICOIMG }}:{{ CALICOVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+
+calico-tag:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }} {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+    - require:
+      - cmd: pull-calico-image
+
+{% else %}
+pull-calico-image:
+  cmd.run:
+    - name: docker pull {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+{% endif %}
+
 
 calico-env:
   file.managed:

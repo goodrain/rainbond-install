@@ -18,12 +18,12 @@ MANAGE_MODULES="init \
 storage \
 docker \
 misc \
+grbase \
 etcd \
 network \
 kubernetes.server \
 node \
 db \
-grbase \
 plugins \
 proxy \
 prometheus \
@@ -65,6 +65,7 @@ MEM_LIMIT=4
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
 INIT_FILE="./.initialized"
+OFFLINE_FILE="./.offlineprepared"
 
 # redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
@@ -78,6 +79,9 @@ if [ "$SYS_NAME" == "centos" ];then
     epel-release )
 
     # centos salt repo
+    #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+
+    if [[ "$1" != "offline" ]];then
     cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
@@ -87,6 +91,7 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
+    fi
 
 # debian and ubuntu
 else

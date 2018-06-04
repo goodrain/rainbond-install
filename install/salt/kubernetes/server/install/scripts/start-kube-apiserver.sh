@@ -23,5 +23,5 @@ exec /usr/bin/docker \
   --net=host \
   --name kube-apiserver \
   --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes \
-  rainbond/kube-apiserver:v1.6.4 \
+  {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['api']['image']}}:{{pillar['kubernetes']['api']['version']}} \  
   $KUBE_APISERVER_OPTS

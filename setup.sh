@@ -37,8 +37,6 @@ check_func(){
 init_config(){
     if [ ! -f $INIT_FILE ];then
         Echo_Info "Init rainbond configure."
-
-        
         ./scripts/init_sls.sh && touch $INIT_FILE
     fi
 }
@@ -46,7 +44,8 @@ init_config(){
 install_func(){
     fail_num=0
     Echo_Info "will install manage node."
-
+#judgment below uses for offline env : del docker from MANAGE_MODULES ( changed by guox 2018.5.18 ).
+    [[ "$@" == "offline" ]] && export MANAGE_MODULES="${MANAGE_MODULES%%docker*}${MANAGE_MODULES##*docker}"
     for module in ${MANAGE_MODULES}
     do
         echo "Start install $module ..."
@@ -57,7 +56,7 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
-        REG_Status || return 0
+        REG_Status $1 || return 0
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
         notready=$(grctl  node list | grep $uuid | grep false)
         if [ "$notready" != "" ];then
@@ -68,9 +67,17 @@ install_func(){
     fi
 }
 
+Offline_Prepare(){
+    if [ ! -f $OFFLINE_FILE ];then
+    Echo_Info "Prepare install rainbond offline."
+    ./scripts/prepare_install.sh && touch $OFFLINE_FILE
+    fi
+}
+
 help_func(){
     echo "help:"
     echo "check   --- check cmd "
+    echo "offline --- work in offline env cmd"
     echo "install --- install cmd "
     echo "dev     --- ignore check install cmd "
     echo ""
@@ -85,6 +92,9 @@ case $1 in
     ;;
     dev)
         check_func force && init_config && install_func ${@:2}
+    ;;
+    offline)
+        Offline_Prepare && init_config offline && install_func offline
     ;;
     *)
         help_func

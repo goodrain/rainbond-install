@@ -1,10 +1,12 @@
 {% if pillar.etcd.proxy.enabled %}
 {% set ETCDPROXYIMG = salt['pillar.get']('etcd:proxy:image') -%}
 {% set ETCDPROXYVER = salt['pillar.get']('etcd:proxy:version') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 pull-etcd-proxy-image:
   cmd.run:
-    - name: docker pull {{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
-    - unless: docker inspect {{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
+    - name: docker pull {{PRIDOMAIN}}/{{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
 
 etcd-proxy-env:
   file.managed:

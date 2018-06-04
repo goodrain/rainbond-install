@@ -1,10 +1,12 @@
 {% set REGISTRYIMG = salt['pillar.get']('rainbond-modules:rbd-registry:image') -%}
 {% set REGISTRYVER = salt['pillar.get']('rainbond-modules:rbd-registry:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 docker-pull-hub-image:
   cmd.run:
-    - name: docker pull {{ REGISTRYIMG }}:{{ REGISTRYVER }}
-    - unless: docker inspect {{ REGISTRYIMG }}:{{ REGISTRYVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
 
 hub-upstart:
   cmd.run:

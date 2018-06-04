@@ -12,28 +12,34 @@
 #       LICENSE: Apache 2.0
 #       CREATED: 07/04/2018 10:49:37 AM
 #======================================================================================================================
+#
+#           ADD: $6 : offline
+#   DESCRIPTION: add a parameter  offline in $6 ,it is use for install a compute node without internet. 
+#
+#
+#======================================================================================================================
 
 # debug
 [[ $DEBUG ]] && set -x
 
-. scripts/common.sh
+. scripts/common.sh $6
 
 init_func(){
     Echo_Info "Init compute node config."
     if [ "$1" = "single" ];then
         echo $@
-        if [ "$#" -ne 4 ];then
-            Echo_Error "need 4 args\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd>"
+        if [ "$#" -ne 4 -a "$#" -ne 5 ];then
+            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd> [offline]"
         fi
         grep "$2" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
             cat >> /etc/salt/roster <<EOF
 $2:
-  host: $3 
-  user: root         
-  passwd: $4  
+  host: $3
+  user: root
+  passwd: $4
   sudo: True
-  port: 22         
+  port: 22
 EOF
         grep "$3" /etc/hosts > /dev/null
         [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
@@ -48,7 +54,12 @@ EOF
         Echo_Error "not support ${1:-null}"
     fi
     Echo_Info "change hostname"
-    salt-ssh -i -E "compute" state.sls init.compute
+    #judgment below uses for offline env : init compute node offline ( changed by guox 2018.5.22 ).
+    if [[ "$5" == "offline" ]];then
+        salt-ssh -i "$2" state.sls offline.minion
+    else
+        salt-ssh -i "$2" state.sls init.compute
+    fi
 }
 
 check_func(){
@@ -60,9 +71,15 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-    salt-ssh -i -E "compute" state.sls minions.install
-    sleep 12
-    Echo_Info "waiting for salt-minions start"
+    #judgment below uses for offline env : do not install salt-minion through internet ( changed by guox 2018.5.31 ).
+    if [ "$1" != "offline" ];then
+      salt-ssh -i -E "compute" state.sls minions.install
+      sleep 12
+      Echo_Info "waiting for salt-minions start"
+    else
+      salt -E "compute" state.sls offline
+    fi
+    
     for module in ${COMPUTE_MODULES}
     do
         Echo_Info "Start install $module ..."
@@ -80,10 +97,10 @@ install_compute_func(){
 help_func(){
     Echo_Info "help"
     Echo_Info "init"
-    echo "args: single <hostname> <ip>  <password/key-path>"
+    echo "args: single <hostname> <ip>  <password/key-path> [offline]"
     echo "args: multi <ip.txt path> <password/key-path>"
     Echo_Info "check"
-    Echo_Info "install"
+    Echo_Info "install [offline]"
 }
 
 case $1 in
@@ -101,7 +118,7 @@ case $1 in
     #    check_func force && install_compute_func
     #;;
     install)
-        install_compute_func
+        install_compute_func $2 $3
     ;;
     *)
         help_func

@@ -4,21 +4,23 @@
 {% set CTLMGEVER = salt['pillar.get']('kubernetes:manager:version') -%}
 {% set SDLIMG = salt['pillar.get']('kubernetes:schedule:image') -%}
 {% set SDLVER = salt['pillar.get']('kubernetes:schedule:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 pull_api_image:
   cmd.run:
-    - name: docker pull {{ APIIMG }}:{{ APIVER }}
-    - unless: docker inspect {{ APIIMG }}:{{ APIVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
 pull_manager_image:
   cmd.run:
-    - name: docker pull {{ CTLMGEIMG }}:{{ APIVER }}
-    - unless: docker inspect {{ CTLMGEIMG }}:{{ APIVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
 
 pull_schedule_image:
   cmd.run:
-    - name: docker pull {{ SDLIMG }}:{{ SDLVER }}
-    - unless: docker inspect {{ SDLIMG }}:{{ SDLVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
 
 k8s-api-script:
   file.managed:

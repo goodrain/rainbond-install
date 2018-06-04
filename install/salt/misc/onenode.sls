@@ -1,14 +1,16 @@
 {% set CFSSLIMG = salt['pillar.get']('kubernetes:cfssl:image') -%}
 {% set CFSSLVER = salt['pillar.get']('kubernetes:cfssl:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 pull_cfssl_image:
   cmd.run:
-    - name: docker pull {{ CFSSLIMG }}:{{ CFSSLVER }}
-    - unless: docker inspect {{ CFSSLIMG }}:{{ CFSSLVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
 
 check_or_create_certificates:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{ CFSSLIMG }}:{{ CFSSLVER }} kip {{ pillar['master-private-ip'] }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }} kip {{ pillar['master-private-ip'] }}
     - unless:
       - ls /srv/salt/kubernetes/server/install/ssl/*.pem
       - ls /srv/salt/kubernetes/server/install/ssl/*.csr
@@ -19,12 +21,12 @@ check_or_create_certificates:
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 pull_kubecfg_image:
   cmd.run:
-    - name: docker pull {{ KUBECFGIMG }}:{{ KUBECFGVER }}
-    - unless: docker inspect {{ KUBECFGIMG }}:{{ KUBECFGVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
 
 check_or_create_kubeconfig:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{ KUBECFGIMG }}:{{ KUBECFGVER }}
+    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
     - unless: ls /srv/salt/kubernetes/server/install/kubecfg/*.kubeconfig
     - require:
       - cmd: pull_kubecfg_image
@@ -33,12 +35,12 @@ check_or_create_kubeconfig:
 {% set K8SCNIVER = salt['pillar.get']('kubernetes:cni:version') -%}
 pull_k8s_cni_image:
   cmd.run:
-    - name: docker pull {{ K8SCNIIMG }}:{{ K8SCNIVER }}
-    - unless: docker inspect {{ K8SCNIIMG }}:{{ K8SCNIVER }}
+    - name: docker pull {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }}
 
 prepare_k8s_cni_tools:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ K8SCNIIMG }}:{{ K8SCNIVER }} tar zxf /pkg.tgz -C /sysdir
+    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }} tar zxf /pkg.tgz -C /sysdir
     - require:
       - cmd: pull_k8s_cni_image
     - unless:
@@ -55,7 +57,7 @@ prepare_k8s_cni_tools:
 {% set RBDCNIVER = salt['pillar.get']('rainbond-modules:rbd-cni:version') -%}
 prepare_rbd_cni_tools:
   cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{ RBDCNIIMG }}:{{ RBDCNIVER }} tar zxf /pkg.tgz -C /sysdir
+    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{PUBDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }} tar zxf /pkg.tgz -C /sysdir
 
 {% if pillar.domain is defined %}
 compose_file:
