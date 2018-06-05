@@ -260,6 +260,7 @@ REG_Status(){
     domain=$( Read_Sls_File domain $MAIN_SLS )
     if [[ "$domain" =~ "grapps" ]];then
         curl --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
+        echo ""
     else
         echo ""
     fi
