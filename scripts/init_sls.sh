@@ -68,7 +68,7 @@ Install_Base_Pkg(){
   $Cache_PKG
 
   # install pkgs
-  Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
+  Install_PKG  ${SYS_BASE_PKGS[*]} ${SYS_COMMON_PKGS[*]}
 }
 
 # -----------------------------------------------------------------------------
@@ -184,12 +184,14 @@ EOF
     cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa.pub ~/.ssh/id_rsa.pub
   )
 
-  [ -d /srv/salt ] && rm /srv/salt -rf
-  [ -d /srv/pillar ] && rm /srv/pillar -rf
+  [ -d /srv/salt ] && rm -rf /srv/salt
+  [ -d /srv/pillar ] && rm -rf /srv/pillar/* || (
+    mkdir -p /srv/pillar
+  )
   cp -rp $PWD/install/salt /srv/
-  cp -rp $PWD/install/pillar /srv/
+  
   cp -rp $PWD/rainbond.yaml /srv/pillar/rainbond.sls
-
+  cp -rp $PWD/install/pillar/top.sls /srv/pillar/top.sls
 
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
