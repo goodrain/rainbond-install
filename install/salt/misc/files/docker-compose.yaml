@@ -33,6 +33,29 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+{% if pillar['rbd-version'] == '3.5' %}
+  rbd-eventlog:
+    image: rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
+    container_name: rbd-eventlog
+    environment:
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
+      MYSQL_DATABASE: region
+      K8S_MASTER: http://127.0.0.1:8181
+      CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
+    - /grdata/downloads/log:/grdata/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+{% else %}
   rbd-eventlog:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     container_name: rbd-eventlog
@@ -57,6 +80,7 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+{% endif %}
   rbd-entrance:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     container_name: rbd-entrance
