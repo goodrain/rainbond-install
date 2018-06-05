@@ -1,15 +1,19 @@
 {% if pillar.etcd.proxy.enabled %}
+{% set ETCDPROXYIMG = salt['pillar.get']('etcd:proxy:image') -%}
+{% set ETCDPROXYVER = salt['pillar.get']('etcd:proxy:version') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 pull-etcd-proxy-image:
   cmd.run:
-    - name: docker pull {{ pillar.etcd.proxy.get('image', 'goodrain.me/etcd:v3.2.13') }}
+    - name: docker pull {{PRIDOMAIN}}/{{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
 
 etcd-proxy-env:
   file.managed:
     - source: salt://etcd/install/envs/etcd-proxy.sh
     - name: {{ pillar['rbd-path'] }}/envs/etcd-proxy.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
     - mode: 644
     - user: root
     - group: root
@@ -18,7 +22,7 @@ etcd-proxy-script:
   file.managed:
     - source: salt://etcd/install/scripts/start-etcdproxy.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root

@@ -1,17 +1,43 @@
+{% set APIIMG = salt['pillar.get']('kubernetes:api:image') -%}
+{% set APIVER = salt['pillar.get']('kubernetes:api:version') -%}
+{% set CTLMGEIMG = salt['pillar.get']('kubernetes:manager:image') -%}
+{% set CTLMGEVER = salt['pillar.get']('kubernetes:manager:version') -%}
+{% set SDLIMG = salt['pillar.get']('kubernetes:schedule:image') -%}
+{% set SDLVER = salt['pillar.get']('kubernetes:schedule:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
+{% if pillar['install-type']!="offline" %}
 pull_api_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
+    - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
 pull_manager_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
+    - name: docker pull {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
 
 pull_schedule_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
+    - name: docker pull {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+{% else %}
+pull_api_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+
+pull_manager_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CTLMGEIMG }}_{{ APIVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+
+pull_schedule_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ SDLIMG }}_{{ SDLVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+{% endif %}
 
 k8s-api-script:
   file.managed:

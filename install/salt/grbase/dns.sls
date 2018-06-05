@@ -1,8 +1,17 @@
 {% if "manage" in grains['id'] %}
+{% set DNSIMG = salt['pillar.get']('rainbond-modules:rbd-dns:image') -%}
+{% set DNSVER = salt['pillar.get']('rainbond-modules:rbd-dns:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 docker-pull-dns-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-dns:{{ pillar["rbd-version"] }}
-    - unless: docker inspect rainbond/rbd-dns:{{ pillar["rbd-version"] }}
+{% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ DNSIMG }}:{{ DNSVER }}
+{% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ DNSIMG }}_{{ DNSVER }}.gz
+{% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ DNSIMG }}:{{ DNSVER }}
 
 dns-upstart:
   cmd.run:

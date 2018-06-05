@@ -1,8 +1,13 @@
+{% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
+{% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 kubelet-script:
   file.managed:
     - source: salt://kubernetes/node/install/scripts/start-kubelet.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kubelet.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -12,7 +17,7 @@ kubelet-env:
   file.managed:
     - source: salt://kubernetes/node/install/envs/kubelet.sh
     - name: {{ pillar['rbd-path'] }}/envs/kubelet.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -22,7 +27,7 @@ k8s-custom-conf:
   file.managed:
     - source: salt://kubernetes/node/install/custom.conf
     - name: {{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
 
 kubelet-ssl-rsync:
@@ -40,7 +45,7 @@ kubelet-cni:
     - source: salt://kubernetes/node/install/cni
     - name: {{ pillar['rbd-path'] }}/etc/cni/
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 kubelet-cni-bin:
   file.recurse:
@@ -49,7 +54,7 @@ kubelet-cni-bin:
     - file_mode: '0755'
     - user: root
     - group: root
-    - makedirs: Ture
+    - makedirs: True
 
 /etc/systemd/system/kubelet.service:
   file.managed:
@@ -65,20 +70,28 @@ kubelet-cni-bin:
 
 pull-pause-img:
   cmd.run:
-    - name: docker pull rainbond/pause-amd64:3.0
-    - unless: docker inspect rainbond/pause-amd64:3.0
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ PAUSEIMG }}_{{ PAUSEVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 
 rename-pause-img:
   cmd.run: 
-    - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
-    - unless: docker inspect goodrain.me/pause-amd64:3.0
+    - name: docker tag {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }} {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
     - require:
       - cmd: pull-pause-img
 {% else %}
 pull-pause-img:
   cmd.run:
-    - name: docker pull goodrain.me/pause-amd64:3.0
-    - unless: docker inspect goodrain.me/pause-amd64:3.0
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+  {% else %}
+    -name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ PAUSEIMG }}_{{ PAUSEVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 {% endif %}
 
 kubelet:

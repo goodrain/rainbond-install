@@ -13,7 +13,7 @@
 #       CREATED: 05/15/2018 16:49:37 AM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
-. scripts/common.sh offline
+. scripts/common.sh
 trap 'exit' SIGINT SIGHUP
 #================================write a local repo file================================================================
 
@@ -35,7 +35,7 @@ Salt_Install(){
 #================================start gr-docker daemon=================================================================
 
 Docker_Run(){
-    ${INSTALL_BIN} install -y -q gr-docker-engine
+    ${INSTALL_BIN} install -y -q gr-docker-engine >/dev/null 2>&1
     sed -i 's/\/etc\/goodrain/\/opt\/rainbond/g' /usr/lib/systemd/system/docker.service
     mkdir -p /opt/rainbond/envs
     cat > /opt/rainbond/envs/docker.sh << EOF
@@ -58,7 +58,7 @@ Load_Image(){
     Echo_Info "loading docker images"
     while read line 
       do 
-        docker load -qi ./install/imgs/$line
+        docker load -qi {{ pillar['install-script-path'] }}/install/imgs/$line
       done < ./install/imgs/img_list.ls 
 }
 

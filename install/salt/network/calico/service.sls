@@ -1,21 +1,34 @@
+{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
+{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 {% if grains['id'] == 'manage01' %}
 pull-calico-image:
   cmd.run:
-    - name: docker pull {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
-    - unless: docker inspect {{ pillar.network.calico.get('image', 'rainbond/calico-node:v2.4.1') }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CALICOIMG }}_{{ CALICOVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
 
 calico-tag:
   cmd.run:
-    - name: docker tag rainbond/calico-node:v2.4.1 goodrain.me/calico-node:v2.4.1
-    - unless: docker inspect goodrain.me/calico-node:v2.4.1
+    - name: docker tag {{PUBDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }} {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
     - require:
       - cmd: pull-calico-image
 
 {% else %}
 pull-calico-image:
   cmd.run:
-    - name: docker pull {{ pillar.network.compute.get('image', 'goodrain.me/calico-node:v2.4.1') }}
-    - unless: docker inspect {{ pillar.network.compute.get('image', 'goodrain.me/calico-node:v2.4.1') }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PRIDOMAIN}}_{{CALICOIMG}}_{{ CALICOVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
 {% endif %}
 
 
@@ -24,7 +37,7 @@ calico-env:
     - source: salt://network/calico/install/envs/calico.sh
     - name: {{ pillar['rbd-path'] }}/envs/calico.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
     - mode: 644
     - user: root
     - group: root
@@ -33,7 +46,7 @@ calico-script:
   file.managed:
     - source: salt://network/calico/install/scripts/start-calico.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-calico.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -64,7 +77,7 @@ init.calico:
   file.managed:
     - name: {{ pillar['rbd-path'] }}/bin/init.calico
     - source: salt://network/calico/install/run/init.calico
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root

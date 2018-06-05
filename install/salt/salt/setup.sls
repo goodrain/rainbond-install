@@ -61,6 +61,7 @@ salt-repo:
   {% endif %}  
     - require_in:
       - pkg: salt-minion-install
+      - pkg: salt-master-install
 
 salt-minion-install:
   pkg.installed:

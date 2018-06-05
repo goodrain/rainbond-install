@@ -3,23 +3,16 @@
 [[ $DEBUG ]] && set -x
 
 # ================================Global ENV ================================
+
+YQBIN="./scripts/yq"
+MAIN_SLS="/srv/pillar/rainbond.sls"
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
-DOCKER_VERSION="1.12.6,1526e3f"
-SALT_VER="stable 2017.7.5"
-SALT_REPO="mirrors.ustc.edu.cn/salt"
 SALT_PKGS="salt-ssh"
+MAIN_CONFIG="rainbond.yaml"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
-DEFAULT_INSTALL_PATH="/opt/rainbond"
-STORAGE_PATH="/grdata"
-LOG_DIR="logs"
-CHECK_LOG="check.log"
-SALT_LOG="install_salt.log"
-DEFAULT_HOSTNAME="manage01"
-OSS_DOMAIN="https://dl.repo.goodrain.com"
-OSS_PATH="repo/ctl/3.5"
-DATE="$(date +"%Y-%m-%d %H:%M:%S")"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
+DOMAIN_API="http://domain.grapps.cn/domain"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="init \
@@ -59,8 +52,8 @@ net-tools \
 telnet \
 rsync \
 lvm2 \
-git  \
-nfs-utils)
+pwgen \
+git )
 
 SYS_NAME=$(grep "^ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
 SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//g')
@@ -72,14 +65,11 @@ MEM_LIMIT=4
 
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1' | head -1)"
 DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | egrep -v ' 10.|172.|192.168|127.' | awk '{print $2}' | cut -d '/' -f 1 | head -1)"
-DNS_SERVER="114.114.114.114"
 INIT_FILE="./.initialized"
 OFFLINE_FILE="./.offlineprepared"
 
 # redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
-    DNS_INFO="^DNS"
-    NET_FILE="/etc/sysconfig/network-scripts"
     INSTALL_BIN="yum"
     Cache_PKG="$INSTALL_BIN makecache fast -q"
     PKG_BIN="rpm -qi"
@@ -88,10 +78,8 @@ if [ "$SYS_NAME" == "centos" ];then
     dstat iproute \
     bash-completion )
 
-    # centos salt repo
-    #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
-
-    if [[ "$1" != "offline" ]];then
+  #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+  if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
     cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
@@ -101,12 +89,10 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
-    fi
+  fi
 
 # debian and ubuntu
 else
-    DNS_INFO="dns-nameservers"
-    NET_FILE="/etc/network/interfaces"
     INSTALL_BIN="apt-get"
     Cache_PKG="$INSTALL_BIN update -y -q"
     PKG_BIN="dpkg -l"
@@ -121,8 +107,6 @@ else
     cat > /etc/apt/sources.list.d/salt.list << END
 deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
 END
-
-wget -q -O - https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub | apt-key add - 
 
 fi
 
@@ -266,45 +250,20 @@ local l1=" ^" \
 }
 
 REG_Check(){
-    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
-    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
-    #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
-    if [[ $1 != "offline" ]];then
+    uid=$( Read_Sls_File reg-uuid )
+    iip=$( Read_Sls_File master-private-ip )
     curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
-    fi
 }
 
 REG_Status(){
-    uid=$( Read_Sls_File reg-uuid ./install/pillar/ )
-    iip=$( Read_Sls_File inet-ip ./install/pillar/ )
-    domain=$( Read_Sls_File domain /srv/pillar/ )
-    #judgment below uses for offline env : do not exec curl cmd ( changed by guox 2018.5.18 ).   
-    if [[ "$1" != "offline" ]];then
-    curl --connect-timeout 20 ${RBD_DING}/install\?uuid=$uid\&ip=$iip\&status=1\&domain=$domain
+    uid=$( Read_Sls_File reg-uuid $MAIN_SLS )
+    iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
+    domain=$( Read_Sls_File domain $MAIN_SLS )
+    if [[ "$domain" =~ "grapps" ]];then
+        curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
+    else
+        echo ""
     fi
-}
-
-# Name     : Check_net_card
-# Args     : $1=network config file,$2=ipaddress,$3=dnsinfo
-# Return   : 
-Check_net_card(){
-  net_file=$1
-  ipaddr=$2
-  
-  if [ -f $net_file ];then
-    isStatic=$(grep "static" $net_file | grep -v "#")
-    isIPExist=$(grep "$ipaddr" $net_file | grep -v "#")
-    isDNSExist=$(grep "$DNS_INFO" $net_file | grep -v "#")
-    
-    if [ "$isStatic" == "" ] || [ "$isIPExist" == "" ] ;then
-      Echo_Error "There is no static ip in $net_file"
-    fi
-    if [ "$isDNSExist" != "" ];then
-      Echo_Error "The DNS shouldn't config in $net_file"
-    fi
-  else
-    Echo_Error "There is no network config file."
-  fi
 }
 
 Write_Host(){
@@ -324,26 +283,22 @@ Install_PKG(){
 # Name   : Write_Sls_File
 # Args   : key,valume,(path)
 Write_Sls_File(){
-  key=$1
-  value=$2
-  path=${3:-$PILLAR_DIR}
-  hasKey=$(grep $key $path/goodrain.sls)
-  if [ "$hasKey" != "" ];then
-    sed -i -e "/$key/d" $path/goodrain.sls
-  fi
-  
-  echo "$key: $value" >> $path/goodrain.sls
+    key=$1
+    value=$2
+    slsfile=${3:-$MAIN_CONFIG}
+    isExist=$( $YQBIN r $slsfile $key )
+    if [ "$isExist" == "null" ];then
+        $YQBIN w -i $slsfile $key "$value"
+    fi
 }
 
 # Name   : Read_Sls_File
-# Args   : key,(path)
-# Return : volume
+# Args   : key,valume,(path)
 Read_Sls_File(){
     key=$1
-    path=${2:-$PILLAR_DIR}
-    grep $key ${path}/goodrain.sls | awk '{print $2}'
+    slsfile=${2:-$MAIN_CONFIG}
+    $YQBIN r $slsfile $key
 }
-
 
 # Clear the job and data when  exit the program
 Exit_Clear() {

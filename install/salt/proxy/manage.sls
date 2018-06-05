@@ -1,79 +1,157 @@
+{% if grains['id'] == "manage01" %}
+{% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
+{% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
+{% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
+pull-plugin-tcm:
+  cmd.run:
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{ PUBDOMAIN }}_{{PLUGINIMG}}_{{TCMTAG}}.gz
+  {% endif %}
+    - unless: docker inspect {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
+
+retag-plugin-tcm:
+  cmd.run:
+    - name: docker tag {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}} {{ PRIDOMAIN }}/{{TCMTAG}}
+    - unless: docker inspect {{ PRIDOMAIN }}/{{TCMTAG}}
+    - require:
+        - cmd: pull-plugin-tcm
+
+
+push-plugin-tcm:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{TCMTAG}}
+    - require:
+        - cmd: retag-plugin-tcm
+
+pull-plugin-mesh:
+  cmd.run:
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{PLUGINIMG}}_{{MESHTAG}}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
+
+retag-plugin-mesh:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}} {{PRIDOMAIN}}/{{MESHTAG}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{MESHTAG}}
+    - require:
+        - cmd: pull-plugin-mesh
+
+push-plugin-mesh:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{MESHTAG}}
+    - require:
+        - cmd: retag-plugin-mesh
+
+{% set RUNNERIMG = salt['pillar.get']('proxy:runner:image') -%}
+{% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
 runner-pull-image:
   cmd.run:
-    - name: docker pull rainbond/runner
-    - unless: docker inspect rainbond/runner
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ RUNNERIMG }}_{{ RUNNERVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }}
 
 runner-tag:
   cmd.run:
-    - name: docker tag rainbond/runner goodrain.me/runner
-    - unless: docker inspect goodrain.me/runner
+    - name: docker tag {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }} {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
     - require:
-      - cmd: runner-pull-image
-  
+        - cmd: runner-pull-image
+
 runner-push-image:
   cmd.run:
-    - name: docker push goodrain.me/runner
+    - name: docker push {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
     - require:
-      - cmd: runner-tag
+        - cmd: runner-tag
 
+{% set ADAPTERIMG = salt['pillar.get']('proxy:adapter:image') -%}
+{% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
 adapter-pull-image:
   cmd.run:
-    - name: docker pull rainbond/adapter
-    - unless: docker inspect rainbond/adapter
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ ADAPTERIMG }}_{{ ADAPTERVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }}
 
 adapter-tag:
   cmd.run:
-    - name: docker tag rainbond/adapter goodrain.me/adapter
-    - unless: docker inspect goodrain.me/adapter
+    - name: docker tag {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }} {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
     - require:
-      - cmd: adapter-pull-image
+        - cmd: adapter-pull-image
 
 adapter-push-image:    
   cmd.run:
-    - name: docker push goodrain.me/adapter
+    - name: docker push {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
     - require:
-      - cmd: adapter-tag
+        - cmd: adapter-tag
 
+{% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
+{% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
 pause-pull-image:
   cmd.run:
-    - name: docker pull rainbond/pause-amd64:3.0
-    - unless: docker inspect rainbond/pause-amd64:3.0
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+  {% else %}
+    - name : docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ PAUSEIMG }}_{{ PAUSEVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 
 pause-tag:
   cmd.run:
-    - name: docker tag rainbond/pause-amd64:3.0 goodrain.me/pause-amd64:3.0
-    - unless: docker inspect goodrain.me/pause-amd64:3.0
+    - name: docker tag {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }} {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
     - require:
-      - cmd: pause-pull-image
-  
+        - cmd: pause-pull-image
+
 pause-push-image:
   cmd.run:
-    - name: docker push goodrain.me/pause-amd64:3.0
+    - name: docker push {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
     - require:
-      - cmd: pause-tag
+        - cmd: pause-tag
 
+{% set BUILDERIMG = salt['pillar.get']('proxy:builder:image') -%}
+{% set BUILDERVER = salt['pillar.get']('proxy:builder:version') -%}
 builder-pull-image:
   cmd.run:
-    - name: docker pull rainbond/builder
-    - unless: docker inspect rainbond/builder
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ BUILDERIMG }}_{{ BUILDERVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
 
 builder-tag:  
   cmd.run:
-    - name: docker tag rainbond/builder goodrain.me/builder
-    - unless: docker inspect goodrain.me/builder
+    - name: docker tag {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
-      - cmd: builder-pull-image
+        - cmd: builder-pull-image
 
 builder-push-image:    
   cmd.run:
-    - name: docker push goodrain.me/builder
+    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
-      - cmd: builder-tag
+        - cmd: builder-tag
 
-etcd-push-image:
+{% else %}
+builder-mpull-image:    
   cmd.run:
-    - name: docker push goodrain.me/etcd:v3.2.13
+    - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}
 
-calico-push-image:
+pause-mpull-image:
   cmd.run:
-    - name: docker push goodrain.me/calico-node:v2.4.1
+    - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{PAUSEVER}}
+{% endif %}

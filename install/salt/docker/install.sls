@@ -3,21 +3,21 @@ docker-envs:
     - source: salt://docker/files/docker.sh
     - name: {{ pillar['rbd-path'] }}/envs/docker.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 docker-envs-old:
   file.managed:
     - source: salt://docker/files/docker.sh
     - name: /etc/goodrain/envs/docker.sh
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 docker-mirrors:
   file.managed:
     - source: salt://docker/files/daemon.json
     - name: /etc/docker/daemon.json
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 docker-repo:
   pkgrepo.managed:
@@ -75,7 +75,7 @@ docker_service:
     - name: /lib/systemd/system/docker.service
   {% endif %}
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 docker_status:
   service.running:
@@ -92,7 +92,7 @@ install-docker-compose:
   file.managed:
     - name: /usr/local/bin/dc-compose
     - source: salt://docker/files/dc-compose
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root

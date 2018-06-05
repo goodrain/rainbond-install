@@ -1,7 +1,7 @@
 # add records to /etc/hosts file
 
 # get master(manage01) ip address
-{% set hostip = pillar['inet-ip'] %}
+{% set hostip = pillar['master-private-ip'] %}
 
 rbd-repo-domain:
   host.present:
@@ -38,4 +38,4 @@ rbd-app-ui-domain:
 /etc/resolv.conf:
   file.append:
     - text:
-      - "nameserver {{ pillar['dns'] }}"
+      - "nameserver {{ pillar.dns.master }}"
