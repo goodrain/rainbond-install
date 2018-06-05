@@ -35,7 +35,7 @@ services:
     restart: always
 {% if pillar['rbd-version'] == '3.5' %}
   rbd-eventlog:
-    image: rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     container_name: rbd-eventlog
     environment:
       MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
@@ -44,7 +44,7 @@ services:
       MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
       MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
-      CLUSTER_BIND_IP: {{ pillar['inet-ip'] }}
+      CLUSTER_BIND_IP: {{ pillar['master-private-ip'] }}
     volumes:
     - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
     - /grdata/downloads/log:/grdata/logs
