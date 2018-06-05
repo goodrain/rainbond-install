@@ -75,7 +75,7 @@ if [ "$SYS_NAME" == "centos" ];then
     SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
-    epel-release \
+  #  epel-release \
     bash-completion )
 
     # centos salt repo
@@ -91,6 +91,9 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
+    # fix some mirrors closed by layer
+    curl -s -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+    curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
     fi
 
 # debian and ubuntu
