@@ -5,13 +5,8 @@
 ```bash
 # Demo Centos 7.3
 git clone https://github.com/goodrain/rainbond-install.git
-cd rainbond-install
-bash -x tests/prepare.sh
-
-cd /srv
-
-ln -s /root/rainbond-install/install/salt .
-ln -s /root/rainbond-install/install/pillar .
+cd rainbond-install/tests
+bash -x ./install_salt.sh
 
 # need update config (ip.) for pillar
 
@@ -19,14 +14,16 @@ ln -s /root/rainbond-install/install/pillar .
 
 salt "*" state.sls init
 
+# install storage default nfs
+salt "*" state.sls storage
+
 # install docker
 salt "*" state.sls docker
 
 # install etcd
 salt "*" state.sls etcd
 
-# install storage default nfs
-salt "*" state.sls storage
+
 
 # install network default Calico
 salt "*" state.sls network
