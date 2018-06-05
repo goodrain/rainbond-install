@@ -7,7 +7,7 @@ update_compute_hostname:
 # config dns for repo-server  
 dns-manage:
   cmd.run: 
-    - name: echo 'nameserver {{ pillar['inet-ip'] }}' > /etc/resolv.conf
+    - name: echo 'nameserver {{ pillar['master-private-ip'] }}' > /etc/resolv.conf
 #backup org repos
 backup-repo-dir:
   file.directory:

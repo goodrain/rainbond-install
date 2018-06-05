@@ -20,14 +20,15 @@ calico-tag:
     - require:
       - cmd: pull-calico-image
 
+push-calico-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+    - require: 
+      - cmd: calico-tag
 {% else %}
 pull-calico-image:
   cmd.run:
-  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
-  {% else %}
-    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PRIDOMAIN}}_{{CALICOIMG}}_{{ CALICOVER }}.gz
-  {% endif %}
     - unless: docker inspect {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
 {% endif %}
 

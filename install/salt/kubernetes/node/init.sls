@@ -86,11 +86,7 @@ rename-pause-img:
 {% else %}
 pull-pause-img:
   cmd.run:
-  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-  {% else %}
-    -name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ PAUSEIMG }}_{{ PAUSEVER }}.gz
-  {% endif %}
     - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 {% endif %}
 
