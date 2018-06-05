@@ -20,12 +20,6 @@ etcd-tag:
     - require:
       - cmd: pull-etcd-image
   
-push-etcd-image:
-  cmd:
-    - name: docker push DOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
-    - require: 
-      - cmd: etcd-tag
-
 etcd-env:
   file.managed:
     - source: salt://etcd/install/envs/etcd.sh

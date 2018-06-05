@@ -26,3 +26,7 @@ rainbond_rbd-webcli_3.5.gz
 rainbond_rbd-worker_3.5.gz
 rainbond_runner_latest.gz
 rainbond_static_allcli_v3.5.gz
+rainbond_cni_k8s_v3.5.gz
+rainbond_cni_rbd_v3.5.gz
+rainbond_plugins_mesh.gz
+rainbond_prometheus_v2.1.0.gz

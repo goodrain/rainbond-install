@@ -42,7 +42,8 @@ handle-urllib3:
     - name: pip install -U urllib3 -y > /dev/null 2>&1
 {% endif %}
     - onlyif:
-      - which pip > /dev/null 2>&1
+      #- which pip > /dev/null 2>&1
+      - pip show urllib3 > /dev/null 2>&1
 #install salt-minion
 salt-minion-install:
   pkg.installed:

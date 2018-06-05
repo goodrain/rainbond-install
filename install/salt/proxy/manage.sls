@@ -145,8 +145,19 @@ builder-push-image:
     - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
         - cmd: builder-tag
+#push etcd & calico image to goodrain.me
+{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
+{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
+push-etcd-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
 
-{% else %}
+{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
+{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+push-calico-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+
 builder-mpull-image:    
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}
