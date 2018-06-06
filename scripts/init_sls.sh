@@ -211,9 +211,7 @@ EOF
 
 if [[ "$INSTALL_TYPE" == "offline" ]];then
     Echo_Info "Use local repo"
-    Local_Repo > /dev/null 2>&1 && Echo_Ok
-else
-    return 0
+    Local_Repo > /dev/null 2>&1 && Echo_Ok    
 fi
 Echo_Info "Install Base Package ..."
 Install_Base_Pkg $1 && Echo_Ok
