@@ -81,13 +81,13 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-    if [ -z "$2" ];then
-        salt-ssh -i $2 state.sls salt.install
+    if [ -z "$1" ];then
+        salt-ssh -i $1 state.sls salt.install
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module ..."
             
-            if ! (salt $2 state.sls $module);then
+            if ! (salt $1 state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
