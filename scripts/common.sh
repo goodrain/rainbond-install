@@ -256,9 +256,15 @@ local l1=" ^" \
 REG_Status(){
     uid=$( Read_Sls_File reg-uuid $MAIN_SLS )
     iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
+    eip=$( Read_Sls_File master-public-ip $MAIN_SLS )
+    if [ ! -z $eip ];then
+        ip=eip
+    else
+        ip=iip
+    fi
     domain=$( Read_Sls_File domain $MAIN_SLS )
     if [[ "$domain" =~ "grapps" ]];then
-        curl --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
+        curl --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$ip\&type=True\&domain=$domain
         echo ""
     else
         echo ""

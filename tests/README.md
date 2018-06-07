@@ -40,5 +40,8 @@ salt "*" state.sls kubernetes.node
 ```
 cd rainbond-install
 ./scripts/compute.sh init single compute01 172.16.0.191 12345678
+或者
+./scripts/compute.sh init single compute01 172.16.0.191 /root/.ssh/id_rsa ssh
+
 ./scripts/compute.sh install
 ```
