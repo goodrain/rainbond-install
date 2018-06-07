@@ -57,3 +57,11 @@
     - user: root
     - group: root
     - unless: test -f /usr/local/bin/node
+
+/usr/local/bin/ctop:
+  file.managed:
+    - source: salt://misc/file/bin/ctop
+    - mode: 755
+    - user: root
+    - group: root
+    - unless: test -f /usr/local/bin/ctop

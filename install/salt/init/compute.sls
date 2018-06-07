@@ -58,4 +58,5 @@ install_req_pkgs:
 update_time:
   cmd.run:
     - name: ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com
+    - unless: ps -ef | grep ntp | grep -v grep
 {% endif %}

@@ -33,6 +33,19 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+  rbd-repo:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
+    container_name: rbd-repo
+    volumes:
+    - /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+
   rbd-entrance:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     container_name: rbd-entrance
@@ -177,18 +190,6 @@ services:
     - /grdata:/grdata
     command: --log-level=info --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
       --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-  rbd-repo:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
-    container_name: rbd-repo
-    volumes:
-    - /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
     logging:
       driver: json-file
       options:
