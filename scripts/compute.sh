@@ -25,10 +25,10 @@
 [ -f "common.sh" ] && cd ..
 
 . scripts/common.sh
-COMPUTE_ID="$3"
 
 init_func(){
     Echo_Info "Init compute node config."
+    Echo_Info "change hostname"
     if [ "$1" = "single" ];then
         echo $@
         if [ "$#" -lt 4 ];then
@@ -60,16 +60,16 @@ EOF
         else
             Echo_EXIST $2["$3"]
         fi
+            
+        salt-ssh -i $2 state.sls init.compute
     elif [ "$1" = "multi" ];then
         if [ "$#" -ne 3 ];then
             Echo_Error "need 3 args\n like: [$PWD] ./scripts/compute.sh init multi <ip.txt path> <passwd>"
         fi
+        salt-ssh -i -E "compute" state.sls init.compute
     else
         Echo_Error "not support ${1:-null}"
     fi
-
-    Echo_Info "change hostname"
-    salt-ssh -i ${COMPUTE_ID} state.sls init.compute
 }
 
 check_func(){
@@ -81,18 +81,33 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-      salt-ssh -i ${COMPUTE_ID} state.sls salt.install
+    if [ -z "$2" ];then
+        salt-ssh -i $2 state.sls salt.install
+        for module in ${COMPUTE_MODULES}
+        do
+            Echo_Info "Start install $module ..."
+            
+            if ! (salt $2 state.sls $module);then
+                ((fail_num+=1))
+                break
+            fi
+        done
+    else
+        salt-ssh -i -E "compute" state.sls salt.install
+        for module in ${COMPUTE_MODULES}
+        do
+            Echo_Info "Start install $module ..."
+            
+            if ! (salt -i -E "compute" state.sls $module);then
+                ((fail_num+=1))
+                break
+            fi
+        done
+    fi
       sleep 12
       Echo_Info "waiting for salt-minions start"
     
-    for module in ${COMPUTE_MODULES}
-    do
-        Echo_Info "Start install $module ..."
-        if ! (salt ${COMPUTE_ID} state.sls $module);then
-            ((fail_num+=1))
-            break
-        fi
-    done
+    
 
     if [ "$fail_num" -eq 0 ];then
         Echo_Info "install compute node successfully"

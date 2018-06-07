@@ -53,8 +53,8 @@ install_req_pkgs:
       - net-tools
     - refresh: true
     
-# sync time online
 {% if pillar['install-type']!="offline" %}
+# sync time online
 update_time:
   cmd.run:
     - name: ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com

@@ -68,13 +68,6 @@ install_func(){
     fi
 }
 
-Offline_Prepare(){
-    if [ ! -f $OFFLINE_FILE ];then
-    Echo_Info "Prepare install rainbond offline."
-    ./scripts/prepare_install.sh && touch $OFFLINE_FILE
-    fi
-}
-
 help_func(){
     echo "help:"
     echo "check   --- check cmd "
@@ -98,9 +91,6 @@ case $1 in
     ;;
     dev)
         check_func force && init_config && install_func ${@:2}
-    ;;
-    offline)
-        Offline_Prepare && init_config && install_func
     ;;
     *)
         help_func
