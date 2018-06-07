@@ -6,7 +6,11 @@
 
 pull-etcd-image:
   cmd.run:
+{% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
+{% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ ETCDIMG }}_{{ ETCDVER }}.gz
+{% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
 
 etcd-tag:
@@ -15,7 +19,7 @@ etcd-tag:
     - unless: docker inspect {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
     - require:
       - cmd: pull-etcd-image
-
+  
 etcd-env:
   file.managed:
     - source: salt://etcd/install/envs/etcd.sh

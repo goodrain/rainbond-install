@@ -7,7 +7,11 @@
 
 pull-plugin-tcm:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{ PUBDOMAIN }}_{{PLUGINIMG}}_{{TCMTAG}}.gz
+  {% endif %}
     - unless: docker inspect {{ PUBDOMAIN }}/{{PLUGINIMG}}:{{TCMTAG}}
 
 retag-plugin-tcm:
@@ -26,7 +30,11 @@ push-plugin-tcm:
 
 pull-plugin-mesh:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{PLUGINIMG}}_{{MESHTAG}}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
 
 retag-plugin-mesh:
@@ -46,7 +54,11 @@ push-plugin-mesh:
 {% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
 runner-pull-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ RUNNERIMG }}_{{ RUNNERVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ RUNNERIMG }}:{{ RUNNERVER }}
 
 runner-tag:
@@ -66,7 +78,11 @@ runner-push-image:
 {% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
 adapter-pull-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ ADAPTERIMG }}_{{ ADAPTERVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }}
 
 adapter-tag:
@@ -86,7 +102,11 @@ adapter-push-image:
 {% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
 pause-pull-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
+  {% else %}
+    - name : docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ PAUSEIMG }}_{{ PAUSEVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
 
 pause-tag:
@@ -106,7 +126,11 @@ pause-push-image:
 {% set BUILDERVER = salt['pillar.get']('proxy:builder:version') -%}
 builder-pull-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ BUILDERIMG }}_{{ BUILDERVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
 
 builder-tag:  
@@ -121,8 +145,19 @@ builder-push-image:
     - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
         - cmd: builder-tag
+#push etcd & calico image to goodrain.me
+{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
+{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
+push-etcd-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
 
-{% else %}
+{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
+{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+push-calico-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+
 builder-mpull-image:    
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}

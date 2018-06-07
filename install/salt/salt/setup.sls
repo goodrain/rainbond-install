@@ -32,11 +32,28 @@ master_service:
 salt-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}
+    {% if pillar['install-type']=='offline' %}
+      {% if grains['id']=="manage01" %}
+    - humanname: local_repo
+    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs
+    - enabled: 1
+    - gpgcheck: 0
+      # compute
+      {% else %}
+    - humanname: local_repo
+    - baseurl: http://repo.goodrain.me/
+    - enabled: 1
+    - gpgcheck: 0
+      {% endif %}
+    # online
+    {% else %}
     - humanname: SaltStack repo for RHEL/CentOS $releasever
     - baseurl: https://mirrors.ustc.edu.cn/salt/yum/redhat/$releasever/$basearch/archive/2017.7.5
     - enabled: 1
     - gpgcheck: 1
     - gpgkey: https://mirrors.ustc.edu.cn/salt/yum/redhat/7/$basearch/archive/2017.7.5/SALTSTACK-GPG-KEY.pub
+    {% endif %}
+  # debian or ubuntu
   {% else %}
     - name: deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
     - file: /etc/apt/sources.list.d/salt.list

@@ -1,6 +1,7 @@
 # offline directory
 install/imgs/*.gz
-install/pkgs/*
+install/pkgs/*.repo
+install/pkgs/repodata
 tools
 .initialized
 LOCAL_IP

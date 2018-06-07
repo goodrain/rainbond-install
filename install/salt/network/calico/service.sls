@@ -6,7 +6,11 @@
 {% if grains['id'] == 'manage01' %}
 pull-calico-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CALICOIMG }}_{{ CALICOVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
 
 calico-tag:
@@ -15,8 +19,7 @@ calico-tag:
     - unless: docker inspect {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
     - require:
       - cmd: pull-calico-image
-
-{% else %}
+{% else %}  
 pull-calico-image:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}

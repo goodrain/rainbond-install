@@ -14,7 +14,11 @@ prometheus-yml:
 
 docker-pull-prom-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ P8SIMG }}:{{ P8SVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ P8SIMG }}_{{ P8SVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ P8SIMG }}:{{ P8SVER }}
 
 create-prom-data:

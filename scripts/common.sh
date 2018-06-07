@@ -8,10 +8,11 @@ YQBIN="./scripts/yq"
 MAIN_SLS="/srv/pillar/rainbond.sls"
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_PKGS="salt-ssh"
+MAIN_CONFIG="rainbond.yaml"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 PILLAR_DIR="./install/pillar"
 RBD_DING="http://v2.reg.rbd.goodrain.org"
-DOMAIN_API="http://domain.grapps.cn/domain"
+DOMAIN_API="http://domain.grapps.cn"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="init \
@@ -75,14 +76,12 @@ if [ "$SYS_NAME" == "centos" ];then
     SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
-    bash-completion \ 
-    epel-release )
+  #  epel-release \
+    bash-completion )
 
-    # centos salt repo
-    #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
-
-    if [[ "$1" != "offline" ]];then
-    cat > /etc/yum.repos.d/salt-repo.repo << END
+  #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
+    if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
+        cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
 name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
 baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
@@ -91,6 +90,9 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
+        # fix some mirrors closed by layer
+        curl -s -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+        curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
     fi
 
 # debian and ubuntu
@@ -251,18 +253,19 @@ local l1=" ^" \
     echo >&2
 }
 
-REG_Check(){
-    uid=$( Read_Sls_File reg-uuid )
-    iip=$( Read_Sls_File master-private-ip )
-    curl --connect-timeout 20 ${RBD_DING}/chk\?uuid=$uid\&ip=$iip
-}
-
 REG_Status(){
     uid=$( Read_Sls_File reg-uuid $MAIN_SLS )
     iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
+    eip=$( Read_Sls_File master-public-ip $MAIN_SLS )
+    if [ ! -z $eip ];then
+        ip=eip
+    else
+        ip=iip
+    fi
     domain=$( Read_Sls_File domain $MAIN_SLS )
     if [[ "$domain" =~ "grapps" ]];then
-        curl --connect-timeout 20 ${DOMAIN_API}/check\?uuid=$uid\&ip=$iip\&type=True\&domain=$domain
+        curl --connect-timeout 20 ${DOMAIN_API}/status\?uuid=$uid\&ip=$ip\&type=True\&domain=$domain
+        echo ""
     else
         echo ""
     fi

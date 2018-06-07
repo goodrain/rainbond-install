@@ -6,7 +6,11 @@
 
 docker-pull-dns-image:
   cmd.run:
+{% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ DNSIMG }}:{{ DNSVER }}
+{% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ DNSIMG }}_{{ DNSVER }}.gz
+{% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ DNSIMG }}:{{ DNSVER }}
 
 dns-upstart:

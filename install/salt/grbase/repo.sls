@@ -5,7 +5,11 @@
 
 docker-pull-repo-image:
   cmd.run:
+{% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ REPOIMG }}:{{ REPOVER }}
+{% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ REPOIMG }}_{{ REPOVER }}.gz
+{% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ REPOIMG }}:{{ REPOVER }}
 
 repo-upstart:

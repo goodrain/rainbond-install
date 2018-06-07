@@ -6,7 +6,11 @@
 
 docker-pull-worker-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ WORKERIMG }}:{{ WORKERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ WORKERIMG }}_{{ WORKERVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ WORKERIMG }}:{{ WORKERVER }}
 
 worker-upstart:
@@ -21,7 +25,11 @@ worker-upstart:
 {% set EVLOGVER = salt['pillar.get']('rainbond-modules:rbd-eventlog:version') -%}
 docker-pull-eventlog-image:
   cmd.run:
+  {%if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ EVLOGIMG }}:{{ EVLOGVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ EVLOGIMG }}_{{ EVLOGVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ EVLOGIMG }}:{{ EVLOGVER }}
 
 eventlog-upstart:
@@ -36,7 +44,11 @@ eventlog-upstart:
 {% set ENTRANCEVER = salt['pillar.get']('rainbond-modules:rbd-entrance:version') -%}
 docker-pull-entrance-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ ENTRANCEIMG }}_{{ ENTRANCEVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
 
 entrance-upstart:
@@ -51,7 +63,11 @@ entrance-upstart:
 {% set APIVER = salt['pillar.get']('rainbond-modules:rbd-api:version') -%}
 docker-pull-api-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
 api-upstart:
@@ -66,7 +82,11 @@ api-upstart:
 {% set CHAOSVER = salt['pillar.get']('rainbond-modules:rbd-chaos:version') -%}
 docker-pull-chaos-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ CHAOSIMG }}:{{ CHAOSVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CHAOSIMG }}_{{ CHAOSVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ CHAOSIMG }}:{{ CHAOSVER }}
 
 chaos-upstart:
@@ -81,7 +101,11 @@ chaos-upstart:
 {% set LBVER = salt['pillar.get']('rainbond-modules:rbd-lb:version') -%}
 docker-pull-lb-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ LBIMG }}_{{ LBVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
 
 default_http_conf:
@@ -121,7 +145,11 @@ lb-restart:
 {% set MQVER = salt['pillar.get']('rainbond-modules:rbd-mq:version') -%}
 docker-pull-mq-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ MQIMG }}:{{ MQVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ MQIMG }}_{{ MQVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ MQIMG }}:{{ MQVER }}
 
 mq-upstart:
@@ -136,7 +164,11 @@ mq-upstart:
 {% set WEBCLIVER = salt['pillar.get']('rainbond-modules:rbd-webcli:version') -%}
 docker-pull-webcli-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ WEBCLIIMG }}:{{ WEBCLIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ WEBCLIIMG }}_{{ WEBCLIVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ WEBCLIIMG }}:{{ WEBCLIVER }}
 
 webcli-upstart:
@@ -151,7 +183,11 @@ webcli-upstart:
 {% set APPUIVER = salt['pillar.get']('rainbond-modules:rbd-app-ui:version') -%}
 docker-pull-app-ui-image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ APPUIIMG }}:{{ APPUIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APPUIIMG }}_{{ APPUIVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ APPUIIMG }}:{{ APPUIVER }}
 
 app-ui-logs:

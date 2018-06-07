@@ -7,6 +7,7 @@
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
+{% if pillar['install-type']!="offline" %}
 pull_api_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
@@ -21,6 +22,22 @@ pull_schedule_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
     - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+{% else %}
+pull_api_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+
+pull_manager_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CTLMGEIMG }}_{{ APIVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+
+pull_schedule_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ SDLIMG }}_{{ SDLVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+{% endif %}
 
 k8s-api-script:
   file.managed:

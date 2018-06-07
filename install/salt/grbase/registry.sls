@@ -5,7 +5,11 @@
 
 docker-pull-hub-image:
   cmd.run:
+{% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
+{% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ REGISTRYIMG }}_{{ REGISTRYVER }}.gz
+{% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
 
 hub-upstart:

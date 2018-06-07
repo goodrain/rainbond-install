@@ -1,7 +1,7 @@
 #!/bin/bash
 #======================================================================================================================
 #
-#          FILE: setup.sh
+#          FILE: install_salt.sh
 #
 #   DESCRIPTION: Install
 #
@@ -10,9 +10,11 @@
 #     COPYRIGHT: (c) 2018 by the Goodrain Delivery Team.
 #
 #       LICENSE: Apache 2.0
-#       CREATED: 03/30/2018 10:49:37 AM
+#       CREATED: 06/04/2018 11:59:37 PM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
+
+cd ../
 
 export MAIN_CONFIG="rainbond.yaml"
 
@@ -55,9 +57,7 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
-      if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
-        REG_Status || return 0
-      fi
+        REG_Status $1 || return 0
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
         notready=$(grctl  node list | grep $uuid | grep false)
         if [ "$notready" != "" ];then
@@ -68,31 +68,8 @@ install_func(){
     fi
 }
 
-help_func(){
-    echo "help:"
-    echo "check   --- check cmd "
-    echo "offline --- work in offline env cmd"
-    echo "install --- install cmd "
-    echo "dev     --- ignore check install cmd "
-    echo ""
-}
-
 case $1 in
-    check)
-        check_func ${@:2} && init_config
-    ;;
-    install)
-        #do not check the internet when install offline
-        if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
-        check_func && init_config && install_func ${@:2}
-        else
-        init_config && install_func
-        fi
-    ;;
-    dev)
-        check_func force && init_config && install_func ${@:2}
-    ;;
     *)
-        help_func
+        check_func force && init_config
     ;;
 esac

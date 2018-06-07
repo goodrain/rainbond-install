@@ -48,7 +48,7 @@ EOF
 #   DESCRIPTION:  Download packages into a designation directory.
 #----------------------------------------------------------------------------------------------------------------------
 Download_Pkgs(){ 
-    for Rbd_pkgs in $( ./scripts/yq r rainbond.sls rbd-pkgs.manage | awk '{print $2}')
+    for Rbd_pkgs in $( ./scripts/yq r rainbond.yaml.default rbd-pkgs.manage | awk '{print $2}')
       do
         ${INSTALL_BIN} install ${Rbd_pkgs} --downloadonly --downloaddir=$PWD/install/pkgs 2>&1>/dev/null
       done
@@ -83,8 +83,8 @@ Download_Image(){
     proxy=(plugins runner adapter builder)
     for Moudles in ${rbd_moudles[@]} ${database[@]} ${etcd[@]} ${kubernetes[@]} ${network[@]} ${proxy[@]}
       do
-        Img=$( ./scripts/yq r rainbond.sls *.$Moudles.image | grep -v null | awk '{print $2}')
-        Ver=$( ./scripts/yq r rainbond.sls *.$Moudles.version | grep -v null | awk '{print $2}')
+        Img=$( ./scripts/yq r rainbond.yaml.default *.$Moudles.image | grep -v null | awk '{print $2}')
+        Ver=$( ./scripts/yq r rainbond.yaml.default *.$Moudles.version | grep -v null | awk '{print $2}')
         Rbd_Img=$Img:$Ver
         Gzp_Name=$( echo $Img | sed 's/\//_/g' )_$Ver
         docker pull $Rbd_Img && docker save $Rbd_Img | gzip > $PWD/install/imgs/$Gzp_Name.gz

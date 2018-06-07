@@ -6,6 +6,20 @@
 
 INSTALL_TYPE=$(Read_Sls_File install-type)
 
+# Name   : Get_Hostname and version
+# Args   : hostname
+# Return : 0|!0
+Local_Repo(){
+    mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
+    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    cat > /etc/yum.repos.d/rainbond_local.repo << EOF
+[rainbond_local]
+name=rainbond_offline_install_repo
+baseurl=file:///root/rainbond-install/install/pkgs
+gpgcheck=0
+enabled=1
+EOF
+}
 
 # Name   : Get_Hostname and version
 # Args   : hostname
@@ -54,7 +68,7 @@ Install_Base_Pkg(){
   $Cache_PKG
 
   # install pkgs
-  Install_PKG ${SYS_COMMON_PKGS[*]} ${SYS_BASE_PKGS[*]}
+  Install_PKG  ${SYS_BASE_PKGS[*]} ${SYS_COMMON_PKGS[*]}
 }
 
 # -----------------------------------------------------------------------------
@@ -170,17 +184,18 @@ EOF
     cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa.pub ~/.ssh/id_rsa.pub
   )
 
-  [ -d /srv/salt ] && rm /srv/salt -rf
-  [ -d /srv/pillar ] && rm /srv/pillar -rf
+  [ -d /srv/salt ] && rm -rf /srv/salt
+  [ -d /srv/pillar ] && rm -rf /srv/pillar/* || (
+    mkdir -p /srv/pillar
+  )
   cp -rp $PWD/install/salt /srv/
-  cp -rp $PWD/install/pillar /srv/
+  
   cp -rp $PWD/rainbond.yaml /srv/pillar/rainbond.sls
-
+  cp -rp $PWD/install/pillar/top.sls /srv/pillar/top.sls
 
   Echo_Info "Salt-ssh test."
   salt-ssh "*" --priv=/etc/salt/pki/master/ssh/salt-ssh.rsa  test.ping -i > /dev/null && Echo_Ok
-  #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
-  [[ "$1" != "offline" ]] && salt-ssh "*" state.sls salt.setup --state-output=mixed
+  salt-ssh "*" state.sls salt.setup --state-output=mixed
 
   Echo_Info "Waiting to start salt."
   for ((i=1;i<=10;i++ )); do
@@ -194,15 +209,10 @@ EOF
   done
 }
 
-Define_Domain(){
-  #judgment below uses for offline env : define domain name by user ( changed by guox 2018.5.18 ).
-  if [[ $1 == "offline" ]];then
-    Echo_Info "Configure custom domain name"
-    read -p "Please input your custom domain: "  Doman_Name
-    echo "domain: $Doman_Name" > /srv/pillar/custom.sls
-  fi
-}
-
+if [[ "$INSTALL_TYPE" == "offline" ]];then
+    Echo_Info "Use local repo"
+    Local_Repo > /dev/null 2>&1 && Echo_Ok    
+fi
 Echo_Info "Install Base Package ..."
 Install_Base_Pkg $1 && Echo_Ok
 

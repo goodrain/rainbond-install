@@ -5,7 +5,11 @@
 
 pull_cfssl_image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CFSSLIMG }}_{{ CFSSLVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
 
 check_or_create_certificates:
@@ -21,7 +25,11 @@ check_or_create_certificates:
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 pull_kubecfg_image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ KUBECFGIMG }}_{{ KUBECFGVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
 
 check_or_create_kubeconfig:
@@ -35,7 +43,11 @@ check_or_create_kubeconfig:
 {% set K8SCNIVER = salt['pillar.get']('kubernetes:cni:version') -%}
 pull_k8s_cni_image:
   cmd.run:
+  {% if pillar['install-type']!="offline" %}
     - name: docker pull {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ K8SCNIIMG }}_{{ K8SCNIVER }}.gz
+  {% endif %}
     - unless: docker inspect {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }}
 
 prepare_k8s_cni_tools:
@@ -55,10 +67,19 @@ prepare_k8s_cni_tools:
 
 {% set RBDCNIIMG = salt['pillar.get']('rainbond-modules:rbd-cni:image') -%}
 {% set RBDCNIVER = salt['pillar.get']('rainbond-modules:rbd-cni:version') -%}
+pull_rbd_cni_image:
+  cmd.run:
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ RBDCNIIMG }}_{{ RBDCNIVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }}
 prepare_rbd_cni_tools:
   cmd.run:
     - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{PUBDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }} tar zxf /pkg.tgz -C /sysdir
-
+    - require: 
+      - cmd: pull_rbd_cni_image
 {% if pillar.domain is defined %}
 compose_file:
   file.managed:
