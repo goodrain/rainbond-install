@@ -29,8 +29,8 @@ init_func(){
     Echo_Info "Init compute node config."
     if [ "$1" = "single" ];then
         echo $@
-        if [ "$#" -ne 4 -a "$#" -ne 5 ];then
-            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd> [offline]"
+        if [ "$#" -ne 4 ];then
+            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd>"
         fi
         grep "$2" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
