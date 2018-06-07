@@ -33,57 +33,10 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-{% if pillar['rbd-version'] == '3.5' %}
-  rbd-eventlog:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
-    container_name: rbd-eventlog
-    environment:
-      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
-      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
-      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
-      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
-      MYSQL_DATABASE: region
-      K8S_MASTER: http://127.0.0.1:8181
-      CLUSTER_BIND_IP: {{ pillar['master-private-ip'] }}
-    volumes:
-    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
-    - /grdata/downloads/log:/grdata/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-{% else %}
-  rbd-eventlog:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
-    container_name: rbd-eventlog
-    environment:
-      K8S_MASTER: http://127.0.0.1:8181
-    volumes:
-    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
-    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
-    - /grdata/downloads/log:/grdata/logs
-    command:
-    - --cluster.bind.ip={{ pillar['master-private-ip'] }}
-    - --db.type=mysql
-    - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
-    - --discover.etcd.addr=http://{{ pillar['master-private-ip'] }}:2379
-    - --eventlog.bind.ip={{ pillar['master-private-ip'] }}
-    - --websocket.bind.ip={{ pillar['master-private-ip'] }}
-    - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-{% endif %}
   rbd-entrance:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     container_name: rbd-entrance
+    mem_limit: 1024M
     logging:
       driver: json-file
       options:
@@ -106,6 +59,7 @@ services:
   rbd-api:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
     container_name: rbd-api
+    mem_limit: 1024M
     environment:
       REGION_TAG: {{ pillar['rbd-tag'] }}
       EX_DOMAIN: {{ pillar['domain'] }}
@@ -127,6 +81,7 @@ services:
   rbd-chaos:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     container_name: rbd-chaos
+    mem_limit: 1024M
     command: --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     environment:
     - SOURCE_DIR=/cache/source
@@ -164,6 +119,7 @@ services:
   rbd-mq:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
     container_name: rbd-mq
+    mem_limit: 1024M
     command: --log-level=debug
     logging:
       driver: json-file
@@ -175,6 +131,7 @@ services:
   rbd-webcli:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
     container_name: rbd-webcli
+    mem_limit: 1024M
     volumes:
     - /usr/local/bin/kubectl:/usr/bin/kubectl
     - /root/.kube:/root/.kube
@@ -207,31 +164,11 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-{% if grains['id'] == "manage01" %}
-  rbd-db:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
-    container_name: rbd-db
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-    volumes:
-    - {{ pillar['rbd-path'] }}/data/rbd-db:/data
-    - {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
   rbd-worker:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
     container_name: rbd-worker
+    mem_limit: 1024M
     environment:
-      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
-      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
-      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
-      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
-      MYSQL_DATABASE: region
       K8S_MASTER: http://127.0.0.1:8181
       CUR_NET: calico
       EX_DOMAIN: {{ pillar['domain'] }}
@@ -259,6 +196,22 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+{% if grains['id'] == "manage01" %}
+  rbd-db:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
+    container_name: rbd-db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+    volumes:
+    - {{ pillar['rbd-path'] }}/data/rbd-db:/data
+    - {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
   rbd-prometheus:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-prometheus']['image'] }}:{{ pillar['rainbond-modules']['rbd-prometheus']['version'] }}
     container_name: rbd-prometheus
@@ -267,6 +220,56 @@ services:
     - /grdata/services/rbd-prometheus/data:/prometheusdata
     - {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+{% endif %}
+{% if pillar['rbd-version'] == "3.6" %}
+  rbd-eventlog:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
+    container_name: rbd-eventlog
+    mem_limit: 1024M
+    environment:
+      K8S_MASTER: http://127.0.0.1:8181
+    volumes:
+    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
+    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
+    - /grdata/downloads/log:/grdata/logs
+    command:
+    - --cluster.bind.ip={{ pillar['master-private-ip'] }}
+    - --db.type=mysql
+    - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
+    - --discover.etcd.addr=http://{{ pillar['master-private-ip'] }}:2379
+    - --eventlog.bind.ip={{ pillar['master-private-ip'] }}
+    - --websocket.bind.ip={{ pillar['master-private-ip'] }}
+    - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+{% else %}
+  rbd-eventlog:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
+    container_name: rbd-eventlog
+    mem_limit: 1024M
+    environment:
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASSWORD: {{ pillar['database']['mysql']['pass'] }}
+      MYSQL_DATABASE: region
+      K8S_MASTER: http://127.0.0.1:8181
+      CLUSTER_BIND_IP: {{ pillar['master-private-ip'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
+    - /grdata/downloads/log:/grdata/logs
     logging:
       driver: json-file
       options:
