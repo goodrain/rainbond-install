@@ -62,7 +62,7 @@ salt-minion-install:
 salt-minion-conf:
   file.managed:
     - name: /etc/salt/minion.d/minion.conf
-    - source: salt://minions/install/conf/minion.conf
+    - source: salt://salt/install/conf/minion.conf
     - user: root
     - group: root
     - mode: 644

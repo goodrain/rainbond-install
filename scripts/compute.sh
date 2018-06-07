@@ -22,6 +22,8 @@
 # debug
 [[ $DEBUG ]] && set -x
 
+[ -f "common.sh" ] && cd ..
+
 . scripts/common.sh
 COMPUTE_ID="$3"
 
@@ -29,12 +31,13 @@ init_func(){
     Echo_Info "Init compute node config."
     if [ "$1" = "single" ];then
         echo $@
-        if [ "$#" -ne 4 -a "$#" -ne 5 ];then
-            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd> [offline]"
+        if [ "$#" -lt 4 ];then
+            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd/key> <type>"
         fi
         grep "$2" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
-            cat >> /etc/salt/roster <<EOF
+            if [ -z "$5" ];then
+                cat >> /etc/salt/roster <<EOF
 $2:
   host: $3
   user: root
@@ -42,6 +45,16 @@ $2:
   sudo: True
   port: 22
 EOF
+        else
+            cat >> /etc/salt/roster <<EOF
+$2:
+  host: $3
+  user: root
+  priv: ${4:-/root/.ssh/id_rsa}
+  sudo: True
+  port: 22
+EOF
+        fi     
         grep "$3" /etc/hosts > /dev/null
         [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
         else
@@ -68,7 +81,7 @@ check_func(){
 install_compute_func(){
     fail_num=0
     Echo_Info "will install compute node."
-      salt-ssh -i ${COMPUTE_ID} state.sls minions.install
+      salt-ssh -i ${COMPUTE_ID} state.sls salt.install
       sleep 12
       Echo_Info "waiting for salt-minions start"
     
@@ -89,7 +102,7 @@ install_compute_func(){
 help_func(){
     Echo_Info "help"
     Echo_Info "init"
-    echo "args: single <hostname> <ip>  <password/key-path>"
+    echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
     echo "args: multi <ip.txt path> <password/key-path>"
     Echo_Info "check"
     Echo_Info "install"
