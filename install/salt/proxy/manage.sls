@@ -2,6 +2,7 @@
 {% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
 {% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
 {% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
+{% set MESHTAG_META = salt['pillar.get']('plugins:mesh:metatag') -%}
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
@@ -39,14 +40,14 @@ pull-plugin-mesh:
 
 retag-plugin-mesh:
   cmd.run:
-    - name: docker tag {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}} {{PRIDOMAIN}}/{{MESHTAG}}
-    - unless: docker inspect {{PRIDOMAIN}}/{{MESHTAG}}
+    - name: docker tag {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}} {{PRIDOMAIN}}/{{MESHTAG_META}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{MESHTAG_META}}
     - require:
         - cmd: pull-plugin-mesh
 
 push-plugin-mesh:
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{MESHTAG}}
+    - name: docker push {{PRIDOMAIN}}/{{MESHTAG_META}}
     - require:
         - cmd: retag-plugin-mesh
 

@@ -127,6 +127,7 @@ plugins:
     tag: tcm
   mesh:
     tag: mesh
+    metatag: mesh_plugin
 
 #proxy
 proxy:
