@@ -18,7 +18,7 @@ rbd-tag: rainbond
 reg-uuid:
 secretkey: 
 docker:
-  version: 1.12.6,1526e3f
+  version: 1.12.6,fbecf51
 
 dns:
   current: 
