@@ -1,8 +1,17 @@
 #==================== rbd-worker ====================
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+{% set WORKERIMG = salt['pillar.get']('rainbond-modules:rbd-worker:image') -%}
+{% set WORKERVER = salt['pillar.get']('rainbond-modules:rbd-worker:version') -%}
+
 docker-pull-worker-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-worker:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-worker:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ WORKERIMG }}:{{ WORKERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ WORKERIMG }}_{{ WORKERVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ WORKERIMG }}:{{ WORKERVER }}
 
 worker-upstart:
   cmd.run:
@@ -12,10 +21,16 @@ worker-upstart:
       - cmd: docker-pull-worker-image
 
 #==================== rbd-eventlog ====================
+{% set EVLOGIMG = salt['pillar.get']('rainbond-modules:rbd-eventlog:image') -%}
+{% set EVLOGVER = salt['pillar.get']('rainbond-modules:rbd-eventlog:version') -%}
 docker-pull-eventlog-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-eventlog:{{ pillar['rbd-version'] }}
+  {%if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ EVLOGIMG }}:{{ EVLOGVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ EVLOGIMG }}_{{ EVLOGVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ EVLOGIMG }}:{{ EVLOGVER }}
 
 eventlog-upstart:
   cmd.run:
@@ -25,10 +40,16 @@ eventlog-upstart:
       - cmd: docker-pull-eventlog-image
 
 #==================== rbd-entrance ====================
+{% set ENTRANCEIMG = salt['pillar.get']('rainbond-modules:rbd-entrance:image') -%}
+{% set ENTRANCEVER = salt['pillar.get']('rainbond-modules:rbd-entrance:version') -%}
 docker-pull-entrance-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-entrance:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ ENTRANCEIMG }}_{{ ENTRANCEVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ ENTRANCEIMG }}:{{ ENTRANCEVER }}
 
 entrance-upstart:
   cmd.run:
@@ -38,10 +59,16 @@ entrance-upstart:
       - cmd: docker-pull-entrance-image
 
 #==================== rbd-api ====================
+{% set APIIMG = salt['pillar.get']('rainbond-modules:rbd-api:image') -%}
+{% set APIVER = salt['pillar.get']('rainbond-modules:rbd-api:version') -%}
 docker-pull-api-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-api:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-api:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
 api-upstart:
   cmd.run:
@@ -51,10 +78,16 @@ api-upstart:
       - cmd: docker-pull-api-image
 
 #==================== rbd-chaos ====================
+{% set CHAOSIMG = salt['pillar.get']('rainbond-modules:rbd-chaos:image') -%}
+{% set CHAOSVER = salt['pillar.get']('rainbond-modules:rbd-chaos:version') -%}
 docker-pull-chaos-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-chaos:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ CHAOSIMG }}:{{ CHAOSVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CHAOSIMG }}_{{ CHAOSVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CHAOSIMG }}:{{ CHAOSVER }}
 
 chaos-upstart:
   cmd.run:
@@ -64,23 +97,29 @@ chaos-upstart:
       - cmd: docker-pull-chaos-image
 
 #==================== rbd-lb ====================
+{% set LBIMG = salt['pillar.get']('rainbond-modules:rbd-lb:image') -%}
+{% set LBVER = salt['pillar.get']('rainbond-modules:rbd-lb:version') -%}
 docker-pull-lb-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-lb:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-lb:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ LBIMG }}_{{ LBVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
 
 default_http_conf:
   file.managed:
     - source: salt://plugins/data/proxy.conf
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
     - template: jinja
-    - makedirs: Ture
+    - makedirs: True
 
 proxy_site_ssl:
   file.recurse:
     - source: salt://proxy/ssl/goodrain.me
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
-    - makedirs: Ture
+    - makedirs: True
 
 lb-upstart:
   cmd.run:
@@ -102,10 +141,16 @@ lb-restart:
       - file: default_http_conf
       - file: proxy_site_ssl
 #==================== rbd-mq ======================
+{% set MQIMG = salt['pillar.get']('rainbond-modules:rbd-mq:image') -%}
+{% set MQVER = salt['pillar.get']('rainbond-modules:rbd-mq:version') -%}
 docker-pull-mq-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-mq:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-mq:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ MQIMG }}:{{ MQVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ MQIMG }}_{{ MQVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ MQIMG }}:{{ MQVER }}
 
 mq-upstart:
   cmd.run:
@@ -115,10 +160,16 @@ mq-upstart:
       - cmd: docker-pull-mq-image
 
 #==================== rbd-webcli ====================
+{% set WEBCLIIMG = salt['pillar.get']('rainbond-modules:rbd-webcli:image') -%}
+{% set WEBCLIVER = salt['pillar.get']('rainbond-modules:rbd-webcli:version') -%}
 docker-pull-webcli-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-webcli:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ WEBCLIIMG }}:{{ WEBCLIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ WEBCLIIMG }}_{{ WEBCLIVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ WEBCLIIMG }}:{{ WEBCLIVER }}
 
 webcli-upstart:
   cmd.run:
@@ -128,10 +179,16 @@ webcli-upstart:
       - cmd: docker-pull-webcli-image
 
 #==================== rbd-app-ui ====================
+{% set APPUIIMG = salt['pillar.get']('rainbond-modules:rbd-app-ui:image') -%}
+{% set APPUIVER = salt['pillar.get']('rainbond-modules:rbd-app-ui:version') -%}
 docker-pull-app-ui-image:
   cmd.run:
-    - name: docker pull rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
-    - unless: docker inspect rainbond/rbd-app-ui:{{ pillar['rbd-version'] }}
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ APPUIIMG }}:{{ APPUIVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APPUIIMG }}_{{ APPUIVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APPUIIMG }}:{{ APPUIVER }}
 
 app-ui-logs:
   cmd.run:

@@ -6,28 +6,18 @@ make_domain_prepare:
     - unless: grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
 
 make_domain:
-  cmd.run:
-  {% if pillar['public-ip'] %}
-    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['public-ip'] }}
-  {% else %}
-    - name: docker run  --rm  -v {{ pillar['rbd-path'] }}/.domain.log:/tmp/domain.log rainbond/archiver:domain_v2 init --ip {{ pillar['inet-ip'] }}
-  {% endif %}
-    - unless:  grep "goodrain" {{ pillar['rbd-path'] }}/.domain.log
-
-update_systeminfo:
   file.managed:
     - source: salt://docker/files/domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/domain.sh
     - template: jinja
     - mode: 755
-    - makedirs: Ture
+    - makedirs: True
   cmd.run:
-    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh
-
-check_domain:
-  cmd.run:
-    - name:  echo "domain not found"
-    - unless: grep "domain" /srv/pillar/goodrain.sls
+  {% if pillar['master-public-ip'] %}
+    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-public-ip'] }}
+  {% else %}
+    - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-private-ip'] }}
+  {% endif %}
 
 rsync_update_domain:
   file.managed:
@@ -35,7 +25,7 @@ rsync_update_domain:
     - name: {{ pillar['rbd-path'] }}/bin/.domain.sh
     - template: jinja
     - mode: 755
-    - makedirs: Ture
+    - makedirs: True
 
 refresh_domain:
   cmd.run:

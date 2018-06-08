@@ -1,0 +1,8 @@
+#!/bin/sh
+SOURCE_BIN=`which docker-compose`
+YAML_FILE=" {{ pillar['rbd-path'] }}/docker-compose.yaml"
+if [ -z "$SOURCE_BIN" ];then
+	echo "docker-compose not found"
+	exit 1
+fi
+eval "$SOURCE_BIN -f $YAML_FILE $@"

@@ -29,8 +29,8 @@ Check_Plugins(){
 
   if (which docker > /dev/null 2>&1 );then
     existDocker=$(docker -v | awk '{print $3$5}' 2>/dev/null)
-  
-    if [ "$existDocker" != "$DOCKER_VERSION" ];then
+    grDocker=$(Read_Sls_File docker.version)
+    if [ "$existDocker" != "$grDocker" ];then
       Echo_Error "Rainbond integrated customized docker, Please stop and uninstall it first."
     fi
   fi

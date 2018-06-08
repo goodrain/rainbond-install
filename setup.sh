@@ -13,10 +13,12 @@
 #       CREATED: 03/30/2018 10:49:37 AM
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
-. scripts/common.sh
 
-[ ! -d ./$LOG_DIR ] && mkdir ./$LOG_DIR
-[ ! -f $PILLAR_DIR/goodrain.sls ] && touch $PILLAR_DIR/goodrain.sls || echo "" > $PILLAR_DIR/goodrain.sls
+export MAIN_CONFIG="rainbond.yaml"
+
+[ ! -f $MAIN_CONFIG ] && cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
+
+. scripts/common.sh
 
  # trap program exit
 trap 'Exit_Clear; exit' SIGINT SIGHUP
@@ -42,7 +44,7 @@ init_config(){
 install_func(){
     fail_num=0
     Echo_Info "will install manage node."
-
+  
     for module in ${MANAGE_MODULES}
     do
         echo "Start install $module ..."
@@ -53,7 +55,9 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
+      if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
         REG_Status || return 0
+      fi
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
         notready=$(grctl  node list | grep $uuid | grep false)
         if [ "$notready" != "" ];then
@@ -67,6 +71,7 @@ install_func(){
 help_func(){
     echo "help:"
     echo "check   --- check cmd "
+    echo "offline --- work in offline env cmd"
     echo "install --- install cmd "
     echo "dev     --- ignore check install cmd "
     echo ""
@@ -77,7 +82,12 @@ case $1 in
         check_func ${@:2} && init_config
     ;;
     install)
+        #do not check the internet when install offline
+        if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
         check_func && init_config && install_func ${@:2}
+        else
+        init_config && install_func
+        fi
     ;;
     dev)
         check_func force && init_config && install_func ${@:2}

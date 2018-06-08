@@ -1,0 +1,190 @@
+# rainbond global config
+# use ./scripts/yq maintain
+# example:
+# read:           ./scripts/yq r t.yml etcd.server.members[0].name
+# write/update:   ./scripts/yq w t.yml etcd.server.members[0].name compute01
+# more information: http://mikefarah.github.io/yq/
+rbd-version: 3.5
+rbd-path: /opt/rainbond
+install-type: online
+master-hostname: manage01
+master-private-ip: 
+master-public-ip: 
+domain: 
+install-script-path: 
+public-image-domain: rainbond
+private-image-domain: goodrain.me
+rbd-tag: rainbond
+reg-uuid:
+secretkey: 
+docker:
+  version: 1.12.6,1526e3f
+
+dns:
+  current: 
+  master: 223.5.5.5
+  slave: 223.6.6.6
+
+rbd-pkgs:
+  manage:
+    - gr-docker-engine
+    - nfs-utils
+    - nfs-kernel-server
+    - nfs-common
+    - glusterfs-server
+    - tar
+    - ntpdate
+    - wget
+    - curl
+    - tree
+    - lsof
+    - htop
+    - nload
+    - net-tools
+    - telnet
+    - rsync
+    - lvm2
+    - git
+    - salt-ssh
+    - perl
+    - bind-utils
+    - dstat 
+    - iproute
+    - bash-completion
+    - salt-master
+    - salt-minion
+
+# rbd-db
+database:
+  type: mysql
+  mysql:
+    image: rbd-db
+    version: 3.5
+    host: 
+    port: 3306
+    user: 
+    pass: 
+  cockroachdb:
+    image: cockroach
+    version: v2.0.2
+    host: 
+    port: 26257
+    user: 
+    pass: 
+
+
+# etcd
+etcd:
+  server:
+    image: etcd
+    version: v3.2.13
+    enabled: true
+    bind:
+      host: 
+    token: 
+    members:
+    - host: 
+      name: 
+      port: 2379
+  proxy:
+    image: etcd
+    version: v3.2.13
+    enabled: true
+
+# kubernetes
+kubernetes:
+  cfssl:
+    image: cfssl
+    version: dev
+  kubecfg:
+    image: kubecfg
+    version: dev
+  cni:
+    image: cni
+    version: k8s_v3.5
+  api:
+    image: kube-apiserver
+    version: v1.6.4
+  manager:
+    image: kube-controller-manager
+    version: v1.6.4
+  schedule:
+    image: kube-scheduler
+    version: v1.6.4
+
+# network
+network:
+  calico:
+    image: calico-node
+    version: v2.4.1
+    enabled: true
+    bind: 
+    net: 
+
+# plugins
+plugins:
+  image: plugins
+  tcm:
+    tag: tcm
+  mesh:
+    tag: mesh
+
+#proxy
+proxy:
+  runner:
+    image: runner
+    version: latest
+  adapter:
+    image: adapter
+    version: latest
+  pause:
+    image: pause-amd64
+    version: '3.0'
+  builder:
+    image: builder
+    version: latest
+
+# rainbond components
+rainbond-modules:
+  rbd-api:
+    image: rbd-api
+    version: 3.5
+  rbd-dns:       
+    image: rbd-dns
+    version: 3.5
+  rbd-registry: 
+    image: rbd-registry
+    version: 2.3.1
+  rbd-repo: 
+    image: rbd-repo
+    version: 3.5
+  rbd-worker: 
+    image: rbd-worker
+    version: 3.5
+  rbd-eventlog: 
+    image: rbd-eventlog
+    version: 3.5
+  rbd-entrance: 
+    image: rbd-entrance
+    version: 3.5
+  rbd-chaos: 
+    image: rbd-chaos
+    version: 3.5
+  rbd-lb: 
+    image: rbd-lb
+    version: 3.5
+  rbd-mq: 
+    image: rbd-mq
+    version: 3.5
+  rbd-webcli: 
+    image: rbd-webcli
+    version: 3.5
+  rbd-app-ui: 
+    image: rbd-app-ui
+    version: 3.5
+  rbd-prometheus: 
+    image: prometheus
+    version: v2.1.0
+  rbd-cni:
+    image: cni
+    version: rbd_v3.5

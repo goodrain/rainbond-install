@@ -9,6 +9,7 @@ include:
   - init.plugins
   - init.gr_bin
   - init.dns
+  - init.pkg
 {% else %}
   - init.user
   - init.create_dir
@@ -18,4 +19,5 @@ include:
   - init.key
   - init.gr_bin
   - init.dns
+  - init.pkg
 {% endif %}

@@ -1,23 +1,49 @@
+{% set APIIMG = salt['pillar.get']('kubernetes:api:image') -%}
+{% set APIVER = salt['pillar.get']('kubernetes:api:version') -%}
+{% set CTLMGEIMG = salt['pillar.get']('kubernetes:manager:image') -%}
+{% set CTLMGEVER = salt['pillar.get']('kubernetes:manager:version') -%}
+{% set SDLIMG = salt['pillar.get']('kubernetes:schedule:image') -%}
+{% set SDLVER = salt['pillar.get']('kubernetes:schedule:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
+{% if pillar['install-type']!="offline" %}
 pull_api_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('api_image','rainbond/kube-apiserver:v1.6.4') }}
+    - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
 pull_manager_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('manager','rainbond/kube-controller-manager:v1.6.4') }}
+    - name: docker pull {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
 
 pull_schedule_image:
   cmd.run:
-    - name: docker pull {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
-    - unless: docker inspect {{ pillar.kubernetes.server.get('schedule','rainbond/kube-scheduler:v1.6.4') }}
+    - name: docker pull {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+{% else %}
+pull_api_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+
+pull_manager_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ CTLMGEIMG }}_{{ APIVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+
+pull_schedule_image:
+  cmd.run:
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ SDLIMG }}_{{ SDLVER }}.gz
+    - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+{% endif %}
 
 k8s-api-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-apiserver.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kube-apiserver.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -27,7 +53,7 @@ k8s-manager-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-controller-manager.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kube-controller-manager.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -37,7 +63,7 @@ k8s-scheduler-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-scheduler.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-kube-scheduler.sh
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
     - mode: 755
     - user: root
@@ -47,7 +73,7 @@ k8s-conf:
   file.managed:
     - source: salt://kubernetes/server/install/custom.conf
     - name: {{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf
-    - makedirs: Ture
+    - makedirs: True
     - template: jinja
 
 /etc/systemd/system:
@@ -66,13 +92,13 @@ kube-cfg-rsync-grdata:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
     - name: /grdata/services/k8s/kubecfg
-    - makedirs: Ture
+    - makedirs: True
 
 kube-ssl-rsync-grdata:
   file.recurse:
     - source: salt://kubernetes/server/install/ssl
     - name: /grdata/services/k8s/ssl
-    - makedirs: Ture
+    - makedirs: True
 
 
 kube-cfg-rsync:
@@ -133,7 +159,7 @@ kube-local:
   file.managed:
     - source: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig
     - name: /root/.kube/config
-    - makedirs: Ture
+    - makedirs: True
     - mode: 600
     - user: root
     - group: root
