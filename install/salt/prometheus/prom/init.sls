@@ -1,15 +1,11 @@
-{% set P8SIMG = salt['pillar.get']('rainbond-modules:rbd-prometheus:image') -%}
-{% set P8SVER = salt['pillar.get']('rainbond-modules:rbd-prometheus:version') -%}
+{% set P8SIMG = salt['pillar.get']('rainbond-modules:rbd-monitor:image') -%}
+{% set P8SVER = salt['pillar.get']('rainbond-modules:rbd-monitor:version') -%}
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 prometheus-yml:
-  file.managed:
-    - source: salt://prometheus/prom/prometheus.yml
+  file.touch:
     - name: {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml
-    - user: rain
-    - group: rain
-    - template: jinja
     - makedirs: True
 
 docker-pull-prom-image:
@@ -31,7 +27,7 @@ create-prom-data:
 
 prom-upstart:
   cmd.run:
-    - name: dc-compose up -d rbd-prometheus
-    - unless: check_compose rbd-prometheus
+    - name: dc-compose up -d rbd-monitor
+    - unless: check_compose rbd-monitor
     - require:
       - file: create-prom-data

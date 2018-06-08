@@ -3,16 +3,17 @@ services:
   rbd-dns:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     container_name: rbd-dns
+    mem_limit: 1024M
     environment:
-    - KUBEURL=http://127.0.0.1:8181
-    - FORWARD={{ pillar.dns.get('current','223.5.5.5') }},{{ pillar.dns.slave }}
-    - SKYDNS_DOMAIN=goodrain.me
-    - RECORD_1=goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_2=lang.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_3=maven.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_4=console.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_5=region.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_6=kubeapi.goodrain.me:{{ pillar['master-private-ip'] }}
+      - VERBOSE=true
+    command:
+    - --kubecfg-file=/etc/kubernetes/admin.kubeconfig
+    - --v=3
+    - --healthz-port=8089
+    - --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
+    - --recoders=goodrain.me={{ pillar['master-private-ip'] }},*.goodrain.me={{ pillar['master-private-ip'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/kubernetes
     logging:
       driver: json-file
       options:
@@ -227,14 +228,13 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-  rbd-prometheus:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-prometheus']['image'] }}:{{ pillar['rainbond-modules']['rbd-prometheus']['version'] }}
-    container_name: rbd-prometheus
-    user: "200"
+  rbd-monitor:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
+    container_name: rbd-monitor
     volumes:
     - /grdata/services/rbd-prometheus/data:/prometheusdata
     - {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
+    command: --etcd-endpoints=http://{{ pillar['master-private-ip'] }}:2379 --advertise-addr={{ pillar['master-private-ip'] }}:9999 --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
     logging:
       driver: json-file
       options:
