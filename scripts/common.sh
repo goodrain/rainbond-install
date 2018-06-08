@@ -11,7 +11,6 @@ SALT_PKGS="salt-ssh"
 MAIN_CONFIG="rainbond.yaml"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 PILLAR_DIR="./install/pillar"
-RBD_DING="http://v2.reg.rbd.goodrain.org"
 DOMAIN_API="http://domain.grapps.cn"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
@@ -258,9 +257,9 @@ REG_Status(){
     iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
     eip=$( Read_Sls_File master-public-ip $MAIN_SLS )
     if [ ! -z $eip ];then
-        ip=eip
+        ip=$eip
     else
-        ip=iip
+        ip=$iip
     fi
     domain=$( Read_Sls_File domain $MAIN_SLS )
     if [[ "$domain" =~ "grapps" ]];then

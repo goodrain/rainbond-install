@@ -22,8 +22,8 @@ docker:
 
 dns:
   current: 
-  master: 223.5.5.5
-  slave: 223.6.6.6
+  master: 114.114.114.114
+  slave: 1.2.4.8
 
 rbd-pkgs:
   manage:
