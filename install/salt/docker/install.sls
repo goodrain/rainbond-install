@@ -37,14 +37,14 @@ docker-repo:
     #online
     {% else %}
     - humanname: Goodrain CentOS-$releasever - for x86_64
-    - baseurl: http://repo.goodrain.com/centos/$releasever/3.5/$basearch
+    - baseurl: http://repo.goodrain.com/centos/$releasever/3.6/$basearch
     - enabled: 1
     - gpgcheck: 1
     - gpgkey: http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
     {% endif %}
   # debain or ubuntu
   {% else %}
-    - name: deb http://repo.goodrain.com/debian/9 3.5 main
+    - name: deb http://repo.goodrain.com/debian/9 3.6 main
     - file: /etc/apt/sources.list.d/docker.list
     - key_url: http://repo.goodrain.com/gpg/goodrain-C4CDA0B7
   {% endif %}  

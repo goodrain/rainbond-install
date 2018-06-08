@@ -4,12 +4,8 @@
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 prometheus-yml:
-  file.managed:
-    - source: salt://prometheus/prom/prometheus.yml
+  file.touch:
     - name: {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml
-    - user: rain
-    - group: rain
-    - template: jinja
     - makedirs: True
 
 docker-pull-prom-image:
