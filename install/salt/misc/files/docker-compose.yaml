@@ -73,7 +73,6 @@ services:
     container_name: rbd-api
     mem_limit: 1024M
     environment:
-      REGION_TAG: {{ pillar['rbd-tag'] }}
       EX_DOMAIN: {{ pillar['domain'] }}
       LicenseSwitch: 'off'
     volumes:
@@ -160,7 +159,6 @@ services:
     container_name: rbd-app-ui
     environment:
       MANAGE_SECRET_KEY: {{ pillar['secretkey'] }}
-      REGION_TAG: {{ pillar['rbd-tag'] }}
       MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
       MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
       MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
@@ -217,7 +215,6 @@ services:
     container_name: rbd-monitor
     volumes:
     - /grdata/services/rbd-prometheus/data:/prometheusdata
-    - {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --etcd-endpoints=http://{{ pillar['master-private-ip'] }}:2379 --advertise-addr={{ pillar['master-private-ip'] }}:9999 --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
     logging:
       driver: json-file

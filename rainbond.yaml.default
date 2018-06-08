@@ -14,7 +14,6 @@ domain:
 install-script-path: 
 public-image-domain: rainbond
 private-image-domain: goodrain.me
-rbd-tag: rainbond
 reg-uuid:
 secretkey: 
 docker:

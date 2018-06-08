@@ -3,11 +3,6 @@
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
-prometheus-yml:
-  file.touch:
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml
-    - makedirs: True
-
 docker-pull-prom-image:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
