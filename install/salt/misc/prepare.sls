@@ -38,6 +38,15 @@
     - user: root
     - group: root
     - unless: test -f /usr/local/bin/kubectl
+{% if grains['id'] == "manage01"  %}
+/usr/local/bin/domain-cli:
+  file.managed:
+    - source: salt://misc/file/bin/domain-cli
+    - mode: 755
+    - user: root
+    - group: root
+    - unless: test -f /usr/local/bin/domain-cli
+{% endif %}
 {% endif %}
 
 {% if "compute" in grains['id'] %}

@@ -8,7 +8,7 @@ function domain() {
     if [ "$?" -ne 0 ];then
         echo "DOMAIN NOT ALLOW"
     else
-        grep "cn.grapps" {{ pillar['rbd-path'] }}/.domain.log > /dev/null
+        /usr/local/bin/domain-cli --newip $IP > /dev/null
         if [ $? -eq 0 ];then
             echo "domain change Success!!!"
         else
