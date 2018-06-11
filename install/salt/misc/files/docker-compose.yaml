@@ -3,17 +3,17 @@ services:
   rbd-dns:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     container_name: rbd-dns
+    mem_limit: 1024M
     environment:
-    - KUBEURL=http://127.0.0.1:8181
-    - FORWARD={{ pillar.dns.get('current','223.5.5.5') }},{{ pillar.dns.slave }}
-    - SKYDNS_DOMAIN=goodrain.me
-    - RECORD_1=goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_2=lang.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_3=maven.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_4=console.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_5=region.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_6=kubeapi.goodrain.me:{{ pillar['master-private-ip'] }}
-    - RECORD_7=repo.goodrain.me:{{ pillar['master-private-ip'] }}
+      - VERBOSE=true
+    command:
+    - --kubecfg-file=/etc/kubernetes/admin.kubeconfig
+    - --v=3
+    - --healthz-port=8089
+    - --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
+    - --recoders=goodrain.me={{ pillar['master-private-ip'] }},*.goodrain.me={{ pillar['master-private-ip'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/kubernetes
     logging:
       driver: json-file
       options:
@@ -229,33 +229,6 @@ services:
     network_mode: host
     restart: always
 {% endif %}
-{% if pillar['rbd-version'] == "3.6" %}
-  rbd-eventlog:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
-    container_name: rbd-eventlog
-    mem_limit: 1024M
-    environment:
-      K8S_MASTER: http://127.0.0.1:8181
-    volumes:
-    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
-    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
-    - /grdata/downloads/log:/grdata/logs
-    command:
-    - --cluster.bind.ip={{ pillar['master-private-ip'] }}
-    - --db.type=mysql
-    - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
-    - --discover.etcd.addr=http://{{ pillar['master-private-ip'] }}:2379
-    - --eventlog.bind.ip={{ pillar['master-private-ip'] }}
-    - --websocket.bind.ip={{ pillar['master-private-ip'] }}
-    - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
-    logging:
-      driver: json-file
-      options:
-        max-size: 50m
-        max-file: '3'
-    network_mode: host
-    restart: always
-{% else %}
   rbd-eventlog:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     container_name: rbd-eventlog
@@ -278,4 +251,3 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-{% endif %}

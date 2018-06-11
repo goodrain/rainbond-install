@@ -22,7 +22,7 @@ compute-pause-pull-image:
 
 {% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
 {% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
-{% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
+{% set MESHTAG = salt['pillar.get']('plugins:mesh:metatag') -%}
 compute-tcm-pull-image:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{TCMTAG}}
