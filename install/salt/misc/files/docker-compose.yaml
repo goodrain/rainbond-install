@@ -210,11 +210,12 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
+{% endif %}
   rbd-monitor:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
     container_name: rbd-monitor
     volumes:
-    - /grdata/services/rbd-prometheus/data:/prometheusdata
+    - {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
     command: --etcd-endpoints=http://{{ pillar['master-private-ip'] }}:2379 --advertise-addr={{ pillar['master-private-ip'] }}:9999 --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
     logging:
       driver: json-file
@@ -223,7 +224,6 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-{% endif %}
   rbd-eventlog:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     container_name: rbd-eventlog

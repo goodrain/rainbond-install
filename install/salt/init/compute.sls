@@ -32,7 +32,7 @@ epel-repo:
     - humanname: Extra Packages for Enterprise Linux 7 - $basearch
     - baseurl: http://mirrors.aliyun.com/epel/7/$basearch
     - gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-    - gpgcheck: 1
+    - gpgcheck: 0
   {% endif %}
 # debain or ubuntu
 {% else %}
