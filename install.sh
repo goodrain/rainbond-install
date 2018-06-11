@@ -15,62 +15,14 @@
 
 [[ $DEBUG ]] && set -x
 
-REPO_URL="https://github.com/goodrain/rainbond-install.git"
+STABLE_VER="3.5"
+PKG_URL="https://pkg.rainbond.com/releases"
+STABLE_PKG="v${STABLE_VER}/rainbond-install-${STABLE_VER}.tar.gz"
 
-which_cmd() {
-    which "${1}" 2>/dev/null || \
-        command -v "${1}" 2>/dev/null
-}
-
-check_cmd() {
-    which_cmd "${1}" >/dev/null 2>&1 && return 0
-    return 1
-}
-
-APT="$(which_cmd apt)"
-YUM="$(which_cmd yum)"
-
-pkg(){
-    echo "Install the prerequisite packages..."
-    if [ ! -z "$YUM" ];then
-        yum makecache fast -q
-        yum install -y -q git ntpdate > /dev/null
-    else
-        apt-get update -q
-        apt-get install -y -q git ntpdate apt-transport-https > /dev/null
-
-    fi
-    ntpdate 0.cn.pool.ntp.org > /dev/null
-}
-
-run(){
-    pkg
-    [ -d "$PWD/rainbond-install" ] && rm -rf $PWD/rainbond-install
+[ -d "~/rainbond-install-$STABLE_VER" ] && rm -rf ~/rainbond-install-$STABLE_VER
+       
+curl -s -L -k  ${PKG_URL}/${STABLE_PKG} | tar xzm -C ~/
     
-    if [ "$1" == "dev" ];then
-        git clone --depth 1 -b dev ${REPO_URL}
-    else
-        git clone --depth 1 ${REPO_URL}
-    fi
-    
-    cd rainbond-install
-    if [[ $1 == "help" ]];then
-        ./setup.sh
-        echo "cd $PWD;  ./setup.sh <args>"
-    elif [[ $1 == "dev" ]];then
-        ./setup.sh dev
-    else
-        ./setup.sh install
-    fi
-}
-case $1 in
-    dev)
-        run dev
-    ;;
-    help)
-        run help
-    ;;
-    * )
-        run
-    ;;
-esac
+cd ~/rainbond-install-$STABLE_VER
+
+./setup.sh install

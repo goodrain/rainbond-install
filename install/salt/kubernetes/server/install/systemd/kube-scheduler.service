@@ -5,6 +5,7 @@ Requires=network.target
 [Service]
 User=root
 PermissionsStartOnly=true
+EnvironmentFile=-{{ pillar['rbd-path'] }}/envs/kube-scheduler.sh
 ExecStartPre=-/usr/bin/docker rm -f kube-scheduler
 ExecStart={{ pillar['rbd-path'] }}/scripts/start-kube-scheduler.sh
 ExecStop=-/usr/bin/docker stop kube-scheduler

@@ -5,6 +5,7 @@ Requires=network.target
 [Service]
 User=root
 PermissionsStartOnly=true
+EnvironmentFile=-{{ pillar['rbd-path'] }}/envs/kube-controller-manager.sh
 ExecStartPre=-/usr/bin/docker rm -f kube-controller-manager
 ExecStart={{ pillar['rbd-path'] }}/scripts/start-kube-controller-manager.sh
 ExecStop=-/usr/bin/docker stop kube-controller-manager

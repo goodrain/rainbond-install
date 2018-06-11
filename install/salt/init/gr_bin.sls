@@ -54,3 +54,12 @@
     - user: root
     - group: root
     - mode: 755
+
+/usr/local/bin/dc-compose:
+  file.managed:
+    - source: salt://init/files/bin/dc-compose
+    - makedirs: Ture
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 755 

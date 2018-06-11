@@ -1,19 +1,34 @@
+{% set RUNNERIMG = salt['pillar.get']('proxy:runner:image') -%}
+{% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 compute-runner-pull-image:
   cmd.run:
-    - name: docker push goodrain.me/runner
-    - unless: docker inspect goodrain.me/runner
+    - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
 
+{% set ADAPTERIMG = salt['pillar.get']('proxy:adapter:image') -%}
+{% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
 compute-adapter-pull-image:
   cmd.run:
-    - name: docker pull goodrain.me/adapter
-    - unless: docker inspect goodrain.me/adapter
+    - name: docker pull {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ADAPTERVER}}
 
+{% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
+{% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
 compute-pause-pull-image:
   cmd.run:
-    - name: docker pull goodrain.me/pause-amd64:3.0
-    - unless: docker inspect goodrain.me/pause-amd64:3.0
+    - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
 
-compute-tcm-pull-image:    
+{% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
+{% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
+{% set MESHTAG = salt['pillar.get']('plugins:mesh:metatag') -%}
+compute-tcm-pull-image:
   cmd.run:
-    - name: docker pull goodrain.me/tcm
-    - unless: docker inspect goodrain.me/tcm
+    - name: docker pull {{PRIDOMAIN}}/{{TCMTAG}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{TCMTAG}}
+
+compute-mesh-pull-image:
+  cmd.run:
+    - name: docker pull {{PRIDOMAIN}}/{{MESHTAG}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{MESHTAG}}
