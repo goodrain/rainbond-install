@@ -23,7 +23,7 @@ docker-pull-prom-image:
 
 create-prom-data:
   file.directory:
-   - name: /grdata/services/rbd-prometheus/data
+   - name: {{ pillar['rbd-path'] }}/data/prom
    - makedirs: True
    - user: rain
    - group: rain

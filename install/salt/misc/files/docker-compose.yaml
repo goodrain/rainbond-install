@@ -218,7 +218,7 @@ services:
     container_name: rbd-prometheus
     user: "200"
     volumes:
-    - /grdata/services/rbd-prometheus/data:/prometheusdata
+    - {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
     - {{ pillar['rbd-path'] }}/etc/rbd-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --web.listen-address=":9999" --storage.tsdb.path="/prometheusdata" --storage.tsdb.retention=7d --config.file="/etc/prometheus/prometheus.yml"
     logging:
