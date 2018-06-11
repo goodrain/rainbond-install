@@ -72,9 +72,6 @@ database:
     user: 
     pass: 
 
-    metatag: mesh_plugin
-    metatag: mesh_plugin
-
 # etcd
 etcd:
   server:
