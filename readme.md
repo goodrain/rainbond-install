@@ -43,7 +43,7 @@ cd rainbond-install
 
 # latest v3.6
 
-git clone --depth 1 -b v3.5 https://github.com/goodrain/rainbond-install.git
+git clone --depth 1 -b v3.6 https://github.com/goodrain/rainbond-install.git
 cd rainbond-install
 ./setup.sh
 
