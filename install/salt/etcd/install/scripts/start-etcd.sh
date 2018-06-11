@@ -40,7 +40,7 @@ exec /usr/bin/docker \
   --net=host \
   --name etcd \
   --volume={{ pillar['rbd-path'] }}/data/etcd/:/data/etcd/ \
-  rainbond/etcd:v3.2.13 \
+  {{ pillar['public-image-domain'] }}/{{pillar['etcd']['server']['image']}}:{{pillar['etcd']['server']['version']}} \
   /usr/local/bin/etcd \
   --name $LOCAL_NODE \
   --data-dir /data/etcd/ \
@@ -51,4 +51,5 @@ exec /usr/bin/docker \
   --initial-cluster $INITIAL_CLUSTER \
   --initial-cluster-token {{ pillar.etcd.server.token }} \
   --initial-cluster-state ${INITIAL_CLUSTER_STATE:-new} \
-  --auto-compaction-retention 1
+  --auto-compaction-retention 1 \
+  --quota-backend-bytes=$((4*1024*1024*1024))

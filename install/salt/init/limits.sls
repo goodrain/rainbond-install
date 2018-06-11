@@ -7,6 +7,8 @@
       - "* hard nofile 102400"
       - "* soft memlock unlimited"
       - "* hard memlock unlimited"
+      - "* soft nproc 2048"
+      - "* hard nproc 4096"
 
 vm.max_map_count:
   sysctl.present:

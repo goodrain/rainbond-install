@@ -1,1 +1,1 @@
-# rainbond offline images direstory
+# Rainbond offline rbd modules docker images directory
