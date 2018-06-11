@@ -15,10 +15,9 @@
 
 [[ $DEBUG ]] && set -x
 
-STABLE_VER="3.5"
+STABLE_VER="3.5.1"
 PKG_URL="https://pkg.rainbond.com/releases"
-STABLE_PKG="v${STABLE_VER}/rainbond-install-${STABLE_VER}.tar.gz"
-
+STABLE_PKG="stable/v3.5.1.tar.gz"
 [ -d "~/rainbond-install-$STABLE_VER" ] && rm -rf ~/rainbond-install-$STABLE_VER
        
 curl -s -L -k  ${PKG_URL}/${STABLE_PKG} | tar xzm -C ~/
