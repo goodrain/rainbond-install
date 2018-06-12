@@ -74,3 +74,11 @@
     - user: root
     - group: root
     - unless: test -f /usr/local/bin/ctop
+
+/usr/local/bin/yq:
+  file.managed:
+    - source: salt://misc/file/bin/yq
+    - mode: 755
+    - user: root
+    - group: root
+    - unless: test -f /usr/local/bin/yq
