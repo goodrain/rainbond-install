@@ -72,7 +72,20 @@ EOF
         Echo_Error "not support ${1:-null}"
     fi
 }
+update_data(){
+    # manage01
+    cat /etc/salt/roster | grep manage | awk -F: '{print $1}' > /tmp/mnode
+    cat /tmp/mnode | while read -r line
+    do
+    # echo $line
+    ip=$(yq r /etc/salt/roster $line.host)
+    echo "$line $ip" >> /tmp/minfo
+    
+    done
+    yq r /srv/pillar/rainbond.sls etcd.server > /tmp/etcd.sls
+    yq d /tmp/etcd.sls 'members' /tmp/detcd.sls
 
+}
 install(){
     fail_num=0
     Echo_Info "will install manage node."
