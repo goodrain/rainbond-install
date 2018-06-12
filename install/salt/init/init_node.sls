@@ -33,12 +33,12 @@ epel-repo:
     - baseurl: http://mirrors.aliyun.com/epel/7/$basearch
     - gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
     - gpgcheck: 0
-  {% endif %}
+{% endif %}
 # debain or ubuntu
 {% else %}
 update_local_pkg_cache:
   cmd.run:
-    - name: apt update -y
+    - name: apt-get update -y
 {% endif %} 
 
 #install base pkgs

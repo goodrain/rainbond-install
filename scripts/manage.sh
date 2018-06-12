@@ -54,7 +54,8 @@ $2:
   sudo: True
   port: 22
 EOF
-        fi     
+        fi
+           
         grep "$3" /etc/hosts > /dev/null
         [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
         else

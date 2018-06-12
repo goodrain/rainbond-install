@@ -61,6 +61,11 @@ etc-prometheus-dir:
     - name: {{ DIR }}/etc/prometheus
     - makedirs: True
 
+etc-api-dir:
+  file.directory:
+    - name: {{ DIR }}/etc/rbd-api
+    - makedirs: True
+
 #=========================== rainbond/data directory ===========================
 data-dir:
   file.directory:
