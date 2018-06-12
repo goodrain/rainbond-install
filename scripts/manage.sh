@@ -1,9 +1,9 @@
 #!/bin/bash
 #======================================================================================================================
 #
-#          FILE: compute.sh
+#          FILE: manage.sh
 #
-#   DESCRIPTION: Install Compute Node
+#   DESCRIPTION: Install Manage Node
 #
 #          BUGS: https://github.com/goodrain/rainbond-install/issues
 #
@@ -26,13 +26,13 @@
 
 . scripts/common.sh
 
-init_func(){
-    Echo_Info "Init compute node config."
+init(){
+    Echo_Info "Init manage node config."
     Echo_Info "change hostname"
     if [ "$1" = "single" ];then
         echo $@
         if [ "$#" -lt 4 ];then
-            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd/key> <type>"
+            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/manage.sh init single <hostname> <ip> <passwd/key> <type>"
         fi
         grep "$2" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
@@ -61,27 +61,23 @@ EOF
             Echo_EXIST $2["$3"]
         fi
             
-        salt-ssh -i $2 state.init_node
+        salt-ssh -i $2 state.sls init.init_node
     elif [ "$1" = "multi" ];then
         if [ "$#" -ne 3 ];then
-            Echo_Error "need 3 args\n like: [$PWD] ./scripts/compute.sh init multi <ip.txt path> <passwd>"
+            Echo_Error "need 3 args\n like: [$PWD] ./scripts/manage.sh init multi <ip.txt path> <passwd>"
         fi
-        salt-ssh -i -E "compute" state.sls init.init_node
+        salt-ssh -i -E "manage" state.sls init.init_node
     else
         Echo_Error "not support ${1:-null}"
     fi
 }
 
-check_func(){
-    Echo_Info "Check Compute func."
-}
-
-install_compute_func(){
+install(){
     fail_num=0
-    Echo_Info "will install compute node."
+    Echo_Info "will install manage node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
-        for module in ${COMPUTE_MODULES}
+        for module in ${MANAGE_MODULES}
         do
             Echo_Info "Start install $module ..."
             
@@ -91,12 +87,12 @@ install_compute_func(){
             fi
         done
     else
-        salt-ssh -i -E "compute" state.sls salt.install
-        for module in ${COMPUTE_MODULES}
+        salt-ssh -i -E "manage" state.sls salt.install
+        for module in ${MANAGE_MODULES}
         do
             Echo_Info "Start install $module ..."
             
-            if ! (salt -E "compute" state.sls $module);then
+            if ! (salt -E "manage" state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
@@ -104,15 +100,12 @@ install_compute_func(){
     fi
       sleep 12
       Echo_Info "waiting for salt-minions start"
-    
-    
-
     if [ "$fail_num" -eq 0 ];then
-        Echo_Info "install compute node successfully"
+        Echo_Info "install manage node successfully"
     fi
 }
 
-help_func(){
+help(){
     Echo_Info "help"
     Echo_Info "init"
     echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
@@ -126,16 +119,16 @@ help_func(){
 
 case $1 in
     init)
-        init_func ${@:2}
+        init ${@:2}
     ;;
     install)
-        install_compute_func $2 
+        install $2 
     ;;
     offline)
-        init_func ${@:2} && install_compute_func ${@:2}
+        init ${@:2} && install ${@:2}
     ;;
     *)
-        help_func
+        help
     ;;
 esac
 

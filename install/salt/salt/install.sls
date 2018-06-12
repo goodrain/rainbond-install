@@ -1,19 +1,12 @@
+{% if grains['id'] != "manage01" %}
 salt-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}
     {% if pillar['install-type']=='offline' %}
-      {% if grains['id']=="manage01" %}
-    - humanname: local_repo
-    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs
-    - enabled: 1
-    - gpgcheck: 0
-      # compute
-      {% else %}
     - humanname: local_repo
     - baseurl: http://repo.goodrain.me/
     - enabled: 1
     - gpgcheck: 0
-      {% endif %}
     # online
     {% else %}
     - humanname: SaltStack repo for RHEL/CentOS $releasever
@@ -78,3 +71,5 @@ minion_service:
     - enable: True
     - require:
       - file: salt-minion-conf
+
+{% endif %}
