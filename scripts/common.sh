@@ -105,6 +105,8 @@ else
     dnsutils \
     python-pip \
     apt-transport-https )
+    
+    curl http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
 
     # debian salt repo
     cat > /etc/apt/sources.list.d/salt.list << END
