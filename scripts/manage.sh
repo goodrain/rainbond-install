@@ -86,10 +86,15 @@ etcd:
 EOF
     cat /tmp/sdetcd.sls | while read -r line
     do
+    if [[ "$line" =~ "host" ]];then
+        cat >> /tmp/detcd.sls <<EOF
+      $line
+EOF
+    else
         cat >> /tmp/detcd.sls <<EOF
     $line
 EOF
-
+    fi
     done
     echo "    members:" >> /tmp/detcd.sls
     cat /tmp/mnode | while read -r line
@@ -101,6 +106,8 @@ EOF
       port: 2379
 EOF
     done
+
+    yq w -i -s /tmp/detcd.sls /srv/pillar/rainbond.sls 
     
 }
 install(){
@@ -141,7 +148,7 @@ help(){
     Echo_Info "init"
     echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
     echo "args: multi <ip.txt path> <password/key-path>"
-    Echo_Info "check"
+    Echo_Info "update"
     Echo_Info "install"
     Echo_Info "offline"
     echo "args: single <hostname> <ip>  <password/key-path>"
@@ -151,6 +158,9 @@ help(){
 case $1 in
     init)
         init ${@:2}
+    ;;
+    update)
+        update_data
     ;;
     install)
         install $2 
