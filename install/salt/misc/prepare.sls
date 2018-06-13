@@ -82,3 +82,14 @@
     - user: root
     - group: root
     - unless: test -f /usr/local/bin/yq
+
+{% if "manage" in grains['id'] %}
+{% if pillar.domain is defined %}
+compose_file:
+  file.managed:
+     - source: salt://misc/files/docker-compose.yaml
+     - name: {{ pillar['rbd-path'] }}/docker-compose.yaml
+     - makedirs: True
+     - template: jinja
+{% endif %}
+{% endif %}
