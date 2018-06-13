@@ -63,7 +63,7 @@ gr-docker-engine:
     - unless: rpm -qa | grep gr-docker-engine
   {% else %}
     - skip_verify: True
-    - unless: dpkg -l | grep gr-docker-engine
+    - unless: dpkg -l | grep gr-docker-engine | grep ii
   {% endif %}
 
 docker_service:
