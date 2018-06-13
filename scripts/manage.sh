@@ -74,17 +74,34 @@ EOF
 }
 update_data(){
     # manage01
+    [ -f "/tmp/mnode" ] && rm -rf /tmp/mnode
+    [ -f "/tmp/minfo" ] && rm -rf /tmp/minfo
     cat /etc/salt/roster | grep manage | awk -F: '{print $1}' > /tmp/mnode
+
+    yq r /srv/pillar/rainbond.sls etcd.server > /tmp/etcd.sls
+    yq d /tmp/etcd.sls 'members' > /tmp/sdetcd.sls 
+    cat > /tmp/detcd.sls <<EOF
+etcd:
+  server:
+EOF
+    cat /tmp/sdetcd.sls | while read -r line
+    do
+        cat >> /tmp/detcd.sls <<EOF
+    $line
+EOF
+
+    done
+    echo "    members:" >> /tmp/detcd.sls
     cat /tmp/mnode | while read -r line
     do
-    # echo $line
     ip=$(yq r /etc/salt/roster $line.host)
-    echo "$line $ip" >> /tmp/minfo
-    
+    cat >> /tmp/detcd.sls <<EOF
+    - host: $ip
+      name: $line
+      port: 2379
+EOF
     done
-    yq r /srv/pillar/rainbond.sls etcd.server > /tmp/etcd.sls
-    yq d /tmp/etcd.sls 'members' /tmp/detcd.sls
-
+    
 }
 install(){
     fail_num=0
