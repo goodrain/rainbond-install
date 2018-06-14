@@ -95,3 +95,17 @@ minion_service:
     - enable: True
     - require:
       - file: salt-minion-conf
+
+{% if grains['os_family']|lower == 'debian' %}
+
+salt-master-restart:
+  cmd.run:
+    - name: systemctl restart salt-master.service
+
+salt-minion-restart:
+  cmd.run:
+    - name: systemctl restart salt-minion.service
+    - require:
+      - cmd: salt-master-restart
+
+{% endif %}
