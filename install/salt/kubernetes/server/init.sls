@@ -39,6 +39,16 @@ pull_schedule_image:
     - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
 {% endif %}
 
+k8s-api-env:
+  file.managed:
+    - source: salt://kubernetes/server/install/env/kube-apiserver.sh
+    - name: {{ pillar['rbd-path'] }}/envs/kube-apiserver.sh
+    - makedirs: True
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+
 k8s-api-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-apiserver.sh

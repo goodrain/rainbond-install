@@ -36,10 +36,7 @@ services:
     - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     - {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
-    command:
-    - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
-    - --log-level=debug 
-    - --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    command: --etcd={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
       options:
@@ -51,10 +48,7 @@ services:
     image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     container_name: rbd-chaos
     mem_limit: 1024M
-    command:
-    - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
-    - --log-level=debug
-    - --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    command: --etcd-endpoints={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     environment:
     - SOURCE_DIR=/cache/source
     - CACHE_DIR=/cache
@@ -109,11 +103,7 @@ services:
     volumes:
     - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     - /grdata:/grdata
-    command: 
-    - --log-level=info 
-    - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
-    - --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
-    - --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    command: --log-level=info --etcd-endpoints={{ pillar['etcd-endpoints'] }} --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig" --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     logging:
       driver: json-file
       options:
