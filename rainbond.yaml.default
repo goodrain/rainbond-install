@@ -43,6 +43,7 @@ rbd-pkgs:
     - net-tools
     - telnet
     - rsync
+    - iotop
     - lvm2
     - git
     - salt-ssh

@@ -43,14 +43,7 @@ SYS_COMMON_PKGS=( tar \
 ntpdate \
 wget \
 curl \
-tree \
-lsof \
-htop \
-nload \
 net-tools \
-telnet \
-rsync \
-lvm2 \
 pwgen \
 git )
 
