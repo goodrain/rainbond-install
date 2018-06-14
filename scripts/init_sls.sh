@@ -192,7 +192,7 @@ EOF
   )
   cp -rp $PWD/install/salt /srv/
   
-  cp -rp $PWD/rainbond.yaml /srv/pillar/rainbond.sls
+  mv $PWD/rainbond.yaml /srv/pillar/rainbond.sls
   cp -rp $PWD/install/pillar/top.sls /srv/pillar/top.sls
 
   Echo_Info "Salt-ssh test."
