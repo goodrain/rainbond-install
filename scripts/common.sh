@@ -19,16 +19,15 @@ storage \
 docker \
 misc \
 grbase \
-etcd "
-#\
-#network \
-#kubernetes.server \
-#node \
-#db \
-#plugins \
-#proxy \
-#prometheus \
-#kubernetes.node"
+etcd \
+network \
+kubernetes.server \
+node \
+db \
+plugins \
+proxy \
+prometheus \
+kubernetes.node"
 
 COMPUTE_MODULES="init \
 storage \
@@ -69,7 +68,6 @@ if [ "$SYS_NAME" == "centos" ];then
     SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
-  #  epel-release \
     bash-completion )
 
   #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
