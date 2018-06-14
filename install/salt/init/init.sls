@@ -10,6 +10,9 @@ include:
   - init.gr_bin
   - init.dns
   - init.pkg
+{% if grains['id'] == "manage01" %}
+  - init.domain
+{% endif %} 
 {% else %}
   - init.user
   - init.create_dir

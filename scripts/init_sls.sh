@@ -97,6 +97,8 @@ Write_Sls_File etcd.server.token $(uuidgen)
 Write_Sls_File etcd.server.members[0].host ${DEFAULT_LOCAL_IP}
 Write_Sls_File etcd.server.members[0].name ${MASTER_HOSTNAME}
 
+Write_Sls_File etcd-endpoints ${DEFAULT_LOCAL_IP}
+
 }
 
 

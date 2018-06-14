@@ -85,10 +85,28 @@
 
 {% if "manage" in grains['id'] %}
 {% if pillar.domain is defined %}
-compose_file:
+compose_base_file:
   file.managed:
-     - source: salt://misc/files/docker-compose.yaml
-     - name: {{ pillar['rbd-path'] }}/docker-compose.yaml
+     - source: salt://misc/files/base.yaml
+     - name: {{ pillar['rbd-path'] }}/compose/base.yaml
+     - makedirs: True
+     - template: jinja
+compose_lb_file:
+  file.managed:
+     - source: salt://misc/files/lb.yaml
+     - name: {{ pillar['rbd-path'] }}/compose/lb.yaml
+     - makedirs: True
+     - template: jinja
+compose_ui_file:
+  file.managed:
+     - source: salt://misc/files/ui.yaml
+     - name: {{ pillar['rbd-path'] }}/compose/ui.yaml
+     - makedirs: True
+     - template: jinja
+compose_plugin_file:
+  file.managed:
+     - source: salt://misc/files/plugin.yaml
+     - name: {{ pillar['rbd-path'] }}/compose/plugin.yaml
      - makedirs: True
      - template: jinja
 {% endif %}

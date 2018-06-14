@@ -24,6 +24,8 @@ dns:
   master: 114.114.114.114
   slave: 1.2.4.8
 
+etcd-endpoints: http://127.0.0.1:2379
+
 rbd-pkgs:
   manage:
     - gr-docker-engine
