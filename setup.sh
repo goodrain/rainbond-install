@@ -55,7 +55,7 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
-      if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
+      if $( grep 'install-type: online' /srv/pillar/${MAIN_CONFIG} >/dev/null );then
         REG_Status || return 0
       fi
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
@@ -83,7 +83,7 @@ case $1 in
     ;;
     install)
         #do not check the internet when install offline
-        if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
+        if $( grep 'install-type: online' rainbond.yaml.default >/dev/null );then
         check_func && init_config && install_func ${@:2}
         else
         init_config && install_func
