@@ -76,6 +76,7 @@ update_data(){
     # manage01
     [ -f "/tmp/mnode" ] && rm -rf /tmp/mnode
     [ -f "/tmp/minfo" ] && rm -rf /tmp/minfo
+    [ -f "/tmp/mip" ] && rm -rf /tmp/mip
     cat /etc/salt/roster | grep manage | awk -F: '{print $1}' > /tmp/mnode
 
     yq r /srv/pillar/rainbond.sls etcd.server > /tmp/etcd.sls
@@ -124,7 +125,7 @@ EOF
         fi
     done
     yq w -i /srv/pillar/rainbond.sls  etcd-endpoints $ETCD_ENDPOINT
-    
+
 }
 install(){
     fail_num=0

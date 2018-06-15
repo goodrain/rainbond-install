@@ -14,9 +14,12 @@
 #======================================================================================================================
 [[ $DEBUG ]] && set -x
 
-export MAIN_CONFIG="rainbond.yaml"
+export MAIN_CONFIG="/srv/pillar/rainbond.sls"
 
-[ ! -f $MAIN_CONFIG ] && cp ${MAIN_CONFIG}.default ${MAIN_CONFIG}
+[ ! -d "/srv/pillar/" ] && (
+    mkdir -p /srv/pillar/
+    cp rainbond.yaml.default ${MAIN_CONFIG}
+)
 
 . scripts/common.sh
 
