@@ -130,17 +130,28 @@ EOF
 install(){
     fail_num=0
     Echo_Info "will install manage node."
+    minion_status=1
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
-        for module in ${MANAGE_MODULES}
-        do
-            Echo_Info "Start install $module ..."
-            
-            if ! (salt $1 state.sls $module);then
-                ((fail_num+=1))
-                break
-            fi
+        Echo_Info "Waiting to start $1 salt-minion."
+        for ((i=1;i<=20;i++ )); do
+            echo -e -n "."
+            sleep 1
+            uuid=$(timeout 3 salt $1 grains.get uuid | grep '-' | awk '{print $1}')
+            [ ! -z $uuid ] && minion_status=0 && break
         done
+        if [ "$minion_status" == 0 ];then
+            for module in ${MANAGE_MODULES}
+            do
+                Echo_Info "Start install $module ..."
+                
+                if ! (salt $1 state.sls $module);then
+                    ((fail_num+=1))
+                    break
+                fi
+            done
+        fi
+
     else
         salt-ssh -i -E "manage" state.sls salt.install
         for module in ${MANAGE_MODULES}
@@ -153,10 +164,10 @@ install(){
             fi
         done
     fi
-      sleep 12
-      Echo_Info "waiting for salt-minions start"
     if [ "$fail_num" -eq 0 ];then
         Echo_Info "install manage node successfully"
+    else
+        Echo_Error "reinstall manage node"
     fi
 }
 
