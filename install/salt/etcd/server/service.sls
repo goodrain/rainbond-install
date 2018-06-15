@@ -47,6 +47,12 @@ etcd-script:
     - user: root
     - group: root
 
+{% if grains['id']!= "manage01" %}
+etcd-add-cluster:
+  cmd.run:
+    - name: curl http://{{ pillar['master-private-ip'] }}:2379/v2/members -XPOST -H "Content-Type: application/json" -d '{"peerURLs": ["http://{{ grains['fqdn_ip4'][0] }}:2380"]}'
+{% endif %}
+
 etcd:
   service.running:
     - enable: True
@@ -60,6 +66,5 @@ etcd:
       - file: etcd-env
       - cmd: pull-etcd-image
   
-
 {% endif %}
 
