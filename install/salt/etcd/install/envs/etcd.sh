@@ -1,1 +1,1 @@
-LOCAL_IP={{ pillar['master-private-ip'] }}
+LOCAL_IP={{ grains['fqdn_ip4'][0] }}
