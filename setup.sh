@@ -55,7 +55,7 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
-      if $( grep 'install-type: online' /srv/pillar/${MAIN_CONFIG} >/dev/null );then
+      if $( grep 'install-type: online' /srv/pillar/rainbond.sls >/dev/null );then
         REG_Status || return 0
       fi
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
