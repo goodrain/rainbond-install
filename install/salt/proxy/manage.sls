@@ -88,14 +88,14 @@ adapter-pull-image:
 
 adapter-tag:
   cmd.run:
-    - name: docker tag {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }} {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ ADAPTERIMG }}:{{ ADAPTERVER }} {{PRIDOMAIN}}/{{ADAPTERIMG}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{ADAPTERIMG}}
     - require:
         - cmd: adapter-pull-image
 
 adapter-push-image:    
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }}
+    - name: docker push {{PRIDOMAIN}}/{{ADAPTERIMG}}
     - require:
         - cmd: adapter-tag
 

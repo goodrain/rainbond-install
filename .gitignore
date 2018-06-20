@@ -1,8 +1,8 @@
 # offline directory
-install/imgs/*.gz
-install/pkgs/*.repo
-install/pkgs/repodata
+install/imgs/*
+install/pkgs/*
 tools
 .initialized
 LOCAL_IP
 rainbond.yaml
+

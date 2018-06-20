@@ -11,7 +11,7 @@ compute-runner-pull-image:
 {% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
 compute-adapter-pull-image:
   cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ADAPTERVER}}
+    - name: docker pull {{PRIDOMAIN}}/{{ADAPTERIMG}}
 
 {% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
 {% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
