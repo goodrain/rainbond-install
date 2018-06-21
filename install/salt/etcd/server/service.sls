@@ -48,9 +48,20 @@ etcd-script:
     - group: root
 
 {% if grains['id']!= "manage01" %}
+
+add-cluster-script:
+  file.managed:
+    - source: salt://etcd/install/scripts/add-cluster.sh
+    - name: /tmp/add-cluster.sh
+    - makedirs: True
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+
 etcd-add-cluster:
   cmd.run:
-    - name: curl http://{{ pillar['master-private-ip'] }}:2379/v2/members -XPOST -H "Content-Type: application/json" -d '{"peerURLs": ["http://{{ grains['fqdn_ip4'][0] }}:2380"]}'
+    - name: bash /tmp/add-cluster.sh
 {% endif %}
 
 etcd:
