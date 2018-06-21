@@ -38,6 +38,17 @@
     - user: root
     - group: root
     - unless: test -f /usr/local/bin/kubectl
+
+kube-ssl-rsync:
+  file.recurse:
+    - source: salt://kubernetes/server/install/ssl
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
+
+kube-cfg-rsync:
+  file.recurse:
+    - source: salt://kubernetes/server/install/kubecfg
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
+
 {% if grains['id'] == "manage01"  %}
 /usr/local/bin/domain-cli:
   file.managed:

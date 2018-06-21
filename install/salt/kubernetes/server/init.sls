@@ -93,11 +93,6 @@ k8s-conf:
     - user: root
     - group: root
 
-kube-ssl-rsync:
-  file.recurse:
-    - source: salt://kubernetes/server/install/ssl
-    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
-
 kube-cfg-rsync-grdata:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
@@ -109,12 +104,6 @@ kube-ssl-rsync-grdata:
     - source: salt://kubernetes/server/install/ssl
     - name: /grdata/services/k8s/ssl
     - makedirs: True
-
-
-kube-cfg-rsync:
-  file.recurse:
-    - source: salt://kubernetes/server/install/kubecfg
-    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
 
 kube-apiserver:
   service.running:
