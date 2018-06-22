@@ -13,7 +13,7 @@
 # Return   : (0|!0)
 Check_Internet(){
   check_url=$1
-  curl -s --connect-timeout 3 $check_url -o /dev/null 2>/dev/null
+  curl -s --connect-timeout 15 $check_url -o /dev/null 2>/dev/null
   if [ $? -eq 0 ];then
     return 0
   else
