@@ -64,7 +64,13 @@ install_func(){
             grctl node up $uuid
         fi
         Echo_Info "install successfully"
-        grctl show
+        public_ip=$(yq r /srv/pillar/rainbond.sls master-public-ip)
+        private_ip=$(yq r /srv/pillar/rainbond.sls master-private-ip)
+        if [ ! -z "$public_ip" ];then
+            Echo_Banner "http://${public_ip}:7070"
+        else
+            Echo_Banner "http://${private_ip}:7070"
+        fi
     fi
 }
 
