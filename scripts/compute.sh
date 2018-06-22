@@ -60,8 +60,11 @@ EOF
         else
             Echo_EXIST $2["$3"]
         fi
-            
         salt-ssh -i $2 state.sls init.compute
+        sleep 12
+        Echo_Info "waiting for salt-minions start"
+        uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+        bash scripts/node_update_hosts.sh $uuid $3 add
     elif [ "$1" = "multi" ];then
         if [ "$#" -ne 3 ];then
             Echo_Error "need 3 args\n like: [$PWD] ./scripts/compute.sh init multi <ip.txt path> <passwd>"
@@ -83,6 +86,7 @@ install_compute_func(){
     Echo_Info "will install compute node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
+
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module ..."
@@ -92,6 +96,7 @@ install_compute_func(){
                 break
             fi
         done
+        
     else
         salt-ssh -i -E "compute" state.sls salt.install
         for module in ${COMPUTE_MODULES}
@@ -104,11 +109,7 @@ install_compute_func(){
             fi
         done
     fi
-      sleep 12
-      Echo_Info "waiting for salt-minions start"
     
-    
-
     if [ "$fail_num" -eq 0 ];then
         Echo_Info "install compute node successfully"
     fi
