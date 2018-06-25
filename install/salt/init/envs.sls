@@ -45,3 +45,26 @@ kubelet-env:
     - mode: 644
     - user: root
     - group: root
+
+getip:
+  file.managed:
+    - source: salt://init/files/bin/myip
+    - name: {{ pillar['rbd-path'] }}/envs/.myip
+    - makedirs: True
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+
+{% if grains['id'] == "manage01" %}
+add_getip_modules:
+  file.managed:
+    - source: salt://init/files/getip.py
+    - name: /srv/salt/_modules/getip.py
+    - makedirs: True
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+{% endif %}
+

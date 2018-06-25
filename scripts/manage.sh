@@ -141,7 +141,10 @@ EOF
 }
 install(){
     fail_num=0
+    Echo_Info "update salt modules"
+    salt "*" saltutil.sync_modules
     Echo_Info "will install manage node."
+
     minion_status=1
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
