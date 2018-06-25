@@ -78,7 +78,7 @@ update_data(){
     [ -f "/tmp/minfo" ] && rm -rf /tmp/minfo
     [ -f "/tmp/mip" ] && rm -rf /tmp/mip
     cat /etc/salt/roster | grep manage | awk -F: '{print $1}' > /tmp/mnode
-    yq r /srv/pillar/rainbond.sls etcd.server > /tmp/etcd-proxy.sls
+    yq r /srv/pillar/rainbond.sls etcd.proxy > /tmp/etcd-proxy.sls
     cat > /tmp/petcd.sls <<EOF
 etcd:
   proxy:
@@ -118,9 +118,9 @@ EOF
       port: 2379
 EOF
     done
+    yq m /tmp/petcd.sls /tmp/detcd.sls > /tmp/all.sls
+    yq w -i -s /tmp/all.sls /srv/pillar/rainbond.sls 
 
-    yq w -i -s /tmp/detcd.sls /srv/pillar/rainbond.sls 
-    yq w -i -s /tmp/petcd.sls /srv/pillar/rainbond.sls 
 
     cat /tmp/mnode | while read line
     do
