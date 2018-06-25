@@ -1,3 +1,10 @@
+{% set mirrors = salt['pillar.get']('docker:registry-mirrors', default='https://registry.docker-cn.com') %}
+{% if mirrors %}
 {
-    "registry-mirrors": [ {{ pillar.docker.get('registry-mirrors', "https: //registry.docker-cn.com") }}]
+    "registry-mirrors": ["{{ mirrors }}"]
 }
+{% else %}
+{
+    "registry-mirrors": ["https://registry.docker-cn.com"]
+}
+{% endif %}
