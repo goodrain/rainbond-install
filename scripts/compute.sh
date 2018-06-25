@@ -111,6 +111,7 @@ install_compute_func(){
     fi
     
     if [ "$fail_num" -eq 0 ];then
+        dc-compose restart rbd-webcli
         Echo_Info "install compute node successfully"
     fi
 }
