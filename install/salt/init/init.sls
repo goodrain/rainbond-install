@@ -10,6 +10,7 @@ include:
   - init.gr_bin
   - init.dns
   - init.pkg
+  - init.envs
 {% if grains['id'] == "manage01" %}
   - init.domain
 {% endif %} 
@@ -23,4 +24,5 @@ include:
   - init.gr_bin
   - init.dns
   - init.pkg
+  - init.envs
 {% endif %}

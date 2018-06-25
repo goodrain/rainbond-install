@@ -19,16 +19,6 @@ etcd-tag:
     - unless: docker inspect {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
     - require:
       - cmd: pull-etcd-image
-  
-etcd-env:
-  file.managed:
-    - source: salt://etcd/install/envs/etcd.sh
-    - name: {{ pillar['rbd-path'] }}/envs/etcd.sh
-    - template: jinja
-    - makedirs: True
-    - mode: 644
-    - user: root
-    - group: root
 
 etcd-script:
   file.managed:
@@ -69,12 +59,10 @@ etcd:
     - enable: True
     - watch:
       - file: etcd-script
-      - file: etcd-env
       - cmd: pull-etcd-image
     - require:
       - file: /etc/systemd/system/etcd.service
       - file: etcd-script
-      - file: etcd-env
       - cmd: pull-etcd-image
   
 {% endif %}
