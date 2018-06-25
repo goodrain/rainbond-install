@@ -47,7 +47,7 @@ install_func(){
   
     for module in ${MANAGE_MODULES}
     do
-        echo "Start install $module ..."
+        Echo_Info "Start install $module ..."
         if ! (salt "*" state.sls $module);then
             ((fail_num+=1))
             break
