@@ -144,7 +144,7 @@ case $1 in
         install_compute_func $2 
     ;;
     offline)
-        init_func ${@:2} && install_compute_func ${@:2}
+        init_func ${@:2} && install_compute_func $3
     ;;
     *)
         help_func
