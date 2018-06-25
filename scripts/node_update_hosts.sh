@@ -19,7 +19,7 @@ function del_uid(){
 }
 
 function run(){
-    if [ $DO_TYPE = 'add' ];then
+    if [ "$DO_TYPE" = 'add' ];then
         add_uid
     else
         del_uid

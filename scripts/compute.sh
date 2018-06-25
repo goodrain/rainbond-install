@@ -54,16 +54,16 @@ $2:
   sudo: True
   port: 22
 EOF
-        fi     
-        grep "$3" /etc/hosts > /dev/null
-        [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
-        else
-            Echo_EXIST $2["$3"]
         fi
         salt-ssh -i $2 state.sls init.compute
         sleep 12
         Echo_Info "waiting for salt-minions start"
-        uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+        uuid=$(salt-ssh -i $2 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+        grep "$3" /etc/hosts > /dev/null
+        [ "$?" -ne 0 ] && echo "$3 $2 $uuid" >> /etc/hosts
+        else
+            Echo_EXIST $2["$3"]
+        fi
         bash scripts/node_update_hosts.sh $uuid $3 add
     elif [ "$1" = "multi" ];then
         if [ "$#" -ne 3 ];then
