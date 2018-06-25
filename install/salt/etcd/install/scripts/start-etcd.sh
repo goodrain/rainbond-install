@@ -1,7 +1,11 @@
 #!/bin/sh
 LOCAL_NODE={{ grains['nodename'] }}
 
+{% if grains['id'] == "manage01" %}
 INITIAL_CLUSTER_STATE=""
+{% else %}
+INITIAL_CLUSTER_STATE="existing"
+{% endif %}
 
 if [ -z $LOCAL_IP ];then
 	echo "find ip address failed" > /dev/stderr

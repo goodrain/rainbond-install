@@ -47,7 +47,7 @@ etcd-script:
     - user: root
     - group: root
 
-{% if grains['id']!= "manage01" %}
+{% if grains['id'] != "manage01" %}
 
 add-cluster-script:
   file.managed:
