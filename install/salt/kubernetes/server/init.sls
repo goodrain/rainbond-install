@@ -110,14 +110,10 @@ kube-apiserver:
     - enable: True
     - watch:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-api-script
       - cmd: pull_api_image
     - require:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-api-script
       - cmd: pull_api_image
 
@@ -126,14 +122,10 @@ kube-controller-manager:
     - enable: True
     - watch:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-manager-script
       - cmd: pull_manager_image
     - require:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-manager-script
       - cmd: pull_manager_image
 
@@ -143,14 +135,10 @@ kube-scheduler:
     - enable: True
     - watch:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-scheduler-script
       - cmd: pull_schedule_image
     - require:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-scheduler-script
       - cmd: pull_schedule_image
 
