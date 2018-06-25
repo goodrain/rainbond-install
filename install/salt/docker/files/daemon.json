@@ -1,13 +1,3 @@
-{% if pillar.get('registry-mirrors') %}
 {
-    "registry-mirrors": [
-        "{{ pillar.get('registry-mirrors') }}"
-    ]
+    "registry-mirrors": [ {{ pillar.docker.get('registry-mirrors', "https: //registry.docker-cn.com") }}]
 }
-{% else %}
-{
-    "registry-mirrors": [
-        "https://registry.docker-cn.com"
-    ]
-}
-{% endif %}
