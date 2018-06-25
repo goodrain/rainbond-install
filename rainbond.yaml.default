@@ -18,7 +18,7 @@ reg-uuid:
 secretkey: 
 docker:
   version: 1.12.6,fbecf51
-  registry-mirrors: "https://registry.docker-cn.com"
+  registry-mirrors: "https://docker.mirrors.ustc.edu.cn/"
 
 dns:
   current: 
