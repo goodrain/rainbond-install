@@ -127,6 +127,7 @@ EOF
         yq r /etc/salt/roster $line.host | awk '{print $1}' >> /tmp/mip
     done
     ETCD_ENDPOINT=""
+    LB_ENDPOINT=""
     for node in $(cat /tmp/mip | sort -u)
     do 
         member="http://$node:2379"
@@ -135,9 +136,15 @@ EOF
         else
             ETCD_ENDPOINT="$ETCD_ENDPOINT,$member"
         fi
+        lb="http://$node:10002"
+        if [ -z "$LB_ENDPOINT" ];then
+        LB_ENDPOINT="$lb"
+        else
+            LB_ENDPOINT="$LB_ENDPOINT-$lb"
+        fi
     done
     yq w -i /srv/pillar/rainbond.sls  etcd-endpoints $ETCD_ENDPOINT
-
+    yq w -i /srv/pillar/rainbond.sls  lb-endpoints $LB_ENDPOINT
 }
 install(){
     fail_num=0

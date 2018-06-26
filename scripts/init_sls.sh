@@ -101,6 +101,12 @@ Write_Sls_File etcd-endpoints "http://${DEFAULT_LOCAL_IP}:2379"
 
 }
 
+# -----------------------------------------------------------------------------
+# init etcd configure
+entrance(){
+  Write_Sls_File lb-endpoints "http://${DEFAULT_LOCAL_IP}:10002"
+}
+
 
 # -----------------------------------------------------------------------------
 # init network-calico configure
@@ -137,6 +143,7 @@ run(){
     db_init
     etcd
     calico
+    entrance
     write_top
 }
 

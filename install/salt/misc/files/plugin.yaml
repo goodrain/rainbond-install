@@ -18,7 +18,7 @@ services:
     - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     command:
     - --plugin-name=openresty
-    - --plugin-opts=urls=http://127.0.0.1:10002
+    - --plugin-opts=urls={{ pillar['lb-endpoints'] }}
     - --kube-conf=/etc/goodrain/kubernetes/admin.kubeconfig
     - --log-level=info
     - --etcd-endpoints={{ pillar['etcd-endpoints'] }}

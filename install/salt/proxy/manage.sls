@@ -1,11 +1,23 @@
-{% if grains['id'] == "manage01" %}
 {% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
 {% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
 {% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
 {% set MESHTAG_META = salt['pillar.get']('plugins:mesh:metatag') -%}
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+{% set RUNNERIMG = salt['pillar.get']('proxy:runner:image') -%}
+{% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
+{% set ADAPTERIMG = salt['pillar.get']('proxy:adapter:image') -%}
+{% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
+{% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
+{% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
+{% set BUILDERIMG = salt['pillar.get']('proxy:builder:image') -%}
+{% set BUILDERVER = salt['pillar.get']('proxy:builder:version') -%}
+{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
+{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
+{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
 
+{% if grains['id'] == "manage01" %}
 pull-plugin-tcm:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
@@ -21,7 +33,6 @@ retag-plugin-tcm:
     - unless: docker inspect {{ PRIDOMAIN }}/{{TCMTAG}}
     - require:
         - cmd: pull-plugin-tcm
-
 
 push-plugin-tcm:
   cmd.run:
@@ -51,8 +62,6 @@ push-plugin-mesh:
     - require:
         - cmd: retag-plugin-mesh
 
-{% set RUNNERIMG = salt['pillar.get']('proxy:runner:image') -%}
-{% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
 runner-pull-image:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
@@ -75,8 +84,6 @@ runner-push-image:
     - require:
         - cmd: runner-tag
 
-{% set ADAPTERIMG = salt['pillar.get']('proxy:adapter:image') -%}
-{% set ADAPTERVER = salt['pillar.get']('proxy:adapter:version') -%}
 adapter-pull-image:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
@@ -99,8 +106,7 @@ adapter-push-image:
     - require:
         - cmd: adapter-tag
 
-{% set PAUSEIMG = salt['pillar.get']('proxy:pause:image') -%}
-{% set PAUSEVER = salt['pillar.get']('proxy:pause:version') -%}
+
 pause-pull-image:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
@@ -123,8 +129,6 @@ pause-push-image:
     - require:
         - cmd: pause-tag
 
-{% set BUILDERIMG = salt['pillar.get']('proxy:builder:image') -%}
-{% set BUILDERVER = salt['pillar.get']('proxy:builder:version') -%}
 builder-pull-image:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
@@ -147,14 +151,11 @@ builder-push-image:
     - require:
         - cmd: builder-tag
 #push etcd & calico image to goodrain.me
-{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
-{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
+
 push-etcd-image:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
 
-{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
-{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
 push-calico-image:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
@@ -166,4 +167,8 @@ builder-mpull-image:
 pause-mpull-image:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{PAUSEVER}}
+{% else %}
+runner-pull-image:
+  cmd.run:
+    - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
 {% endif %}

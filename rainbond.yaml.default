@@ -25,7 +25,8 @@ dns:
   master: 114.114.114.114
   slave: 1.2.4.8
 
-etcd-endpoints: 
+etcd-endpoints:
+lb-endpoints: 
 
 rbd-pkgs:
   manage:
