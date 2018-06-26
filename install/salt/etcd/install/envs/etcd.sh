@@ -1,1 +1,1 @@
-LOCAL_IP={{ grains['mip'] }}
+LOCAL_IP={{ grains['mip'][0] }}
