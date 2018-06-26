@@ -56,8 +56,7 @@ $2:
 EOF
         fi
         salt-ssh -i $2 state.sls init.init_node
-        sleep 12
-        Echo_Info "waiting for salt-minions start"
+
         uuid=$(salt-ssh -i $2 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
         grep "$3" /etc/hosts > /dev/null
         [ "$?" -ne 0 ] && echo "$3 $2 $uuid" >> /etc/hosts
@@ -84,7 +83,8 @@ install_compute_func(){
     Echo_Info "will install compute node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
-
+        sleep 12
+        Echo_Info "waiting for salt-minions start"
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module ..."
@@ -97,6 +97,8 @@ install_compute_func(){
         
     else
         salt-ssh -i -E "compute" state.sls salt.install
+        sleep 12
+        Echo_Info "waiting for salt-minions start"
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module ..."
