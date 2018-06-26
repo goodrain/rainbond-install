@@ -10,6 +10,7 @@ install-type: online
 master-hostname: manage01
 master-private-ip: 
 master-public-ip: 
+vip: 
 domain: 
 install-script-path: 
 public-image-domain: rainbond
@@ -18,11 +19,15 @@ reg-uuid:
 secretkey: 
 docker:
   version: 1.12.6,fbecf51
+  registry-mirrors: "https://docker.mirrors.ustc.edu.cn/"
 
 dns:
   current: 
   master: 114.114.114.114
   slave: 1.2.4.8
+
+etcd-endpoints:
+lb-endpoints: 
 
 rbd-pkgs:
   manage:
@@ -136,7 +141,7 @@ proxy:
     version: latest
   adapter:
     image: adapter
-    version: latest
+    version: 3.6
   pause:
     image: pause-amd64
     version: '3.0'

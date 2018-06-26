@@ -8,7 +8,7 @@ YQBIN="./scripts/yq"
 MAIN_SLS="/srv/pillar/rainbond.sls"
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_PKGS="salt-ssh"
-MAIN_CONFIG="rainbond.yaml"
+MAIN_CONFIG="/srv/pillar/rainbond.sls"
 RAINBOND_HOMEPAGE="https://www.rainbond.com"
 PILLAR_DIR="./install/pillar"
 DOMAIN_API="http://domain.grapps.cn"
@@ -43,14 +43,7 @@ SYS_COMMON_PKGS=( tar \
 ntpdate \
 wget \
 curl \
-tree \
-lsof \
-htop \
-nload \
 net-tools \
-telnet \
-rsync \
-lvm2 \
 pwgen \
 git )
 
@@ -75,7 +68,6 @@ if [ "$SYS_NAME" == "centos" ];then
     SYS_BASE_PKGS=( perl \
     bind-utils \
     dstat iproute \
-  #  epel-release \
     bash-completion )
 
   #judgment below uses for offline env : do not install salt through internet ( changed by guox 2018.5.18 ).
@@ -105,7 +97,7 @@ else
     dnsutils \
     python-pip \
     apt-transport-https )
-    curl https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
+    curl http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
     # debian salt repo
     cat > /etc/apt/sources.list.d/salt.list << END
 deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main

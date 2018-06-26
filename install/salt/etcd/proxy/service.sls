@@ -8,16 +8,6 @@ pull-etcd-proxy-image:
     - name: docker pull {{PRIDOMAIN}}/{{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
     - unless: docker inspect {{PRIDOMAIN}}/{{ ETCDPROXYIMG }}:{{ ETCDPROXYVER }}
 
-etcd-proxy-env:
-  file.managed:
-    - source: salt://etcd/install/envs/etcd-proxy.sh
-    - name: {{ pillar['rbd-path'] }}/envs/etcd-proxy.sh
-    - template: jinja
-    - makedirs: True
-    - mode: 644
-    - user: root
-    - group: root
-
 etcd-proxy-script:
   file.managed:
     - source: salt://etcd/install/scripts/start-etcdproxy.sh
@@ -40,12 +30,10 @@ etcd-proxy:
     - enable: True
     - watch:
       - file: etcd-proxy-script
-      - file: etcd-proxy-env
       - cmd: pull-etcd-proxy-image
     - require:
       - file: /etc/systemd/system/etcd-proxy.service
       - file: etcd-proxy-script
-      - file: etcd-proxy-env
       - cmd: pull-etcd-proxy-image
 
 {% endif %}

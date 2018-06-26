@@ -1,4 +1,4 @@
 include:
-{% if grains['id'] == 'manage01' %}
+{% if "manage" in grains['id'] %}
 - prometheus.prom
 {% endif %}

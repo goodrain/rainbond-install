@@ -13,16 +13,6 @@ kubelet-script:
     - user: root
     - group: root
 
-kubelet-env:
-  file.managed:
-    - source: salt://kubernetes/node/install/envs/kubelet.sh
-    - name: {{ pillar['rbd-path'] }}/envs/kubelet.sh
-    - makedirs: True
-    - template: jinja
-    - mode: 755
-    - user: root
-    - group: root
-
 k8s-custom-conf:
   file.managed:
     - source: salt://kubernetes/node/install/custom.conf
@@ -94,7 +84,6 @@ kubelet:
   service.running:
     - enable: True
     - watch:
-      - file: kubelet-env
       - file: k8s-custom-conf
       - file: kubelet-cni
       - file: kubelet-ssl-rsync
@@ -104,7 +93,6 @@ kubelet:
       - cmd: rename-pause-img
 {% endif %}
     - require:
-      - file: kubelet-env
       - file: k8s-custom-conf
       - file: kubelet-cni
       - file: kubelet-ssl-rsync

@@ -89,9 +89,33 @@ salt-minion-conf:
     - require:
       - pkg: salt-minion-install
 
+salt-minion-exconf:
+  file.managed:
+    - name: /etc/salt/minion.d/minion.ex.conf
+    - source: salt://salt/install/conf/core.conf
+    - user: root
+    - group: root
+    - mode: 644
+    - template: jinja
+
 minion_service:
   service.running:
     - name: salt-minion
     - enable: True
     - require:
       - file: salt-minion-conf
+      - file: salt-minion-exconf
+
+{% if grains['os_family']|lower == 'debian' %}
+
+salt-master-restart:
+  cmd.run:
+    - name: systemctl restart salt-master.service
+
+salt-minion-restart:
+  cmd.run:
+    - name: systemctl restart salt-minion.service
+    - require:
+      - cmd: salt-master-restart
+
+{% endif %}

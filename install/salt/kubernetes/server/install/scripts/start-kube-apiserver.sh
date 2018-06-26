@@ -2,7 +2,7 @@
 KUBE_APISERVER_OPTS="--insecure-bind-address=127.0.0.1 \
 --insecure-port=8181 \
 --advertise-address=0.0.0.0 --bind-address=0.0.0.0 \
---etcd-servers=http://${ETCD_ADDRESS:-127.0.0.1:2379} \
+--etcd-servers=${ETCD_ADDRESS:-http://127.0.0.1:2379} \
 --admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota \
 --authorization-mode=RBAC \
 --runtime-config=rbac.authorization.k8s.io/v1beta1 \

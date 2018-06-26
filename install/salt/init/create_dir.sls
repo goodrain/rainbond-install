@@ -28,6 +28,12 @@ scripts-dir:
     - name: {{ DIR }}/scripts
     - makedirs: True
 
+#=========================== rainbond/compose directory ===========================
+compose-dir:
+  file.directory:
+    - name: {{ DIR }}/compose
+    - makedirs: True
+
 #=========================== rainbond/envs directory ===========================
 env-dir:
   file.directory:
@@ -59,6 +65,11 @@ etc-db-dir:
 etc-prometheus-dir:
   file.directory:
     - name: {{ DIR }}/etc/prometheus
+    - makedirs: True
+
+etc-api-dir:
+  file.directory:
+    - name: {{ DIR }}/etc/rbd-api
     - makedirs: True
 
 #=========================== rainbond/data directory ===========================
@@ -102,3 +113,10 @@ logs-eventlog-dir:
   file.directory:
     - name: {{ DIR }}/logs/rbd-eventlog
     - makedirs: True
+
+{% if grains['os_family']|lower == 'debian' %}
+rdma-kubepod-dir:
+  file.directory:
+    - name: /sys/fs/cgroup/rdma/kubepods
+    - makedirs: True
+{% endif %}

@@ -29,6 +29,7 @@ Init_system(){
   LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   Write_Sls_File master-private-ip $DEFAULT_LOCAL_IP
+  Write_Sls_File vip $DEFAULT_LOCAL_IP
   Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
 
   # configure hostname and hosts
@@ -97,6 +98,14 @@ Write_Sls_File etcd.server.token $(uuidgen)
 Write_Sls_File etcd.server.members[0].host ${DEFAULT_LOCAL_IP}
 Write_Sls_File etcd.server.members[0].name ${MASTER_HOSTNAME}
 
+Write_Sls_File etcd-endpoints "http://${DEFAULT_LOCAL_IP}:2379"
+
+}
+
+# -----------------------------------------------------------------------------
+# init etcd configure
+entrance(){
+  Write_Sls_File lb-endpoints "http://${DEFAULT_LOCAL_IP}:10002"
 }
 
 
@@ -135,6 +144,7 @@ run(){
     db_init
     etcd
     calico
+    entrance
     write_top
 }
 
@@ -185,12 +195,9 @@ EOF
   )
 
   [ -d /srv/salt ] && rm -rf /srv/salt
-  [ -d /srv/pillar ] && rm -rf /srv/pillar/* || (
-    mkdir -p /srv/pillar
-  )
+  
   cp -rp $PWD/install/salt /srv/
   
-  cp -rp $PWD/rainbond.yaml /srv/pillar/rainbond.sls
   cp -rp $PWD/install/pillar/top.sls /srv/pillar/top.sls
 
   Echo_Info "Salt-ssh test."

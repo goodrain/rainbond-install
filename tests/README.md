@@ -45,3 +45,8 @@ cd rainbond-install
 
 ./scripts/compute.sh install
 ```
+### Manage
+
+```
+git clone --depth 1 -b manage https://github.com/goodrain/rainbond-install.git
+```
