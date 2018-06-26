@@ -113,3 +113,10 @@ logs-eventlog-dir:
   file.directory:
     - name: {{ DIR }}/logs/rbd-eventlog
     - makedirs: True
+
+{% if grains['os_family']|lower == 'debian' %}
+rdma-kubepod-dir:
+  file.directory:
+    - name: /sys/fs/cgroup/rdma/kubepods
+    - makedirs: True
+{% endif %}
