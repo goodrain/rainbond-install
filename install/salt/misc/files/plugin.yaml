@@ -84,7 +84,7 @@ services:
     volumes:
     - /usr/local/bin/kubectl:/usr/bin/kubectl
     - /root/.kube:/root/.kube
-    command: --hostIP={{ pillar['mip'] }} --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    command: --hostIP={{ grains['mip'] }} --etcd-endpoints={{ pillar['etcd-endpoints'] }}
     logging:
       driver: json-file
       options:
@@ -118,7 +118,7 @@ services:
     - {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
     command:
     - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
-    - --advertise-addr={{ pillar['mip'] }}:9999 
+    - --advertise-addr={{ grains['mip'] }}:9999 
     - --web.listen-address=0.0.0.0:9999
     - --config.file=/etc/prometheus/prometheus.yml 
     - --storage.tsdb.path=/prometheusdata 
@@ -143,12 +143,12 @@ services:
     - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     - /grdata/downloads/log:/grdata/logs
     command:
-    - --cluster.bind.ip={{ pillar['mip'] }}
+    - --cluster.bind.ip={{ grains['mip'] }}
     - --db.type=mysql
     - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
     - --discover.etcd.addr={{ pillar['etcd-endpoints'] }}
-    - --eventlog.bind.ip={{ pillar['mip'] }}
-    - --websocket.bind.ip={{ pillar['mip'] }}
+    - --eventlog.bind.ip={{ grains['mip'] }}
+    - --websocket.bind.ip={{ grains['mip'] }}
     - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
     logging:
       driver: json-file
