@@ -10,6 +10,7 @@ install-type: online
 master-hostname: manage01
 master-private-ip: 
 master-public-ip: 
+vip: 
 domain: 
 install-script-path: 
 public-image-domain: rainbond

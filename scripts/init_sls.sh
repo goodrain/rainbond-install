@@ -29,6 +29,7 @@ Init_system(){
   LOCAL_IP=$(cat ./LOCAL_IP 2> /dev/null)
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   Write_Sls_File master-private-ip $DEFAULT_LOCAL_IP
+  Write_Sls_File vip $DEFAULT_LOCAL_IP
   Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
 
   # configure hostname and hosts
