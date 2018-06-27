@@ -46,11 +46,15 @@ init_config(){
 
 install_func(){
     fail_num=0
-    Echo_Info "will install manage node."
+    Echo_Info "will install manage node.It will take 15-30 minutes to install"
   
     for module in ${MANAGE_MODULES}
     do
-        Echo_Info "Start install $module ..."
+        if [ "$module" = "plugins" -o "$module" = "proxy" ];then
+            Echo_Info "Start install $module, it will take 3-8 minutes "
+        else
+            Echo_Info "Start install $module ..."
+        fi
         if ! (salt "*" state.sls $module);then
             ((fail_num+=1))
             break

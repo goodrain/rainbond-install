@@ -68,6 +68,10 @@ rbd-app-ui-domain:
     - ip: {{ hostip }}
     - names:
       - console.goodrain.me
+
+update_compute_hosts:
+  cmd.run:
+    - name: echo "{{ grains['mip'] }} {{ grains['id'] }}" > /etc/hostname
 {% endif %}
 
 # Modify /etc/resolv.conf

@@ -23,6 +23,7 @@ etcd-proxy-env:
     - mode: 644
     - user: root
     - group: root
+
 {% endif %}
 {% endif %}
 
@@ -67,4 +68,3 @@ add_getip_modules:
     - user: root
     - group: root
 {% endif %}
-
