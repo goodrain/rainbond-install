@@ -2,7 +2,7 @@
 
 # get master(manage01) ip address
 {% if "manage" in grains['id'] %}
-{% set hostip = grains['mip'] %}
+{% set hostip = grains['mip'][0] %}
 rbd-repo-domain:
   host.present:
     - ip: {{ hostip }}
@@ -37,6 +37,7 @@ rbd-app-ui-domain:
 {% else %}
 # Todo:support VIP
 {% set hostip = pillar['vip'] %}
+{% set localip = grains['mip'][0] %}
 
 rbd-repo-domain:
   host.present:
@@ -69,9 +70,20 @@ rbd-app-ui-domain:
     - names:
       - console.goodrain.me
 
-update_compute_hosts:
-  cmd.run:
-    - name: echo "{{ grains['mip'] }} {{ grains['id'] }}" > /etc/hostname
+
+hostname-domain:
+  host.present:
+    - ip: {{ localip }}
+    - names:
+      - {{ grains['id'] }}
+
+uuid-domain:
+  host.present:
+    - ip: {{ localip }}
+    - names:
+      - {{ grains['uuid'] }}
+
+
 {% endif %}
 
 # Modify /etc/resolv.conf
