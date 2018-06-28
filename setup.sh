@@ -59,6 +59,7 @@ install_func(){
             ((fail_num+=1))
             break
         fi
+        sleep 2
     done
 
     if [ "$fail_num" -eq 0 ];then
