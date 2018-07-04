@@ -79,9 +79,11 @@ install_func(){
         private_ip=$(yq r /srv/pillar/rainbond.sls master-private-ip)
         
         if [ ! -z "$public_ip" ];then
-            Echo_Banner "http://${public_ip}:7070/#/user/register"
+            Echo_Info "Please visit: http://${public_ip}:7070/#/user/register"
+            Echo_Banner "http://${public_ip}:7070"
         else
-            Echo_Banner "http://${private_ip}:7070/#/user/register"
+            Echo_Info "Please visit: http://${private_ip}:7070/#/user/register"
+            Echo_Banner "http://${private_ip}:7070"
         fi
     fi
 }
