@@ -80,6 +80,8 @@ check_func(){
 
 install_compute_func(){
     fail_num=0
+    step_num=1
+    all_steps=$(echo ${COMPUTE_MODULES} | tr ' ' '\n' | wc -l)
     Echo_Info "will install compute node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
@@ -87,12 +89,13 @@ install_compute_func(){
         Echo_Info "waiting to start salt-minions "
         for module in ${COMPUTE_MODULES}
         do
-            Echo_Info "Start install $module ..."
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
             
             if ! (salt $1 state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
+            (($step_num++))
         done
         
     else
