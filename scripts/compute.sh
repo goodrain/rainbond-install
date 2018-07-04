@@ -84,7 +84,7 @@ install_compute_func(){
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
         sleep 12
-        Echo_Info "waiting for salt-minions start"
+        Echo_Info "waiting to start salt-minions "
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module ..."
@@ -98,7 +98,7 @@ install_compute_func(){
     else
         salt-ssh -i -E "compute" state.sls salt.install
         sleep 12
-        Echo_Info "waiting for salt-minions start"
+        Echo_Info "waiting to start salt-minions"
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module ..."

@@ -205,7 +205,7 @@ EOF
   salt-ssh "*" state.sls salt.setup --state-output=mixed
 
   Echo_Info "Waiting to start salt."
-  for ((i=1;i<=10;i++ )); do
+  for ((i=1;i<=60;i++ )); do
     echo -e -n "."
     sleep 1
     uuid=$(timeout 3 salt "*" grains.get uuid | grep '-' | awk '{print $1}')
