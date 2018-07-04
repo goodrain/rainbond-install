@@ -29,10 +29,10 @@ handle-urllib3:
   cmd.run:
 {% if grains['os_family']|lower == 'redhat' %}
   {% if grains['id']!="manage01" %}
-    - name: pip uninstall urllib3 -y  > /dev/null 2>&1
+    - name: pip uninstall urllib3 > /dev/null 2>&1
   {% endif %}
 {% else %}
-    - name: pip install -U urllib3 -y > /dev/null 2>&1
+    - name: pip install -U urllib3 > /dev/null 2>&1
 {% endif %}
     - onlyif:
       #- which pip > /dev/null 2>&1
