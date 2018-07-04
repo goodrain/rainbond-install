@@ -18,6 +18,7 @@ make_domain:
   {% else %}
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-private-ip'] }}
   {% endif %}
+{% endif %}
 
 rsync_update_domain:
   file.managed:
@@ -30,7 +31,6 @@ rsync_update_domain:
 refresh_domain:
   cmd.run:
     - name: salt "*" saltutil.refresh_pillar
-{% endif %}
 {% endif %}
 
 
