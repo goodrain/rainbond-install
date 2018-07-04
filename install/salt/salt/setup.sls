@@ -110,7 +110,7 @@ minion_service:
     - enable: True
     - require:
       - file: salt-minion-conf
-      - file: salt-minion-exconf
+      - cmd: salt-minion-exconf
 
 {% if grains['os_family']|lower == 'debian' %}
 
