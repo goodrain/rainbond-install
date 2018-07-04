@@ -51,6 +51,10 @@ install_req_pkgs:
       - nload 
       - rsync 
       - net-tools
+{% if grains['os_family']|lower == 'debian' %}
+      - python-apt
+      - python-pip
+{% endif %}
     - refresh: true
     
 {% if pillar['install-type']!="offline" %}
