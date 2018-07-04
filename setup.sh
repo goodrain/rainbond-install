@@ -53,9 +53,9 @@ install_func(){
     for module in ${MANAGE_MODULES}
     do
         if [ "$module" = "plugins" -o "$module" = "proxy" ];then
-            Echo_Info "Start install step $module($step_num/$all_steps), it will take 3-8 minutes "
+            Echo_Info "Start install $module(step: $step_num/$all_steps), it will take 3-8 minutes "
         else
-            Echo_Info "Start install step $module($step_num/$all_steps) ..."
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
         fi
         if ! (salt "*" state.sls $module);then
             ((fail_num+=1))
