@@ -65,14 +65,27 @@ salt-minion-conf:
     - require:
       - pkg: salt-minion-install
 
-salt-minion-exconf:
+#salt-minion-exconf:
+#  file.managed:
+#    - name: /etc/salt/minion.d/minion.ex.conf
+#    - source: salt://salt/install/conf/core.conf
+#    - user: root
+#    - group: root
+#    - mode: 644
+#    - template: jinja
+
+salt-minion-script:
   file.managed:
-    - name: /etc/salt/minion.d/minion.ex.conf
-    - source: salt://salt/install/conf/core.conf
+    - name: /tmp/salt-minion-install
+    - source: salt://salt/install/script/getip.sh
     - user: root
     - group: root
-    - mode: 644
+    - mode: 777
     - template: jinja
+
+salt-minion-exconf:
+  cmd.run:
+    - name: bash -x /tmp/salt-minion-install
 
 minion_service:
   service.running:
