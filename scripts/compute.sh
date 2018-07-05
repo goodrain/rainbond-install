@@ -110,7 +110,7 @@ install_compute_func(){
                 ((fail_num+=1))
                 break
             fi
-            (($step_num++))
+            ((step_num++))
         done
     fi
     
@@ -131,9 +131,7 @@ help_func(){
     Echo_Info "help"
     Echo_Info "init"
     echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
-    echo "args: multi <ip.txt path> <password/key-path>"
-    Echo_Info "check"
-    Echo_Info "install"
+    Echo_Info "install <hostname>"
     Echo_Info "offline"
     echo "args: single <hostname> <ip>  <password/key-path>"
 
