@@ -25,8 +25,9 @@ salt-repo:
       - pkg: salt-minion-install
 
 uninstall-urllib3:
-  pip.uninstall:
-    - name: urllib3
+  cmd.run:
+    - name: pip uninstall -y urllib3
+    - onlyif: pip show urllib3
 
 #install salt-minion
 salt-minion-install:
