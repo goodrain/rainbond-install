@@ -80,6 +80,8 @@ check_func(){
 
 install_compute_func(){
     fail_num=0
+    step_num=1
+    all_steps=$(echo ${COMPUTE_MODULES} | tr ' ' '\n' | wc -l)
     Echo_Info "will install compute node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
@@ -87,12 +89,13 @@ install_compute_func(){
         Echo_Info "waiting to start salt-minions "
         for module in ${COMPUTE_MODULES}
         do
-            Echo_Info "Start install $module ..."
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
             
             if ! (salt $1 state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
+            ((step_num++))
         done
         
     else
@@ -101,18 +104,26 @@ install_compute_func(){
         Echo_Info "waiting to start salt-minions"
         for module in ${COMPUTE_MODULES}
         do
-            Echo_Info "Start install $module ..."
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
             
             if ! (salt -E "compute" state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
+            ((step_num++))
         done
     fi
     
     if [ "$fail_num" -eq 0 ];then
         dc-compose restart rbd-webcli
         Echo_Info "install compute node successfully"
+        if [ ! -z "$1" ];then
+            uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+            grctl node up $uuid
+            Echo_Info "compute node($uuid) has been added to the cluster"
+        else
+            Echo_Info "you need up compute node"
+        fi
     fi
 }
 
@@ -120,9 +131,7 @@ help_func(){
     Echo_Info "help"
     Echo_Info "init"
     echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
-    echo "args: multi <ip.txt path> <password/key-path>"
-    Echo_Info "check"
-    Echo_Info "install"
+    Echo_Info "install <hostname>"
     Echo_Info "offline"
     echo "args: single <hostname> <ip>  <password/key-path>"
 
