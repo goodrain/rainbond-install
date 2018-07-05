@@ -87,4 +87,8 @@ minion_service:
       - file: salt-minion-conf
       - cmd: salt-minion-exconf
 
+salt-minion-restart:
+  cmd.run:
+    - name: systemctl restart salt-minion.service
+
 {% endif %}
