@@ -95,7 +95,7 @@ install_compute_func(){
                 ((fail_num+=1))
                 break
             fi
-            (($step_num++))
+            ((step_num++))
         done
         
     else
