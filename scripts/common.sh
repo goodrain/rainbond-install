@@ -83,7 +83,9 @@ enabled_metadata=1
 END
         # fix some mirrors closed by layer
         #curl -s -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-        #curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+        [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
+            curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+        )
     fi
 
 # debian and ubuntu
