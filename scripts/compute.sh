@@ -118,7 +118,7 @@ install_compute_func(){
         dc-compose restart rbd-webcli
         Echo_Info "install compute node successfully"
         if [ ! -z "$1" ];then
-            uuid=$(salt-ssh -i $2 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+            uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
             grctl node up $uuid
             Echo_Info "compute node($uuid) has been added to the cluster"
         else
