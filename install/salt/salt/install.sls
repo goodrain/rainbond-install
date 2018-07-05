@@ -24,15 +24,9 @@ salt-repo:
     - require_in:
       - pkg: salt-minion-install
 
-fixed-urllib3:
-  cmd.run:
-{% if grains['os_family']|lower == 'redhat' %}
-    - name: pip uninstall urllib3 > /dev/null 2>&1
-{% else %}
-    - name: pip install -U urllib3 > /dev/null 2>&1
-{% endif %}
-    - onlyif:
-      - pip show urllib3 > /dev/null 2>&1
+uninstall-urllib3:
+  pip.uninstall:
+    - name: urllib3
 
 #install salt-minion
 salt-minion-install:
@@ -42,7 +36,7 @@ salt-minion-install:
     - refresh: True
     - require:
       - pkgrepo: salt-repo
-      - cmd: fixed-urllib3
+      - cmd: uninstall-urllib3
   {% if grains['os_family']|lower == 'redhat' %}
     - unless: rpm -qa | grep salt-minion
   {% else %}
