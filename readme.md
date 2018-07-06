@@ -48,11 +48,9 @@ cd rainbond-install
 ./setup.sh
 ```
 
-You can find all the documentation in the [Wiki](https://github.com/goodrain/rainbond-install/wiki).
-
 ### Documents
 
-You can find all the documentation in the [Docs](https://www.rainbond.com/docs/stable/).
+You can find all the documentation in the [troubleshooting install](https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html)/[Docs](https://www.rainbond.com/docs/stable/).
 
 ## License
 
