@@ -86,6 +86,7 @@ install_compute_func(){
     Echo_Info "will install compute node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
+        sleep 12
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
@@ -97,6 +98,7 @@ install_compute_func(){
         done
     else
         salt-ssh -i -E "compute" state.sls salt.install
+        sleep 12
         for module in ${COMPUTE_MODULES}
         do
             Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
