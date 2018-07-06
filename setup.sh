@@ -43,15 +43,23 @@ init_config(){
 
 install_func(){
     fail_num=0
-    Echo_Info "will install manage node."
+    step_num=1
+    all_steps=$(echo ${MANAGE_MODULES} | tr ' ' '\n' | wc -l)
+    Echo_Info "will install manage node.It will take 15-30 minutes to install"
   
     for module in ${MANAGE_MODULES}
     do
-        echo "Start install $module ..."
+        if [ "$module" = "plugins" -o "$module" = "proxy" ];then
+            Echo_Info "Start install $module(step: $step_num/$all_steps), it will take 3-8 minutes "
+        else
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
+        fi
         if ! (salt "*" state.sls $module);then
             ((fail_num+=1))
             break
         fi
+        ((step_num++))
+        sleep 1
     done
 
     if [ "$fail_num" -eq 0 ];then
@@ -64,7 +72,6 @@ install_func(){
             grctl node up $uuid
         fi
         Echo_Info "install successfully"
-        grctl show
     fi
 }
 

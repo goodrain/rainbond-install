@@ -89,12 +89,27 @@ salt-minion-conf:
     - require:
       - pkg: salt-minion-install
 
+salt-minion-script:
+  file.managed:
+    - name: /tmp/salt-minion-install
+    - source: salt://salt/install/script/getip.sh
+    - user: root
+    - group: root
+    - mode: 777
+    - template: jinja
+
+salt-minion-exconf:
+  cmd.run:
+    - name: bash -x /tmp/salt-minion-install
+
+
 minion_service:
   service.running:
     - name: salt-minion
     - enable: True
     - require:
       - file: salt-minion-conf
+      - cmd: salt-minion-exconf
 
 {% if grains['os_family']|lower == 'debian' %}
 

@@ -1,4 +1,4 @@
-DEFAULT_IPV4={{ grains['fqdn_ip4'][0] }}
+DEFAULT_IPV4={{ grains['mip'][0] }}
 {% if "manage" in grains['id'] %}
 ETCD_ENDPOINTS=http://127.0.0.1:2379
 {% else %}
