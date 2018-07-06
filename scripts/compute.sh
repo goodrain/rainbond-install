@@ -54,19 +54,21 @@ $2:
   sudo: True
   port: 22
 EOF
-        fi     
+        fi
+        salt-ssh -i $2 state.sls init.init_node
+
+        uuid=$(salt-ssh -i $2 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
         grep "$3" /etc/hosts > /dev/null
-        [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
+        [ "$?" -ne 0 ] && echo "$3 $2 $uuid" >> /etc/hosts
         else
             Echo_EXIST $2["$3"]
         fi
-            
-        salt-ssh -i $2 state.sls init.compute
+        bash scripts/node_update_hosts.sh $uuid $3 add
     elif [ "$1" = "multi" ];then
         if [ "$#" -ne 3 ];then
             Echo_Error "need 3 args\n like: [$PWD] ./scripts/compute.sh init multi <ip.txt path> <passwd>"
         fi
-        salt-ssh -i -E "compute" state.sls init.compute
+        salt-ssh -i -E "compute" state.sls init.init_node
     else
         Echo_Error "not support ${1:-null}"
     fi
@@ -74,43 +76,61 @@ EOF
 
 check_func(){
     Echo_Info "Check Compute func."
-    # Todo
-    # ./scripts/check.sh $@
 }
 
 install_compute_func(){
     fail_num=0
+    step_num=1
+    all_steps=$(echo ${COMPUTE_MODULES} | tr ' ' '\n' | wc -l)
     Echo_Info "will install compute node."
     if [ ! -z "$1" ];then
         salt-ssh -i $1 state.sls salt.install
+        sleep 12
+        Echo_Info "waiting to start salt-minions "
         for module in ${COMPUTE_MODULES}
         do
-            Echo_Info "Start install $module ..."
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
             
             if ! (salt $1 state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
+            ((step_num++))
         done
+        
     else
         salt-ssh -i -E "compute" state.sls salt.install
+        sleep 12
+        Echo_Info "waiting to start salt-minions"
         for module in ${COMPUTE_MODULES}
         do
-            Echo_Info "Start install $module ..."
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
             
             if ! (salt -E "compute" state.sls $module);then
                 ((fail_num+=1))
                 break
             fi
+            ((step_num++))
         done
     fi
-      sleep 12
-      Echo_Info "waiting for salt-minions start"
     
-    
-
     if [ "$fail_num" -eq 0 ];then
+        dc-compose restart rbd-webcli
         Echo_Info "install compute node successfully"
+        if [ ! -z "$1" ];then
+              uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+              for ((i=1;i<=15;i++ )); do
+                sleep 1
+                grctl node list | grep "$uuid" > /dev/null 2>&1
+                [ "$?" -eq 0 ] && (
+                 grctl node up $uuid
+                 Echo_Info "compute node($uuid) added to the cluster"
+                ) && break
+              done
+            # Echo_Info "compute node($uuid) has been added to the cluster"
+        else
+            Echo_Info "you need up compute node"
+        fi
     fi
 }
 
@@ -118,9 +138,7 @@ help_func(){
     Echo_Info "help"
     Echo_Info "init"
     echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
-    echo "args: multi <ip.txt path> <password/key-path>"
-    Echo_Info "check"
-    Echo_Info "install"
+    Echo_Info "install <hostname>"
     Echo_Info "offline"
     echo "args: single <hostname> <ip>  <password/key-path>"
 
@@ -130,21 +148,11 @@ case $1 in
     init)
         init_func ${@:2}
     ;;
-    check)
-        check_func ${@:2}
-    ;;
-    # Todo 
-    #install)
-    #    check_func && install_compute_func
-    #;;
-    #dev)
-    #    check_func force && install_compute_func
-    #;;
     install)
         install_compute_func $2 
     ;;
     offline)
-        init_func ${@:2} && install_compute_func ${@:2}
+        init_func ${@:2} && install_compute_func $3
     ;;
     *)
         help_func

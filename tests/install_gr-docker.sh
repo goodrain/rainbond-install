@@ -18,7 +18,7 @@
 config_repo(){
     cat > /etc/yum.repos.d/docker-repo.repo <<EOF
 [docker-repo]
-gpgcheck=1
+gpgcheck=0
 gpgkey=http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
 enabled=1
 baseurl=http://repo.goodrain.com/centos/$releasever/3.5/$basearch

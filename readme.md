@@ -36,23 +36,21 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# stable v3.5
-git clone --depth 1 -b v3.5 https://github.com/goodrain/rainbond-install.git
-cd rainbond-install
-./setup.sh
-
-# latest v3.6
+# Mainline v3.6
 
 git clone --depth 1 -b v3.6 https://github.com/goodrain/rainbond-install.git
 cd rainbond-install
 ./setup.sh
-```
 
-You can find all the documentation in the [Wiki](https://github.com/goodrain/rainbond-install/wiki).
+# Stable v3.5
+git clone --depth 1 -b v3.5 https://github.com/goodrain/rainbond-install.git
+cd rainbond-install
+./setup.sh
+```
 
 ### Documents
 
-You can find all the documentation in the [Docs](https://www.rainbond.com/docs/stable/).
+You can find all the documentation in the [troubleshooting install](https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html)/[Docs](https://www.rainbond.com/docs/stable/).
 
 ## License
 

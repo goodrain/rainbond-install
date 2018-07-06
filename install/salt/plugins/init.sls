@@ -204,14 +204,13 @@ app-ui-upstart:
     - require:
       - cmd: docker-pull-app-ui-image
 
+#==================== init region db ====================
+{% if grains['id'] == "manage01" %}
 update-app-ui:
   cmd.run:
     - name: docker exec rbd-app-ui python /app/ui/manage.py migrate && docker exec rbd-db touch /data/.inited
     - unless: docker exec rbd-db ls /data/.inited
 
-
-#==================== init region db ====================
-{% if grains['id'] == "manage01" %}
 update_sql:
   file.managed:
     - source: salt://plugins/data/init.sql

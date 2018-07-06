@@ -7,7 +7,7 @@ make_domain_prepare:
 
 make_domain:
   file.managed:
-    - source: salt://docker/files/domain.sh
+    - source: salt://init/files/domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/domain.sh
     - template: jinja
     - mode: 755
@@ -18,10 +18,11 @@ make_domain:
   {% else %}
     - name: bash {{ pillar['rbd-path'] }}/bin/domain.sh {{ pillar['master-private-ip'] }}
   {% endif %}
+{% endif %}
 
 rsync_update_domain:
   file.managed:
-    - source: salt://docker/files/.domain.sh
+    - source: salt://init/files/.domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/.domain.sh
     - template: jinja
     - mode: 755
@@ -30,7 +31,6 @@ rsync_update_domain:
 refresh_domain:
   cmd.run:
     - name: salt "*" saltutil.refresh_pillar
-{% endif %}
 {% endif %}
 
 

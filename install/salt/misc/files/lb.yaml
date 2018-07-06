@@ -1,0 +1,18 @@
+version: '2.1'
+services:  
+  rbd-lb:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
+    container_name: rbd-lb
+    environment:
+      DEFAULT_PORT: 80
+      HTTP_SUFFIX_URL: {{ pillar['domain'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
+    - {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always

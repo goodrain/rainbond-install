@@ -1,0 +1,22 @@
+version: '2.1'
+services:
+  rbd-app-ui:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
+    container_name: rbd-app-ui
+    environment:
+      MANAGE_SECRET_KEY: {{ pillar['secretkey'] }}
+      MYSQL_HOST: {{ pillar['database']['mysql']['host'] }}
+      MYSQL_PORT: {{ pillar['database']['mysql']['port'] }}
+      MYSQL_USER: {{ pillar['database']['mysql']['user'] }}
+      MYSQL_PASS: {{ pillar['database']['mysql']['pass'] }}
+      MYSQL_DB: console
+    volumes:
+    - /grdata/services/console:/data
+    - {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log:/tmp/goodrain.log
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always

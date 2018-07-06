@@ -16,5 +16,5 @@ if [[ "$wilddomain" == *grapps.cn ]];then
     sed -i -r  "s/(^domain: ).*/\1$wilddomain/" /srv/pillar/rainbond.sls
 else
     echo "not generate, will use example"
-    sed -i -r  "s/(^domain: ).*/\paas.example.com/" /srv/pillar/rainbond.sls
+    sed -i -r  "s/(^domain: ).*/\1paas.example.com/" /srv/pillar/rainbond.sls
 fi

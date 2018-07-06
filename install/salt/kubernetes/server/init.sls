@@ -39,6 +39,16 @@ pull_schedule_image:
     - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
 {% endif %}
 
+k8s-api-env:
+  file.managed:
+    - source: salt://kubernetes/server/install/env/kube-apiserver.sh
+    - name: {{ pillar['rbd-path'] }}/envs/kube-apiserver.sh
+    - makedirs: True
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+
 k8s-api-script:
   file.managed:
     - source: salt://kubernetes/server/install/scripts/start-kube-apiserver.sh
@@ -83,11 +93,6 @@ k8s-conf:
     - user: root
     - group: root
 
-kube-ssl-rsync:
-  file.recurse:
-    - source: salt://kubernetes/server/install/ssl
-    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
-
 kube-cfg-rsync-grdata:
   file.recurse:
     - source: salt://kubernetes/server/install/kubecfg
@@ -100,25 +105,15 @@ kube-ssl-rsync-grdata:
     - name: /grdata/services/k8s/ssl
     - makedirs: True
 
-
-kube-cfg-rsync:
-  file.recurse:
-    - source: salt://kubernetes/server/install/kubecfg
-    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
-
 kube-apiserver:
   service.running:
     - enable: True
     - watch:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-api-script
       - cmd: pull_api_image
     - require:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-api-script
       - cmd: pull_api_image
 
@@ -127,14 +122,10 @@ kube-controller-manager:
     - enable: True
     - watch:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-manager-script
       - cmd: pull_manager_image
     - require:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-manager-script
       - cmd: pull_manager_image
 
@@ -144,14 +135,10 @@ kube-scheduler:
     - enable: True
     - watch:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-scheduler-script
       - cmd: pull_schedule_image
     - require:
       - file: k8s-conf
-      - file: kube-ssl-rsync
-      - file: kube-cfg-rsync
       - file: k8s-scheduler-script
       - cmd: pull_schedule_image
 

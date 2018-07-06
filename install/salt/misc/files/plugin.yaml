@@ -1,0 +1,159 @@
+version: '2.1'
+services:
+  rbd-entrance:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
+    container_name: rbd-entrance
+    mem_limit: 1024M
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+    environment:
+      DEFAULT_HTTP_PORT: 80
+      DEFAULT_HTTPS_PORT: 443
+    volumes:
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
+    command:
+    - --plugin-name=openresty
+    - --plugin-opts=urls={{ pillar['lb-endpoints'] }}
+    - --kube-conf=/etc/goodrain/kubernetes/admin.kubeconfig
+    - --log-level=info
+    - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    - --run-mode=sync
+  rbd-api:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
+    container_name: rbd-api
+    mem_limit: 1024M
+    environment:
+      EX_DOMAIN: {{ pillar['domain'] }}
+      LicenseSwitch: 'off'
+    volumes:
+    - /grdata:/grdata
+    - {{ pillar['rbd-path'] }}/etc/rbd-api:/etc/goodrain
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
+    - {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
+    - {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
+    command: --etcd={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-chaos:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
+    container_name: rbd-chaos
+    mem_limit: 1024M
+    command: --etcd-endpoints={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    environment:
+    - SOURCE_DIR=/cache/source
+    - CACHE_DIR=/cache
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    volumes:
+    - /logs:/logs
+    - /grdata:/grdata
+    - /cache:/cache
+    - /var/run:/var/run
+    - {{ pillar['rbd-path'] }}/etc/rbd-chaos/ssh:/root/.ssh
+    network_mode: host
+    restart: always
+  rbd-mq:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
+    container_name: rbd-mq
+    mem_limit: 1024M
+    command: --log-level=debug --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-webcli:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
+    container_name: rbd-webcli
+    mem_limit: 1024M
+    volumes:
+    - /usr/local/bin/kubectl:/usr/bin/kubectl
+    - /root/.kube:/root/.kube
+    command: --hostIP={{ grains['mip'][0] }} --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-worker:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
+    container_name: rbd-worker
+    mem_limit: 1024M
+    environment:
+      K8S_MASTER: http://127.0.0.1:8181
+      CUR_NET: calico
+      EX_DOMAIN: {{ pillar['domain'] }}
+    volumes:
+    - {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
+    - /grdata:/grdata
+    command: --log-level=info --etcd-endpoints={{ pillar['etcd-endpoints'] }} --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig" --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-monitor:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
+    container_name: rbd-monitor
+    volumes:
+    - {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
+    command:
+    - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    - --advertise-addr={{ grains['mip'][0] }}:9999 
+    - --web.listen-address=0.0.0.0:9999
+    - --config.file=/etc/prometheus/prometheus.yml 
+    - --storage.tsdb.path=/prometheusdata 
+    - --storage.tsdb.no-lockfile 
+    - --storage.tsdb.retention=7d 
+    - --log.level=info
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always
+  rbd-eventlog:
+    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
+    container_name: rbd-eventlog
+    mem_limit: 1024M
+    environment:
+      K8S_MASTER: http://127.0.0.1:8181
+    volumes:
+    - {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
+    - {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
+    - /grdata/downloads/log:/grdata/logs
+    command:
+    - --cluster.bind.ip={{ grains['mip'][0] }}
+    - --db.type=mysql
+    - --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region
+    - --discover.etcd.addr={{ pillar['etcd-endpoints'] }}
+    - --eventlog.bind.ip={{ grains['mip'][0] }}
+    - --websocket.bind.ip={{ grains['mip'][0] }}
+    - --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '3'
+    network_mode: host
+    restart: always

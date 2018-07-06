@@ -14,8 +14,6 @@
 name=CentOS-$releasever - Base - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/$releasever/os/$basearch/
-        http://mirrors.aliyuncs.com/centos/$releasever/os/$basearch/
-#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os
 gpgcheck=1
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
  
@@ -24,8 +22,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-$releasever - Updates - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/$releasever/updates/$basearch/
-        http://mirrors.aliyuncs.com/centos/$releasever/updates/$basearch/
-#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=updates
 gpgcheck=1
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
  
@@ -34,8 +30,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-$releasever - Extras - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/$releasever/extras/$basearch/
-        http://mirrors.aliyuncs.com/centos/$releasever/extras/$basearch/
-#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=extras
 gpgcheck=1
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
  
@@ -44,8 +38,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-$releasever - Plus - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/$releasever/centosplus/$basearch/
-        http://mirrors.aliyuncs.com/centos/$releasever/centosplus/$basearch/
-#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=centosplus
 gpgcheck=1
 enabled=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
@@ -55,8 +47,6 @@ gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7
 name=CentOS-$releasever - Contrib - mirrors.aliyun.com
 failovermethod=priority
 baseurl=http://mirrors.aliyun.com/centos/$releasever/contrib/$basearch/
-        http://mirrors.aliyuncs.com/centos/$releasever/contrib/$basearch/
-#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=contrib
 gpgcheck=1
 enabled=0
 gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7

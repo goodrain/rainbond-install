@@ -32,13 +32,13 @@ epel-repo:
     - humanname: Extra Packages for Enterprise Linux 7 - $basearch
     - baseurl: http://mirrors.aliyun.com/epel/7/$basearch
     - gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
-    - gpgcheck: 1
-  {% endif %}
+    - gpgcheck: 0
+{% endif %}
 # debain or ubuntu
 {% else %}
 update_local_pkg_cache:
   cmd.run:
-    - name: apt update -y
+    - name: apt-get update -y
 {% endif %} 
 
 #install base pkgs
@@ -51,6 +51,10 @@ install_req_pkgs:
       - nload 
       - rsync 
       - net-tools
+{% if grains['os_family']|lower == 'debian' %}
+      - python-apt
+      - python-pip
+{% endif %}
     - refresh: true
     
 {% if pillar['install-type']!="offline" %}
