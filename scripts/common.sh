@@ -353,7 +353,7 @@ Check_Python_Urllib(){
                 if [ "$SYS_NAME" == "centos" ];then
                     pip uninstall urllib3 -y  > /dev/null 2>&1 
                 else
-                    pip install -U urllib3 -y > /dev/null 2>&1
+                    pip install -U urllib3  > /dev/null 2>&1
                 fi
             fi
         fi
