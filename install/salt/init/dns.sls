@@ -91,3 +91,16 @@ uuid-domain:
   file.append:
     - text:
       - "nameserver {{ pillar.dns.master }}"
+
+# 注释domain search
+domain-resolv:
+  file.replace:
+    - name: /etc/resolv.conf
+    - pattern: "^domain"
+    - repl: "# domain"
+
+search-resolv:
+  file.replace:
+    - name: /etc/resolv.conf
+    - pattern: "^search"
+    - repl: "# search"
