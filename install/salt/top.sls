@@ -12,7 +12,6 @@ base:
     - grbase
     - plugins
     - proxy
-    - prometheus
 
   "role:manage":
     - match: grains

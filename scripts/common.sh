@@ -26,7 +26,6 @@ node \
 db \
 plugins \
 proxy \
-prometheus \
 kubernetes.node"
 
 COMPUTE_MODULES="init \
