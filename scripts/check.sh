@@ -109,7 +109,7 @@ Check_Net(){
 
   # write sls file
   echo $DEFAULT_LOCAL_IP > ./LOCAL_IP
-
+  echo $DEFAULT_LOCAL_IP > /tmp/LOCAL_IP
 }
 
 
