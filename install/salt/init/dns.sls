@@ -2,7 +2,7 @@
 
 # get master(manage01) ip address
 {% if "manage" in grains['id'] %}
-{% set hostip = grains['vip'] %}
+{% set hostip = pillar['vip'] %}
 rbd-repo-domain:
   host.present:
     - ip: {{ hostip }}
