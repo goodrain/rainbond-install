@@ -1,1 +1,0 @@
-ETCD_ADDRESS={{ pillar['etcd-endpoints'] }}
