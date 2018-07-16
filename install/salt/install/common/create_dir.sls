@@ -94,6 +94,14 @@ data-etcd-dir:
     - name: {{ DIR }}/data/etcd
     - makedirs: True
 
+data-prom-dir:
+  file.directory:
+   - name: {{ DIR }}/data/prom
+   - makedirs: True
+   - user: root
+   - group: root
+   - mode: 755
+
 #=========================== rainbond/logs directory ===========================
 logs-dir:
   file.directory:
@@ -103,6 +111,11 @@ logs-dir:
 logs-appui-dir:
   file.directory:
     - name: {{ DIR }}/logs/rbd-app-ui
+    - makedirs: True
+
+log-rbd-app-ui:
+  file.touch:
+    - name: {{ DIR }}/logs/rbd-app-ui/goodrain.log
     - makedirs: True
 
 logs-lb-dir:

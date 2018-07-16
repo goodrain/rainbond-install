@@ -1,18 +1,6 @@
-{% set DBIMG = salt['pillar.get']('database:mysql:image') -%}
-{% set DBVER = salt['pillar.get']('database:mysql:version') -%}
 {% set DBPORT = salt['pillar.get']('database:mysql:port') -%}
 {% set DBUSER = salt['pillar.get']('database:mysql:user') -%}
 {% set DBPASS = salt['pillar.get']('database:mysql:pass') -%}
-{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
-
-docker-pull-db-image:
-  cmd.run:
-{% if pillar['install-type']!="offline" %}
-    - name: docker pull {{PUBDOMAIN}}/{{ DBIMG }}:{{ DBVER }}
-{% else %}
-    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ DBIMG }}_{{ DBVER }}.gz
-{% endif %}
-    - unless: docker inspect {{PUBDOMAIN}}/{{ DBIMG }}:{{ DBVER }}
 
 my.cnf:
   file.managed:
