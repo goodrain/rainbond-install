@@ -36,9 +36,10 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# Develop dev
+# Develop dev 
+# new install func
 
-git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git
+git clone --depth 1 -b v3.7-dev https://github.com/goodrain/rainbond-install.git
 cd rainbond-install
 ./setup.sh
 
