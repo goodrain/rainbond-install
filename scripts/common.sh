@@ -73,9 +73,10 @@ if [ "$SYS_NAME" == "centos" ];then
     if $( grep 'install-type: online' ${MAIN_CONFIG} >/dev/null );then
         cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
-name=SaltStack archive/2017.7.5 Release Channel for RHEL/CentOS $releasever
-baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2017.7.5/
+name=SaltStack archive/2018.3.2 Release Channel for RHEL/CentOS $releasever
+baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2018.3.2
 skip_if_unavailable=True
+failovermethod=priority
 gpgcheck=0
 enabled=1
 enabled_metadata=1
@@ -83,7 +84,31 @@ END
         # fix some mirrors closed by layer
         #curl -s -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
         [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
-            curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+            cat > /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+baseurl=https://mirrors.ustc.edu.cn/epel/7/$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+baseurl=https://mirrors.ustc.edu.cn/epel/7/$basearch/debug
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=0
+
+[epel-source]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+baseurl=https://mirrors.ustc.edu.cn/epel/7/SRPMS
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=0
+EOF
         )
     fi
 
@@ -98,10 +123,10 @@ else
     dnsutils \
     python-pip \
     apt-transport-https )
-    curl http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
+    curl https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
     # debian salt repo
     cat > /etc/apt/sources.list.d/salt.list << END
-deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
+deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
 END
 
 fi
@@ -351,7 +376,7 @@ Check_Python_Urllib(){
                 if [ "$SYS_NAME" == "centos" ];then
                     pip uninstall urllib3 -y  > /dev/null 2>&1 
                 else
-                    pip install -U urllib3 -y > /dev/null 2>&1
+                    pip install -U urllib3 > /dev/null 2>&1
                 fi
             fi
         fi

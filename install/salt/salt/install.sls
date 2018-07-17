@@ -10,16 +10,16 @@ salt-repo:
     # online
     {% else %}
     - humanname: SaltStack repo for RHEL/CentOS $releasever
-    - baseurl: https://mirrors.ustc.edu.cn/salt/yum/redhat/$releasever/$basearch/archive/2017.7.5
+    - baseurl: https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2018.3.2
     - enabled: 1
-    - gpgcheck: 1
-    - gpgkey: https://mirrors.ustc.edu.cn/salt/yum/redhat/7/$basearch/archive/2017.7.5/SALTSTACK-GPG-KEY.pub
+    - gpgcheck: 0
+    - gpgkey: https://mirrors.ustc.edu.cn/salt/yum/redhat/7/$basearch/archive/2018.3.2/SALTSTACK-GPG-KEY.pub
     {% endif %}
   # debian or ubuntu
   {% else %}
-    - name: deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7 stretch main
+    - name: deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
     - file: /etc/apt/sources.list.d/salt.list
-    - key_url: http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2017.7/SALTSTACK-GPG-KEY.pub
+    - key_url: http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3/SALTSTACK-GPG-KEY.pub
   {% endif %}  
     - require_in:
       - pkg: salt-minion-install
