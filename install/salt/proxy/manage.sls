@@ -129,27 +129,7 @@ pause-push-image:
     - require:
         - cmd: pause-tag
 
-builder-pull-image:
-  cmd.run:
-  {% if pillar['install-type']!="offline" %}
-    - name: docker pull {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
-  {% else %}
-    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ BUILDERIMG }}_{{ BUILDERVER }}.gz
-  {% endif %}
-    - unless: docker inspect {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
 
-builder-tag:  
-  cmd.run:
-    - name: docker tag {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
-    - require:
-        - cmd: builder-pull-image
-
-builder-push-image:    
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
-    - require:
-        - cmd: builder-tag
 #push etcd & calico image to goodrain.me
 
 push-etcd-image:
@@ -167,8 +147,20 @@ builder-mpull-image:
 pause-mpull-image:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{PAUSEVER}}
-{% else %}
-runner-pull-image:
-  cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
 {% endif %}
+
+builder-pull-image:
+  cmd.run:
+  {% if pillar['install-type']!="offline" %}
+    - name: docker pull {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
+  {% else %}
+    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ BUILDERIMG }}_{{ BUILDERVER }}.gz
+  {% endif %}
+    - unless: docker inspect {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }}
+
+builder-tag:  
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - require:
+        - cmd: builder-pull-image
