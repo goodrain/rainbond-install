@@ -42,3 +42,5 @@ install_func(){
         echo "install successfully"
     fi
 }
+
+install_func
