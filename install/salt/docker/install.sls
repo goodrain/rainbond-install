@@ -12,7 +12,7 @@ docker-envs-old:
     - template: jinja
     - makedirs: True
 
-{% if pillar.get('docker.proxy','false') %}
+{% if pillar.docker.mirrors.enabled %}
 docker-mirrors:
   file.managed:
     - source: salt://docker/files/daemon.json
