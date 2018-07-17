@@ -12,12 +12,14 @@ docker-envs-old:
     - template: jinja
     - makedirs: True
 
+{% if pillar.docker.mirrors.enabled %}
 docker-mirrors:
   file.managed:
     - source: salt://docker/files/daemon.json
     - name: /etc/docker/daemon.json
     - template: jinja
     - makedirs: True
+{% endif %}
 
 docker-repo:
   pkgrepo.managed:

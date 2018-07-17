@@ -129,6 +129,19 @@ pause-push-image:
     - require:
         - cmd: pause-tag
 
+
+#push etcd & calico image to goodrain.me
+
+push-etcd-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
+
+push-calico-image:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+
+{% endif %}
+
 builder-pull-image:
   cmd.run:
   {% if pillar['install-type']!="offline" %}
@@ -144,31 +157,3 @@ builder-tag:
     - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
     - require:
         - cmd: builder-pull-image
-
-builder-push-image:    
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
-    - require:
-        - cmd: builder-tag
-#push etcd & calico image to goodrain.me
-
-push-etcd-image:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{ETCDIMG}}:{{ETCDVER}}
-
-push-calico-image:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
-
-builder-mpull-image:    
-  cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}
-
-pause-mpull-image:
-  cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{PAUSEVER}}
-{% else %}
-runner-pull-image:
-  cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
-{% endif %}
