@@ -140,13 +140,6 @@ push-calico-image:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
 
-builder-mpull-image:    
-  cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}
-
-pause-mpull-image:
-  cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{PAUSEIMG}}:{{PAUSEVER}}
 {% endif %}
 
 builder-pull-image:
