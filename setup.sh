@@ -45,14 +45,27 @@ init_config(){
 }
 
 install_func(){
-    # fail_num=0
-    # step_num=1
-    # all_steps=$(echo ${MANAGE_MODULES} | tr ' ' '\n' | wc -l)
+    fail_num=0
+    step_num=1
+    all_steps=$(echo ${MANAGE_MODULES} | tr ' ' '\n' | wc -l)
     Echo_Info "will install manage node.It will take 15-30 minutes to install"
   
-    salt "*" state.sls install
+    for module in ${MANAGE_MODULES}
+    do
+        if [ "$module" = "plugins" -o "$module" = "proxy" ];then
+            Echo_Info "Start install $module(step: $step_num/$all_steps), it will take 3-8 minutes "
+        else
+            Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
+        fi
+        if ! (salt "*" state.sls $module);then
+            ((fail_num+=1))
+            break
+        fi
+        ((step_num++))
+        sleep 1
+    done
 
-    if [ "$?" -eq 0 ];then
+    if [ "$fail_num" -eq 0 ];then
       if $( grep 'install-type: online' /srv/pillar/rainbond.sls >/dev/null );then
         REG_Status || return 0
       fi

@@ -14,28 +14,17 @@ PILLAR_DIR="./install/pillar"
 DOMAIN_API="http://domain.grapps.cn"
 K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
-MANAGE_MODULES="init \
+MANAGE_MODULES="common \
 storage \
-docker \
-misc \
-grbase \
 etcd \
-network \
-kubernetes.server \
-node \
-db \
-plugins \
-proxy \
-kubernetes.node"
+master \
+worker 
+"
 
-COMPUTE_MODULES="init \
+COMPUTE_MODULES="common \
 storage \
-docker \
-misc \
 etcd \
-network \
-node \
-kubernetes.node"
+worker"
 
 # system common pkgs
 SYS_COMMON_PKGS=( tar \

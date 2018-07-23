@@ -78,6 +78,12 @@ database:
     user: 
     pass: 
 
+storage:
+  type: nfs
+  enabled: true
+  server_args: "/grdata *(rw,sync,no_root_squash,no_subtree_check)"
+  client_args: "/grdata nfs rw 0 0"
+  
 
 # etcd
 etcd:
