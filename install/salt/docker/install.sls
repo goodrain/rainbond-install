@@ -41,7 +41,7 @@ docker-repo:
     - humanname: Goodrain CentOS-$releasever - for x86_64
     - baseurl: http://repo.goodrain.com/centos/$releasever/3.6/$basearch
     - enabled: 1
-    - gpgcheck: 1
+    - gpgcheck: 0
     - gpgkey: http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
     {% endif %}
   # debain or ubuntu

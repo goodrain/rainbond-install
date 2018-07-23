@@ -3,15 +3,6 @@
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
-kubelet-script:
-  file.managed:
-    - source: salt://kubernetes/node/install/scripts/start-kubelet.sh
-    - name: {{ pillar['rbd-path'] }}/scripts/start-kubelet.sh
-    - makedirs: True
-    - template: jinja
-    - mode: 755
-    - user: root
-    - group: root
 
 k8s-custom-conf:
   file.managed:
@@ -20,15 +11,16 @@ k8s-custom-conf:
     - makedirs: True
     - template: jinja
 
-kubelet-ssl-rsync:
+kube-ssl-rsync:
   file.recurse:
-    - source: salt://kubernetes/server/install/ssl
+    - source: salt://install/files/k8s/ssl
     - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
 
-kubelet-cfg-rsync:
+kube-cfg-rsync:
   file.recurse:
-    - source: salt://kubernetes/server/install/kubecfg
-    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg
+    - source: salt://install/files/k8s/kubecfg
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
+
 
 kubelet-cni:
   file.recurse:
@@ -39,21 +31,17 @@ kubelet-cni:
 
 kubelet-cni-bin:
   file.recurse:
-    - source: salt://misc/file/cni/bin
+    - source: salt://install/files/misc/cni/bin
     - name: {{ pillar['rbd-path'] }}/bin
     - file_mode: '0755'
     - user: root
     - group: root
     - makedirs: True
 
-/etc/systemd/system/kubelet.service:
-  file.managed:
-    - source: salt://kubernetes/node/install/systemd/kubelet.service
-    - template: jinja
 
 /usr/local/bin/kubelet:
   file.managed:
-    - source: salt://misc/file/bin/kubelet
+    - source: salt://install/files/misc/bin/kubelet
     - mode: 755
 
 {% if grains['id'] == 'manage01' %}
@@ -78,26 +66,4 @@ pull-pause-img:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
     - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-{% endif %}
-
-kubelet:
-  service.running:
-    - enable: True
-    - watch:
-      - file: k8s-custom-conf
-      - file: kubelet-cni
-      - file: kubelet-ssl-rsync
-      - file: kubelet-cfg-rsync
-      - file: kubelet-script
-{% if grains['id'] == 'manage01' %}
-      - cmd: rename-pause-img
-{% endif %}
-    - require:
-      - file: k8s-custom-conf
-      - file: kubelet-cni
-      - file: kubelet-ssl-rsync
-      - file: kubelet-cfg-rsync
-      - cmd: pull-pause-img
-{% if grains['id'] == 'manage01' %}
-      - cmd: rename-pause-img
 {% endif %}

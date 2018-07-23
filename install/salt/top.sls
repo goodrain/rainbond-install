@@ -1,4 +1,7 @@
 base:
   "*":
-    - install
-    - etcd
+    - common
+    - storage
+    - docker
+    - master
+    - worker

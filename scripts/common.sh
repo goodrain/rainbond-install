@@ -16,14 +16,14 @@ K8S_SERVICE=( kube-controller-manager kube-scheduler kube-apiserver kubelet)
 RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="common \
 storage \
-etcd \
+docker \
+base \
 master \
-worker 
-"
+worker"
 
 COMPUTE_MODULES="common \
 storage \
-etcd \
+base \
 worker"
 
 # system common pkgs

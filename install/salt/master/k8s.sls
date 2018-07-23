@@ -5,15 +5,25 @@ k8s-conf:
     - makedirs: True
     - template: jinja
 
+kube-ssl-rsync:
+  file.recurse:
+    - source: salt://install/files/k8s/ssl
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/ssl
+
+kube-cfg-rsync:
+  file.recurse:
+    - source: salt://install/files/k8s/kubecfg
+    - name: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
+
 kube-cfg-rsync-grdata:
   file.recurse:
-    - source: salt://kubernetes/server/install/kubecfg
+    - source: salt://install/files/k8s/kubecfg
     - name: /grdata/services/k8s/kubecfg
     - makedirs: True
 
 kube-ssl-rsync-grdata:
   file.recurse:
-    - source: salt://kubernetes/server/install/ssl
+    - source: salt://install/files/k8s/ssl
     - name: /grdata/services/k8s/ssl
     - makedirs: True
 

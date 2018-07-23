@@ -1,13 +1,3 @@
-node-script:
-  file.managed:
-    - source: salt://node/install/scripts/start-node.sh
-    - name: {{ pillar['rbd-path'] }}/scripts/start-node.sh
-    - makedirs: True
-    - template: jinja
-    - mode: 755
-    - user: root
-    - group: root
-
 node-uuid-conf:
   file.managed:
     - source: salt://install/files/node/node_host_uuid.conf
@@ -15,9 +5,19 @@ node-uuid-conf:
     - makedirs: True
     - template: jinja
 
+node-script:
+  file.managed:
+    - source: salt://install/files/node/start-node.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/start-node.sh
+    - makedirs: True
+    - template: jinja
+    - mode: 755
+    - user: root
+    - group: root
+
 /etc/systemd/system/node.service:
   file.managed:
-    - source: salt://node/install/systemd/node.service
+    - source: salt://install/files/node/node.service
     - template: jinja
     - user: root
     - group: root
@@ -26,7 +26,7 @@ node:
   service.running:
     - enable: True
     - watch:
-      - file: node-script
       - file: node-uuid-conf
+      - file: node-script
   cmd.run:
     - name: systemctl restart node

@@ -78,6 +78,16 @@ etc-api-dir:
     - name: {{ DIR }}/etc/rbd-api
     - makedirs: True
 
+etc-k8s-ssl-dir:
+  file.directory:
+    - name: {{ DIR }}/etc/kubernetes/ssl
+    - makedirs: True
+
+etc-k8s-kubecfg-dir:
+  file.directory:
+    - name: {{ DIR }}/etc/kubernetes/kubecfg
+    - makedirs: True
+
 #=========================== rainbond/data directory ===========================
 data-dir:
   file.directory:

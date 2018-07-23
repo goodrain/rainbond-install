@@ -19,7 +19,6 @@ db-upstart:
     - name: dc-compose up -d rbd-db
     - unless: check_compose rbd-db
     - require:
-      - cmd: docker-pull-db-image
       - file: charset.cnf
       - file: my.cnf
 
@@ -52,3 +51,27 @@ create_console:
     - name: docker exec rbd-db mysql -e "CREATE DATABASE IF NOT EXISTS console DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
     - require:
       - cmd: waiting_for_db
+
+rbd-app-ui:
+  cmd.run:
+    - name: dc-compose up -d rbd-app-ui
+
+update-app-ui:
+  cmd.run:
+    - name: docker exec rbd-app-ui python /app/ui/manage.py migrate && docker exec rbd-db touch /data/.inited
+    - unless: docker exec rbd-db ls /data/.inited
+    - require:
+      - cmd: rbd-app-ui
+
+
+exec_init_sql:
+  cmd.run:
+    - name: bash /tmp/init.sh
+
+db-stop:
+  cmd.run:
+    - name: dc-compose stop 
+
+db-cclear:
+  cmd.run:
+    - name: cclear

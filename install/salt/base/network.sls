@@ -1,3 +1,8 @@
+
+{% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
+{% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+
 {% if grains['id'] == 'manage01' %}
 init.calico:
   file.managed:
@@ -14,5 +19,8 @@ init_calico:
     - name: bash {{ pillar['rbd-path'] }}/bin/init.calico
     - require:
       - file: init.calico
-
+{% else %}
+pull-calico-image:
+  cmd.run:
+    - name: docker pull {{PUBDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
 {% endif %}

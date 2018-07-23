@@ -186,11 +186,6 @@ runner-tag:
     - require:
         - cmd: runner-pull-image
 
-runner-push-image:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
-    - require:
-        - cmd: runner-tag
 
 adapter-pull-image:
   cmd.run:
@@ -208,12 +203,6 @@ adapter-tag:
     - require:
         - cmd: adapter-pull-image
 
-adapter-push-image:    
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{ADAPTERIMG}}
-    - require:
-        - cmd: adapter-tag
-
 pause-pull-image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
@@ -224,12 +213,6 @@ pause-tag:
     - unless: docker inspect {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
     - require:
         - cmd: pause-pull-image
-
-pause-push-image:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{PAUSEIMG}}:{{ PAUSEVER }}
-    - require:
-        - cmd: pause-tag
 
 builder-pull-image:
   cmd.run:
@@ -242,11 +225,7 @@ builder-tag:
     - require:
         - cmd: builder-pull-image
 
-builder-push-image:    
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
-    - require:
-        - cmd: builder-tag
+
 
 #===================== addons image ==============================
 pull-plugin-tcm:
@@ -260,12 +239,6 @@ retag-plugin-tcm:
     - require:
         - cmd: pull-plugin-tcm
 
-push-plugin-tcm:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{TCMTAG}}
-    - require:
-        - cmd: retag-plugin-tcm
-
 pull-plugin-mesh:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{PLUGINIMG}}:{{MESHTAG}}
@@ -277,74 +250,3 @@ retag-plugin-mesh:
     - require:
         - cmd: pull-plugin-mesh
 
-push-plugin-mesh:
-  cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{MESHTAG_META}}
-    - require:
-        - cmd: retag-plugin-mesh
-
-#===================== init rainbond ============================
-
-#==================== init region db ====================
-{% if grains['id'] == "manage01" %}
-update-app-ui:
-  cmd.run:
-    - name: docker exec rbd-app-ui python /app/ui/manage.py migrate && docker exec rbd-db touch /data/.inited
-    - unless: docker exec rbd-db ls /data/.inited
-
-update_sql:
-  file.managed:
-    - source: salt://install/files/plugins/init.sql
-    - name: /tmp/init.sql
-    - template: jinja
-  
-update_sql_sh:
-  file.managed:
-    - source: salt://install/files/plugins/init.sh
-    - name: /tmp/init.sh
-    - template: jinja
-  cmd.run:
-    - name: bash /tmp/init.sh
-{% endif %}
-
-#==================== init lb ====================
-default_http_conf:
-  file.managed:
-    - source: salt://install/files/plugins/proxy.conf
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
-    - template: jinja
-    - makedirs: True
-
-proxy_site_ssl:
-  file.recurse:
-    - source: salt://install/files/ssl/goodrain.me
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
-    - makedirs: True
-
-proxy_kubeconfig:
-  file.managed:
-     - source: salt://kubernetes/kubecfg/kube-proxy.kubeconfig
-     - name: /grdata/kubernetes/kube-proxy.kubeconfig
-     - unless: ls /grdata/kubernetes/kube-proxy.kubeconfig
-     - makedirs: True
-
-
-prepare_rbd_cni_tools:
-  cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{PUBDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }} tar zxf /pkg.tgz -C /sysdir
-
-prepare_k8s_cni_tools:
-  cmd.run:
-    - name: docker run --rm -v /srv/salt/misc/file:/sysdir {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }} tar zxf /pkg.tgz -C /sysdir
-
-check_or_create_kubeconfig:
-  cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/kubernetes/server/install/kubecfg:/k8s {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
-    - unless: ls /srv/salt/kubernetes/server/install/kubecfg/*.kubeconfig
-
-check_or_create_certificates:
-  cmd.run:
-    - name: docker run --rm -v /srv/salt/kubernetes/server/install/ssl:/ssl -w /ssl {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }} kip {{ pillar['master-private-ip'] }}
-    - unless:
-      - ls /srv/salt/kubernetes/server/install/ssl/*.pem
-      - ls /srv/salt/kubernetes/server/install/ssl/*.csr

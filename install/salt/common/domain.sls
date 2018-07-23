@@ -7,7 +7,7 @@ make_domain_prepare:
 
 make_domain:
   file.managed:
-    - source: salt://init/files/domain.sh
+    - source: salt://install/files/init/domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/domain.sh
     - template: jinja
     - mode: 755
@@ -22,7 +22,7 @@ make_domain:
 
 rsync_update_domain:
   file.managed:
-    - source: salt://init/files/.domain.sh
+    - source: salt://install/files/init/.domain.sh
     - name: {{ pillar['rbd-path'] }}/bin/.domain.sh
     - template: jinja
     - mode: 755
