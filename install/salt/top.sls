@@ -1,5 +1,4 @@
 base:
   "*":
-    - init
-    - docker
     - install
+    - etcd
