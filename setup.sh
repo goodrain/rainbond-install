@@ -83,6 +83,9 @@ install_func(){
         else
             Echo_Banner "http://${private_ip}:7070"
         fi
+    else
+        Echo_Info "install help"
+        Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"
     fi
 }
 
