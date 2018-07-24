@@ -2,7 +2,7 @@
 {% if "manage" in grains['id'] %}
 etcd-env:
   file.managed:
-    - source: salt://etcd/install/envs/etcd.sh
+    - source: salt://install/files/etcd/envs/etcd.sh
     - name: {{ pillar['rbd-path'] }}/envs/etcd.sh
     - template: jinja
     - makedirs: True
@@ -16,7 +16,7 @@ etcd-env:
 {% if "compute" in grains['id'] %}
 etcd-proxy-env:
   file.managed:
-    - source: salt://etcd/install/envs/etcd-proxy.sh
+    - source: salt://install/files/etcd/envs/etcd-proxy.sh
     - name: {{ pillar['rbd-path'] }}/envs/etcd-proxy.sh
     - template: jinja
     - makedirs: True
