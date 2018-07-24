@@ -1,0 +1,681 @@
+version: '2.1'
+services:
+- name: rbd-grafana
+  registry:
+  - name: GRAFANA_ENDPOINTS
+    protocol: http
+    port: 3000
+  health:
+    name: rbd-grafana
+    model: tcp
+    address: 127.0.0.1:3000
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-grafana
+  start: >-
+    docker run
+    --name rbd-grafana
+    --network host
+    --memory 1024M
+    --user 200
+    -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    -e GF_SECURITY_ADMIN_PASSWORD="gr123465!"
+    -v /opt/rainbond/data/rbd-grafana:/var/lib/grafana
+    -i grafana/grafana:5.1.3
+  stop: docker stop rbd-grafana
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-api
+  endpoints:
+  - name: API_ENDPOINTS
+    protocol: http
+    port: 8888
+  health:
+    name: rbd-api
+    model: http
+    address: 127.0.0.1:8888/v2/health
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-api
+  start: >-
+    docker run --name rbd-api
+    --network host
+    --memory 1024M
+    -e REGION_TAG=cloudbang
+    -e EX_DOMAIN=tvga8.goodrain.org
+    -v /grdata:/grdata
+    -v /opt/rainbond/k8s:/etc/goodrain/kubernetes
+    -v /opt/rainbond/logs/docker_logs:/data/docker_logs
+    -v /opt/rainbond/logs/rainbond-api:/logs
+    -i rainbond/rbd-api:3.7
+    --log-level=debug --mysql="write:08a01100@tcp(192.168.8.229:3306)/region"
+  stop: docker stop rbd-api
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-chaos
+  endpoints:
+  - name: CHAOS_ENDPOINTS
+    protocol: http
+    port: 3228
+  health:
+    name: rbd-chaos
+    model: http
+    address: 127.0.0.1:3228/v2/builder/health
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-chaos
+  start: >-
+    docker run --name rbd-chaos
+    --network host
+    --memory 1024M
+    -v /logs:/logs
+    -v /grdata:/grdata
+    -v /cache:/cache
+    -v /var/run:/var/run
+    -v /opt/rainbond/etc/rbd-chaos/ssh:/root/.ssh
+    -v /opt/rainbond/etc/rbd-chaos/config.json:/run/plugins/config.json
+    -i rainbond/rbd-chaos:3.7
+    --log-level=debug --mysql="write:08a01100@tcp(192.168.8.229:3306)/region"
+  stop: docker stop rbd-chaos
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-worker
+  endpoints:
+  - name: WORKER_ENDPOINTS
+    protocol: http
+    port: 6369
+  health:
+    name: rbd-worker
+    model: http
+    address: 127.0.0.1:6369/worker/health
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-worker
+  start: >-
+    docker run --name rbd-worker
+    --network host
+    --memory 1024M
+    -e MYSQL_HOST=192.168.8.229
+    -e MYSQL_PORT=3306
+    -e MYSQL_USER=write
+    -e MYSQL_PASSWORD="08a01100"
+    -e MYSQL_DATABASE=region
+    -e K8S_MASTER=http://127.0.0.1:8181
+    -e CUR_NET=calico
+    -e EX_DOMAIN=tvga8.goodrain.org
+    -v /opt/rainbond/k8s:/etc/goodrain/kubernetes
+    -v /grdata:/grdata
+    -i rainbond/rbd-worker:3.7
+    --log-level=debug
+    --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig"
+    --mysql="write:08a01100@tcp(192.168.8.229:3306)/region"
+  stop: docker stop rbd-worker
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-dns
+  endpoints:
+  - name: DNS_ENDPOINTS
+    protocol: udp
+    port: 53
+  health:
+    name: rbd-dns
+    model: cmd
+    address: /opt/rainbond/health/rbd-dns.sh
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-dns
+  start: >-
+    docker run --name rbd-dns
+    --network host
+    --memory 1024M
+    -e VERBOSE=true
+    -v /opt/rainbond/kubernetes/kubecfg/:/opt/rainbond/kubernetes/kubecfg/
+    -i rainbond/rbd-dns:3.6
+    --kubecfg-file=/opt/rainbond/kubernetes/kubecfg/admin.kubeconfig
+    --v=5
+    --healthz-port=8089
+    --nameservers=100.100.2.136,114.114.114.114
+    --recoders=goodrain.me=192.168.8.229,*.goodrain.me=192.168.8.229,alihz.824b2e9dcc4d461a852ddea20369d377.svc.cluster.local=8.8.8.8,test.xx=8.8.8.8
+  stop: docker stop rbd-dns
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-eventlog
+  endpoints:
+  - name: EVENTLOG_ENDPOINTS
+    protocol: http
+    port: 6363
+  health:
+    name: rbd-eventlog
+    model: http
+    address: 127.0.0.1:6363/health
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-eventlog
+  start: >-
+    docker run --name rbd-eventlog
+    --network host
+    --memory 1024M
+    -e MYSQL_HOST=192.168.8.229
+    -e MYSQL_PORT=3306
+    -e MYSQL_USER=write
+    -e MYSQL_PASSWORD=08a01100
+    -e MYSQL_DATABASE=region
+    -e K8S_MASTER=http://127.0.0.1:8181
+    -e CLUSTER_BIND_IP=192.168.8.229
+    -v /opt/rainbond/logs/eventlog:/var/log
+    -v /grdata/downloads/log:/grdata/logs
+    -i rainbond/rbd-eventlog:3.7
+  stop: docker stop rbd-eventlog
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-lb
+  endpoints:
+  - name: LB_ENDPOINTS
+    protocol: http
+    port: 80
+  health:
+    name: rbd-lb
+    model: http
+    address: 127.0.0.1:10002/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-lb
+  start: >-
+    docker run --name rbd-lb
+    --network host
+    --memory 1024M
+    -e HTTP_SUFFIX_URL=tvga8.goodrain.org
+    -e DEFAULT_PORT=80
+    -v /opt/rainbond/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
+    -i rainbond/rbd-lb:3.6
+  stop: docker stop rbd-lb
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-mq
+  endpoints:
+  - name: MQ_ENDPOINTS
+    protocol: http
+    port: 6301
+  health:
+    name: rbd-mq
+    model: http
+    address: 127.0.0.1:6301/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-mq
+  start: >-
+    docker run --name rbd-mq
+    --network host
+    --memory 1024M
+    -i rainbond/rbd-mq:3.7
+    --log-level=debug
+  stop: docker stop rbd-mq
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-webcli
+  endpoints:
+  - name: WEBCLI_ENDPOINTS
+    protocol: http
+    port: 7171
+  health:
+    name: rbd-webcli
+    model: http
+    address: 127.0.0.1:7171/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-webcli
+  start: >-
+    docker run --name rbd-webcli
+    --network host
+    --memory 1024M
+    -v /usr/local/bin/kubectl:/usr/bin/kubectl
+    -v /root/.kube:/root/.kube
+    -i rainbond/rbd-webcli:3.7
+    --hostIP=192.168.8.229
+  stop: docker stop rbd-webcli
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-app-ui
+  endpoints:
+  - name: APP_UI_ENDPOINTS
+    protocol: http
+    port: 7070
+  health:
+    name: rbd-app-ui
+    model: http
+    address: 127.0.0.1:7070/
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-app-ui
+  start: >-
+    docker run --name rbd-app-ui
+    --network host
+    --memory 1024M
+    -e  REGION_TAG=cloudbang
+    -e  MYSQL_HOST=192.168.8.229
+    -e  MYSQL_PORT=3306
+    -e  MYSQL_USER=write
+    -e  MYSQL_PASS=08a01100
+    -e  MYSQL_DB=console
+    -v /grdata/services/console:/data
+    -v /opt/rainbond/logs/service_logs/goodrain_web/goodrain.log:/tmp/goodrain.log
+    -v /opt/rainbond/logs/service_logs/goodrain_web/request.log:/tmp/request.log
+    -i rainbond/rbd-app-ui:3.5
+  stop: docker stop rbd-app-ui
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-db
+  endpoints:
+  - name: DB_ENDPOINTS
+    protocol: tcp
+    port: 3306
+  health:
+    name: rbd-db
+    model: tcp
+    address: 127.0.0.1:3306
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-db
+  start: >-
+    docker run --name rbd-db
+    --network host
+    --memory 1024M
+    -e MYSQL_ALLOW_EMPTY_PASSWORD=true
+    -e MYSQL_ROOT_PASSWORD="gr123465!"
+    -e MYSQL_RANDOM_ROOT_PASSWORD="gr123465!"
+    -v /opt/rainbond/data/rbd-db:/data
+    -i rainbond/rbd-db:3.5
+  stop: docker stop rbd-db
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-entrance
+  endpoints:
+  - name: ENTRANCE_ENDPOINTS
+    protocol: http
+    port: 6200
+  health:
+    name: rbd-entrance
+    model: http
+    address: 127.0.0.1:6200/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-entrance
+  start: >-
+    docker run --name rbd-entrance
+    --network host
+    --memory 1024M
+    -e DEFAULT_HTTP_PORT=80
+    -e DEFAULT_HTTPS_PORT=443
+    -v /opt/rainbond/k8s:/etc/goodrain/kubernetes
+    -i rainbond/rbd-entrance:3.7
+    --plugin-name=openresty
+    --plugin-opts=urls=http://192.168.8.229:10002
+    --kube-conf=/etc/goodrain/kubernetes/admin.kubeconfig
+    --log-level=debug
+    --etcd-endpoints http://192.168.8.229:2379
+  stop: docker stop rbd-entrance
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-fs
+  health:
+    name: rbd-fs
+    model: cmd
+    address: ((`df -Th | grep nfs | wc -l` == 1))
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  type: oneshot
+  start: ((`df -Th | grep nfs | wc -l` == 1)) || timeout -s 9 9 mount -t nfs -o vers=3,nolock,noatime 9b16a4af62-ajd69.cn-zhangjiakou.nas.aliyuncs.com:/ /grdata
+- name: rbd-hub
+  health:
+    name: rbd-hub
+    model: http
+    address: 127.0.0.1:5000/
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-hub
+  start: >-
+    docker run --name rbd-hub
+    --network host
+    --memory 1024M
+    -v /grdata/services/registry/:/var/lib/registry
+    -i rainbond/rbd-registry:2.3.1
+  stop: docker stop rbd-hub
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-monitor
+  endpoints:
+  - name: MONITOR_ENDPOINTS
+    protocol: http
+    port: 3329
+  - name: PROMETHEUS_ENDPOINTS
+    protocol: http
+    port: 9999
+  health:
+    name: rbd-monitor
+    model: http
+    address: 127.0.0.1:3329/monitor/health
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-monitor
+  start: >-
+    docker run --name rbd-monitor
+    --network host
+    --memory 1024M
+    -v /grdata/services/prometheus/data:/prometheusdata
+    -i rainbond/rbd-monitor:3.7
+    --etcd-endpoints=http://192.168.8.229:2379 --advertise-addr=192.168.8.229:9999 --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
+  stop: docker stop rbd-monitor
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-repo
+  endpoints:
+  - name: REPO_ENDPOINTS
+    protocol: http
+    port:
+  health:
+    name: rbd-repo
+    model: http
+    address: 127.0.0.1:8081/
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-repo
+  start: >-
+    docker run --name rbd-repo
+    --network host
+    --memory 1024M
+    -v /grdata/services/artifactory5:/var/opt/jfrog/artifactory
+    -i rainbond/rbd-repo:3.5
+  stop: docker stop rbd-repo
+  restart_policy: always
+  restart_sec: 10
+- name: etcd
+  endpoints:
+  - name: ETCD_ENDPOINTS
+    protocol: http
+    port: 2379
+  health:
+    name: etcd
+    model: http
+    address: 127.0.0.1:2379/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm etcd
+  start: LOCAL_IP=192.168.8.229 /opt/rainbond/etcd/scripts/start.sh
+  #start: LOCAL_IP=__LOCAL_IP__ /opt/rainbond/etcd/scripts/start.sh
+  stop: docker stop etcd
+  restart_policy: always
+  restart_sec: 10
+- name: kube-apiserver
+  endpoints:
+  - name: APISERVER_ENDPOINTS
+    protocol: http
+    port: 8181
+  health:
+    name: kube-apiserver
+    model: http
+    address: 127.0.0.1:8181/version
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-apiserver
+  start: >-
+    docker run --name kube-apiserver
+    --network host
+    --privileged
+    -v /opt/rainbond/kubernetes:/opt/rainbond/kubernetes
+    rainbond/kube-apiserver:v1.6.4
+    --etcd_servers=${ETCD_ENDPOINTS}
+    --insecure-bind-address=127.0.0.1
+    --insecure-port=8181
+    --advertise-address=0.0.0.0 --bind-address=0.0.0.0
+    --admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota
+    --authorization-mode=RBAC
+    --runtime-config=rbac.authorization.k8s.io/v1beta1
+    --experimental-bootstrap-token-auth
+    --token-auth-file=/opt/rainbond/kubernetes/kubecfg/token.csv
+    --tls-cert-file=/opt/rainbond/kubernetes/ssl/kubernetes.pem
+    --tls-private-key-file=/opt/rainbond/kubernetes/ssl/kubernetes-key.pem
+    --client-ca-file=/opt/rainbond/kubernetes/ssl/ca.pem
+    --service-account-key-file=/opt/rainbond/kubernetes/ssl/ca-key.pem
+    --logtostderr=true
+    --service-cluster-ip-range=11.1.0.0/16
+  stop: docker stop kube-apiserver
+  restart_policy: always
+  restart_sec: 10
+- name: docker
+  endpoints:
+  - name: DOCKER_ENDPOINTS
+    protocol: http
+    port: 2376
+  health:
+    name: docker
+    model: http
+    address:  127.0.0.1:2376/version
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  type: notify
+  start: none
+  restart_policy: always
+  restart_sec: 10
+- name: kubelet
+  endpoints:
+  - name: KUBELET_ENDPOINTS
+    protocol: http
+    port: 10248
+  health:
+    name: kubelet
+    model: tcp
+    address: 127.0.0.1:10248
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+    #--address=__HOST_IP__
+    #--hostname_override=__HOST_UUID__
+  start: >-
+    kubelet
+    --address=192.168.8.229
+    --port=10250
+    --hostname_override=192.168.8.229
+    --kubeconfig=/opt/rainbond/kubernetes/kubecfg/admin.kubeconfig
+    --require-kubeconfig
+    --cert-dir=/opt/rainbond/kubernetes/ssl
+    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge
+    --cluster-dns=$DNS_SERVERS
+    --register-node=true
+    --max-pods=10000
+    --custom-config=/opt/rainbond/kubernetes/k8s/custom.conf
+    --network-plugin=cni
+    --network-plugin-dir=/opt/rainbond/cni/bin
+    --cni-conf-dir=/opt/rainbond/cni/net.d
+    --cpu-cfs-quota=false
+    --pod-infra-container-image=goodrain.me/pause-amd64:3.0
+    --logtostderr=true
+    --log-driver=streamlog
+    --maximum-dead-containers-per-container=0
+    --v=2
+  restart_policy: always
+  restart_sec: 10
+- name: kube-scheduler
+  endpoints:
+  - name: SCHEDULER_ENDPOINTS
+    protocol: http
+    port:
+  health:
+    name: kube-scheduler
+    model: tcp
+    address: 127.0.0.1:10251
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-scheduler
+  start: >-
+    docker run --name kube-scheduler
+    --network=host
+    --privileged
+    --volume=/opt/rainbond/kubernetes/k8s:/opt/rainbond/kubernetes/k8s
+    rainbond/kube-scheduler:v1.6.4
+    --logtostderr=true
+    --v=5
+    --master=127.0.0.1:8181
+    --custom-config=/opt/rainbond/kubernetes/k8s/custom.conf
+    --leader-elect=true
+  stop: docker stop kube-scheduler
+  restart_policy: always
+  restart_sec: 10
+- name: kube-controller-manager
+  endpoints:
+  - name: CONTROLLER_MANAGER_ENDPOINTS
+    protocol:
+    port: 10252
+  health:
+    name: kube-controller-manager
+    model: tcp
+    address: 127.0.0.1:10252
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm kube-controller-manager
+  start: >-
+    docker run --name kube-controller-manager
+    --network host
+    --privileged
+    -v /opt/rainbond/kubernetes/k8s:/opt/rainbond/kubernetes/k8s
+    -v /opt/rainbond/kubernetes:/opt/rainbond/kubernetes
+    rainbond/kube-controller-manager:v1.6.4
+    --master=127.0.0.1:8181
+    --pod-eviction-timeout=3m0s
+    --custom-config=/opt/rainbond/kubernetes/k8s/custom.conf
+    --leader-elect=true
+    --logtostderr=true
+    --address=127.0.0.1
+    --v=2
+    --cluster-name=kubernetes
+    --cluster-signing-cert-file=/opt/rainbond/kubernetes/ssl/ca.pem
+    --cluster-signing-key-file=/opt/rainbond/kubernetes/ssl/ca-key.pem
+    --service-account-private-key-file=/opt/rainbond/kubernetes/ssl/ca-key.pem
+    --root-ca-file=/opt/rainbond/kubernetes/ssl/ca.pem
+  stop: docker stop kube-controller-manager
+  restart_policy: always
+  restart_sec: 10
+- name: calico
+  endpoints:
+  - name: CALICO_ENDPOINTS
+    protocol:
+    port: 187
+  health:
+    name: rbd-proxy
+    model: tcp
+    address: 127.0.0.1:187
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-proxy
+  start: >-
+    docker run --name rbd-proxy
+    --network host
+    --memory 1024M
+    -v /opt/rainbond/proxy/sites:/usr/local/tengine/conf/sites
+    -v /opt/rainbond/proxy/ssl:/usr/local/tengine/conf/ssl
+    -v /grdata:/grdata
+    -i rainbond/rbd-proxy:3.5
+  stop: docker stop rbd-proxy
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-proxy
+  endpoints:
+  - name: PROXY_ENDPOINTS
+    protocol:
+    port: 80
+  health:
+    name: rbd-proxy
+    model: tcp
+    address: 127.0.0.1:10252
+    time_interval: 5
+  after:
+    - docker
+    - rbd-fs
+  requires:
+    - rbd-fs
+  type: simple
+  pre_start: docker rm rbd-proxy
+  start: >-
+    docker run --name rbd-proxy
+    --network host
+    --memory 1024M
+    -v /opt/rainbond/proxy/sites:/usr/local/tengine/conf/sites
+    -v /opt/rainbond/proxy/ssl:/usr/local/tengine/conf/ssl
+    -v /grdata:/grdata
+    -i rainbond/rbd-proxy:3.5
+  stop: docker stop rbd-proxy
+  restart_policy: always
+  restart_sec: 10

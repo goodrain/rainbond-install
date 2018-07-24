@@ -69,20 +69,6 @@ install_func(){
       if $( grep 'install-type: online' /srv/pillar/rainbond.sls >/dev/null );then
         REG_Status || return 0
       fi
-        uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
-        notready=$(grctl  node list | grep $uuid | grep false)
-        if [ "$notready" != "" ];then
-            grctl node up $uuid
-        fi
-        Echo_Info "install successfully"
-        public_ip=$(yq r /srv/pillar/rainbond.sls master-public-ip)
-        private_ip=$(yq r /srv/pillar/rainbond.sls master-private-ip)
-        
-        if [ ! -z "$public_ip" ];then
-            Echo_Banner "http://${public_ip}:7070"
-        else
-            Echo_Banner "http://${private_ip}:7070"
-        fi
     else
         Echo_Info "install help"
         Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"

@@ -1,0 +1,6 @@
+version: '2.1'
+services:
+  - name: fs
+  - name: etcd
+  - name: network
+  - name: node

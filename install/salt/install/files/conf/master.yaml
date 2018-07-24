@@ -1,0 +1,19 @@
+version: '2.1'
+services:
+  - name: rbd-monitor
+  - name: rbd-app-ui
+  - name: rbd-webcli
+  - name: rbd-mq
+  - name: rbd-lb
+  - name: rbd-chaos
+  - name: rbd-api
+  - name: rbd-entrance
+  - name: rbd-eventlog
+  - name: rbd-worker
+  - name: rbd-db
+  - name: kube-scheduler
+  - name: kube-controller-manager
+  - name: kube-apiserver
+  - name: rbd-hub
+  - name: rbd-repo
+  - name: rbd-dns

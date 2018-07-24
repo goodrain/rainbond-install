@@ -9,7 +9,7 @@
 {% if pillar.etcd.server.enabled %}
 etcd-script:
   file.managed:
-    - source: salt://install/files/etcd/install/scripts/start-etcd.sh
+    - source: salt://install/files/etcd/scripts/start-etcd.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-etcd.sh
     - makedirs: True
     - template: jinja
@@ -19,7 +19,7 @@ etcd-script:
 
 /etc/systemd/system/etcd.service:
   file.managed:
-    - source: salt://install/files/etcd/install/systemd/etcd.service
+    - source: salt://install/files/etcd/systemd/etcd.service
     - template: jinja
     - user: root
     - group: root
@@ -28,7 +28,7 @@ etcd-script:
 
 add-cluster-script:
   file.managed:
-    - source: salt://install/files/etcd/install/scripts/add-cluster.sh
+    - source: salt://install/files/etcd/scripts/add-cluster.sh
     - name: /tmp/add-cluster.sh
     - makedirs: True
     - template: jinja
@@ -60,7 +60,7 @@ pull-etcd-proxy-image:
 
 etcd-proxy-script:
   file.managed:
-    - source: salt://install/files/etcd/install/scripts/start-etcdproxy.sh
+    - source: salt://install/files/etcd/scripts/start-etcdproxy.sh
     - name: {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
     - makedirs: True
     - template: jinja
@@ -70,7 +70,7 @@ etcd-proxy-script:
 
 /etc/systemd/system/etcd-proxy.service:
   file.managed:
-    - source: salt://install/files/etcd/install/systemd/etcd-proxy.service
+    - source: salt://install/files/etcd/systemd/etcd-proxy.service
     - template: jinja
     - user: root
     - group: root
