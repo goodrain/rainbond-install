@@ -38,7 +38,7 @@ Plugins Version:
 ```Bash
 # Develop dev 
 # new install func
-
+# 3.7版本正式release后不在适用如下方式: 
 git clone --depth 1 -b v3.7-dev https://github.com/goodrain/rainbond-install.git
 cd rainbond-install
 ./setup.sh
