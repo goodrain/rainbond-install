@@ -155,7 +155,7 @@ proxy:
     version: '3.0'
   builder:
     image: builder
-    version: latest
+    version: 3.7
 
 # rainbond components
 rainbond-modules:
