@@ -43,6 +43,7 @@ $2:
   user: root
   passwd: $4
   sudo: True
+  tty: True
   port: 22
 EOF
         else
@@ -52,6 +53,7 @@ $2:
   user: root
   priv: ${4:-/root/.ssh/id_rsa}
   sudo: True
+  tty: True
   port: 22
 EOF
         fi
