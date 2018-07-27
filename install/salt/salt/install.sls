@@ -51,7 +51,7 @@ epel-install:
       - epel-release
     - refresh: True
     - unless: rpm -qa | grep epel-release
-{% else %}
+{% endif %}
 
 salt-minion-conf:
   file.managed:
