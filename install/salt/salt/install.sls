@@ -44,6 +44,15 @@ salt-minion-install:
     - unless: dpkg -l | grep salt-minion
   {% endif %}
 
+{% if grains['os_family']|lower == 'redhat' %}
+epel-install:
+  pkg.installed:
+    - pkgs:
+      - epel-release
+    - refresh: True
+    - unless: rpm -qa | grep epel-release
+{% endif %}
+
 salt-minion-conf:
   file.managed:
     - name: /etc/salt/minion.d/minion.conf
