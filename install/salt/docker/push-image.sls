@@ -14,6 +14,8 @@
 {% set BUILDERVER = salt['pillar.get']('proxy:builder:version') -%}
 {% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
 {% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
+{% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
+{% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
 
 
 upstart-lb:
@@ -47,6 +49,14 @@ push-plugin-tcm:
 push-plugin-mesh:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{MESHTAG_META}}
+
+push-calico:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+
+push-etcd:
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
 
 stop-lb:
     cmd.run:

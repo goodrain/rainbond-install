@@ -66,6 +66,10 @@ pull-calico-image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
 
+rename-calico-image:
+  cmd.run:
+    - name docker tag {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }} {{PRIDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+
 #===================== db image ==================================
 {% set DBIMG = salt['pillar.get']('database:mysql:image') -%}
 {% set DBVER = salt['pillar.get']('database:mysql:version') -%}
