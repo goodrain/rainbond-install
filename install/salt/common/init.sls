@@ -11,6 +11,7 @@ include:
   - common.dns
   - common.pkg
   - common.envs
+  - common.node_conf
 {% if grains['id'] == "manage01" %}
   - common.domain
 {% endif %} 
@@ -25,4 +26,5 @@ include:
   - common.dns
   - common.pkg
   - common.envs
+  - common.node_conf
 {% endif %}
