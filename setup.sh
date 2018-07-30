@@ -85,21 +85,7 @@ help_func(){
 }
 
 case $1 in
-    check)
-        check_func ${@:2} && init_config
-    ;;
-    install)
-        #do not check the internet when install offline
-        if $( grep 'install-type: online' rainbond.yaml.default >/dev/null );then
-        check_func && init_config && install_func ${@:2}
-        else
-        init_config && install_func
-        fi
-    ;;
-    dev)
-        check_func force && init_config && install_func ${@:2}
-    ;;
     *)
-        help_func
+        check_func && init_config && install_func ${@:2}
     ;;
 esac
