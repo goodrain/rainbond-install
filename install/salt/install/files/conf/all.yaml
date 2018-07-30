@@ -12,7 +12,7 @@ services:
   requires:
     - network.target
   type: oneshot
-  start: ((`df -Th | grep nfs | wc -l` == 1)) || timeout -s 9 9 mount -t nfs -o vers=3,nolock,noatime 9b16a4af62-ajd69.cn-zhangjiakou.nas.aliyuncs.com:/ /grdata
+  start: ((`df -Th | grep nfs | wc -l` == 1)) || timeout -s 9 9 mount -t nfs -o vers=3,nolock,noatime xxx:/ /grdata
 - name: rbd-dns
   endpoints:
   - name: DNS_ENDPOINTS
@@ -472,26 +472,29 @@ services:
   type: simple
   pre_start: docker rm kube-apiserver
   start: >-
-    docker run --name kube-apiserver
-    --network host
-    --privileged
-    -v /opt/rainbond/kubernetes:/opt/rainbond/kubernetes
-    rainbond/kube-apiserver:v1.6.4
-    --etcd_servers=${ETCD_ENDPOINTS}
-    --insecure-bind-address=127.0.0.1
-    --insecure-port=8181
-    --advertise-address=0.0.0.0 --bind-address=0.0.0.0
-    --admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota
-    --authorization-mode=RBAC
-    --runtime-config=rbac.authorization.k8s.io/v1beta1
-    --experimental-bootstrap-token-auth
-    --token-auth-file=/opt/rainbond/kubernetes/kubecfg/token.csv
-    --tls-cert-file=/opt/rainbond/kubernetes/ssl/kubernetes.pem
-    --tls-private-key-file=/opt/rainbond/kubernetes/ssl/kubernetes-key.pem
-    --client-ca-file=/opt/rainbond/kubernetes/ssl/ca.pem
-    --service-account-key-file=/opt/rainbond/kubernetes/ssl/ca-key.pem
-    --logtostderr=true
-    --service-cluster-ip-range=11.1.0.0/16
+    /usr/bin/docker \
+  run \
+  --privileged \
+  --restart=always \
+  --net=host \
+  --name kube-apiserver \
+  --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes \
+  {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['api']['image']}}:{{pillar['kubernetes']['api']['version']}} \
+  --insecure-bind-address=127.0.0.1 \
+  --insecure-port=8181 \
+  --advertise-address=0.0.0.0 --bind-address=0.0.0.0 \
+  --etcd-servers=${ETCD_ADDRESS:-{{ pillar['etcd-endpoints'] }}} \
+  --admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota \
+  --authorization-mode=RBAC \
+  --runtime-config=rbac.authorization.k8s.io/v1beta1 \
+  --experimental-bootstrap-token-auth \
+  --token-auth-file={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/token.csv \
+  --tls-cert-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/kubernetes.pem \
+  --tls-private-key-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/kubernetes-key.pem \
+  --client-ca-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca.pem \
+  --service-account-key-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca-key.pem \
+  --logtostderr=true \
+  --service-cluster-ip-range=11.1.0.0/16
   stop: docker stop kube-apiserver
   restart_policy: always
   restart_sec: 10
@@ -510,15 +513,18 @@ services:
   type: simple
   pre_start: docker rm kube-scheduler
   start: >-
-    docker run --name kube-scheduler
-    --network=host
-    --privileged
-    --volume=/opt/rainbond/kubernetes/k8s:/opt/rainbond/kubernetes/k8s
-    rainbond/kube-scheduler:v1.6.4
-    --logtostderr=true
-    --v=5
-    --master=127.0.0.1:8181
-    --custom-config=/opt/rainbond/kubernetes/k8s/custom.conf
+    /usr/bin/docker \
+    run \
+    --privileged \
+    --restart=always \
+    --net=host \
+    --name kube-scheduler \
+    --volume={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:{{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg \
+    {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['schedule']['image']}}:{{pillar['kubernetes']['schedule']['version']}} \
+    --logtostderr=true \
+    --v=5 \
+    --master=127.0.0.1:8181 \
+    --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf \
     --leader-elect=true
   stop: docker stop kube-scheduler
   restart_policy: always
@@ -538,24 +544,26 @@ services:
   type: simple
   pre_start: docker rm kube-controller-manager
   start: >-
-    docker run --name kube-controller-manager
-    --network host
-    --privileged
-    -v /opt/rainbond/kubernetes/k8s:/opt/rainbond/kubernetes/k8s
-    -v /opt/rainbond/kubernetes:/opt/rainbond/kubernetes
-    rainbond/kube-controller-manager:v1.6.4
-    --master=127.0.0.1:8181
-    --pod-eviction-timeout=3m0s
-    --custom-config=/opt/rainbond/kubernetes/k8s/custom.conf
-    --leader-elect=true
-    --logtostderr=true
-    --address=127.0.0.1
-    --v=2
-    --cluster-name=kubernetes
-    --cluster-signing-cert-file=/opt/rainbond/kubernetes/ssl/ca.pem
-    --cluster-signing-key-file=/opt/rainbond/kubernetes/ssl/ca-key.pem
-    --service-account-private-key-file=/opt/rainbond/kubernetes/ssl/ca-key.pem
-    --root-ca-file=/opt/rainbond/kubernetes/ssl/ca.pem
+    /usr/bin/docker \
+  run \
+  --privileged \
+  --restart=always \
+  --net=host \
+  --name kube-controller-manager \
+  --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes \
+  {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['manager']['image']}}:{{pillar['kubernetes']['manager']['version']}} \
+  --master=127.0.0.1:8181 \
+  --pod-eviction-timeout=3m0s \
+  --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf \
+  --leader-elect=true \
+  --logtostderr=true \
+  --address=127.0.0.1 \
+  --v=2 \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca.pem \
+  --cluster-signing-key-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca-key.pem \
+  --service-account-private-key-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca-key.pem \
+  --root-ca-file={{ pillar['rbd-path'] }}/etc/kubernetes/ssl/ca.pem
   stop: docker stop kube-controller-manager
   restart_policy: always
   restart_sec: 10
@@ -574,27 +582,26 @@ services:
   type: simple
   pre_start: docker rm calico
   start: >-
-    docker run --name calico
-    --network host
-    --memory 1024M
-    --privileged
-    --restart=always
-    -e NO_DEFAULT_POOLS=
-    -e CALICO_LIBNETWORK_ENABLED=true
-    -e IP=192.168.8.229
-    -e CALICO_LIBNETWORK_CREATE_PROFILES=true
-    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false
-    -e CALICO_LIBNETWORK_IFPREFIX=cali
-    -e NODENAME=manage01
-    -e CALICO_NETWORKING_BACKEND=bird
-    -e IP6_AUTODETECTION_METHOD=first-found
-    -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS}
-    -v /var/log/calico:/var/log/calico
-    -v /var/run/calico:/var/run/calico
-    -v /lib/modules:/lib/modules
-    -v /run/docker/plugins:/run/docker/plugins
-    -v /var/run/docker.sock:/var/run/docker.sock
-    -i rainbond/calico-node:v2.4.1
+    /usr/bin/docker run --net=host \
+    --privileged \
+    --name=calico  \
+    --restart=always \
+    -e NO_DEFAULT_POOLS= \
+    -e CALICO_LIBNETWORK_ENABLED=true \
+    -e IP={{ grains['mip'][0] }} \
+    -e CALICO_LIBNETWORK_CREATE_PROFILES=true \
+    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false \
+    -e CALICO_LIBNETWORK_IFPREFIX=cali \
+    -e NODENAME=${HOSTNAME} \
+    -e CALICO_NETWORKING_BACKEND=bird \
+    -e IP6_AUTODETECTION_METHOD=first-found \
+    -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS:-http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379} \
+    -v /var/log/calico:/var/log/calico \
+    -v /var/run/calico:/var/run/calico \
+    -v /lib/modules:/lib/modules \
+    -v /run/docker/plugins:/run/docker/plugins \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    {{ pillar['private-image-domain'] }}/{{ pillar['network']['calico']['image'] }}:{{ pillar['network']['calico']['version'] }}
   stop: docker stop calico
   restart_policy: always
   restart_sec: 10
@@ -689,27 +696,26 @@ services:
   type: simple
   pre_start: docker rm calico
   start: >-
-    docker run --name calico
-    --network host
-    --memory 1024M
-    --privileged
-    --restart=always
-    -e NO_DEFAULT_POOLS=
-    -e CALICO_LIBNETWORK_ENABLED=true
-    -e IP=192.168.8.229
-    -e CALICO_LIBNETWORK_CREATE_PROFILES=true
-    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false
-    -e CALICO_LIBNETWORK_IFPREFIX=cali
-    -e NODENAME=manage01
-    -e CALICO_NETWORKING_BACKEND=bird
-    -e IP6_AUTODETECTION_METHOD=first-found
-    -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS}
-    -v /var/log/calico:/var/log/calico
-    -v /var/run/calico:/var/run/calico
-    -v /lib/modules:/lib/modules
-    -v /run/docker/plugins:/run/docker/plugins
-    -v /var/run/docker.sock:/var/run/docker.sock
-    -i rainbond/calico-node:v2.4.1
+    /usr/bin/docker run --net=host \
+    --privileged \
+    --name=calico  \
+    --restart=always \
+    -e NO_DEFAULT_POOLS= \
+    -e CALICO_LIBNETWORK_ENABLED=true \
+    -e IP={{ grains['mip'][0] }} \
+    -e CALICO_LIBNETWORK_CREATE_PROFILES=true \
+    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false \
+    -e CALICO_LIBNETWORK_IFPREFIX=cali \
+    -e NODENAME=${HOSTNAME} \
+    -e CALICO_NETWORKING_BACKEND=bird \
+    -e IP6_AUTODETECTION_METHOD=first-found \
+    -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS:-http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379} \
+    -v /var/log/calico:/var/log/calico \
+    -v /var/run/calico:/var/run/calico \
+    -v /lib/modules:/lib/modules \
+    -v /run/docker/plugins:/run/docker/plugins \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    {{ pillar['private-image-domain'] }}/{{ pillar['network']['calico']['image'] }}:{{ pillar['network']['calico']['version'] }}
   stop: docker stop calico
   restart_policy: always
   restart_sec: 10
