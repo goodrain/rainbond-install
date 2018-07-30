@@ -172,7 +172,7 @@ services:
     docker run --name rbd-api
     --network host
     --memory 1024M
-    -e LicenseSwitch='off'
+    -e LicenseSwitch="off"
     -e EX_DOMAIN={{ pillar['domain'] }}
     -v /grdata:/grdata
     -v {{ pillar['rbd-path'] }}/etc/rbd-api:/etc/goodrain
@@ -368,7 +368,7 @@ services:
     -e MYSQL_PORT={{ pillar['database']['mysql']['port'] }}
     -e MYSQL_USER={{ pillar['database']['mysql']['user'] }}
     -e MYSQL_PASS={{ pillar['database']['mysql']['pass'] }}
-    -e MYSQL_DB: console
+    -e MYSQL_DB=console
     -v /grdata/services/console:/data
     -v /opt/rainbond/logs/service_logs/goodrain_web/goodrain.log:/tmp/goodrain.log
     -v /opt/rainbond/logs/service_logs/goodrain_web/request.log:/tmp/request.log
@@ -395,7 +395,7 @@ services:
     --name rbd-grafana
     --network host
     --memory 1024M
-    --user 200
+    --user 0
     -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     -e GF_SECURITY_ADMIN_PASSWORD={{ pillar['secretkey'] }}
     -v /opt/rainbond/data/rbd-grafana:/var/lib/grafana
@@ -447,7 +447,7 @@ services:
     --insecure-bind-address=127.0.0.1 
     --insecure-port=8181 
     --advertise-address=0.0.0.0 --bind-address=0.0.0.0 
-    --etcd-servers=${ETCD_ADDRESS:-{{ pillar['etcd-endpoints'] }}} 
+    --etcd-servers={{ pillar['etcd-endpoints'] }}
     --admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota 
     --authorization-mode=RBAC 
     --runtime-config=rbac.authorization.k8s.io/v1beta1 
