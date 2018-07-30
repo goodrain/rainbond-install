@@ -623,6 +623,45 @@ services:
   start: none
   restart_policy: always
   restart_sec: 10
+{% if grains['id'] = "manage01" %}
+- name: kubelet
+  endpoints:
+  - name: KUBELET_ENDPOINTS
+    protocol: http
+    port: 10248
+  health:
+    name: kubelet
+    model: tcp
+    address: 127.0.0.1:10248
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  start: >-
+    /usr/local/bin/kubelet
+    --address={{ grains['mip'][0] }}
+    --port=10250
+    --hostname_override={{ grains['uuid'] }}
+    --kubeconfig={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig \
+    --require-kubeconfig \
+    --cert-dir={{ pillar['rbd-path'] }}/etc/kubernetes/ssl \
+    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge \
+    --cluster-dns={{ pillar['master-private-ip'] }}
+    --register-node=false
+    --max-pods=10000 \
+    --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf \
+    --network-plugin=cni \
+    --network-plugin-dir={{ pillar['rbd-path'] }}/bin \
+    --cni-conf-dir={{ pillar['rbd-path'] }}/etc/cni/ \
+    --cpu-cfs-quota=false \
+    --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
+    --logtostderr=true \
+    --log-driver=streamlog \
+    --maximum-dead-containers-per-container=0 \
+    --v=2
+  restart_policy: always
+  restart_sec: 10
+{% endif %}
 {% else %}
 - name: etcd-proxy
   endpoints:
@@ -655,29 +694,27 @@ services:
   after:
     - docker
   type: simple
-    #--address=__HOST_IP__
-    #--hostname_override=__HOST_UUID__
   start: >-
-    kubelet
-    --address=192.168.8.229
+    /usr/local/bin/kubelet
+    --address={{ grains['mip'][0] }}
     --port=10250
-    --hostname_override=192.168.8.229
-    --kubeconfig=/opt/rainbond/kubernetes/kubecfg/admin.kubeconfig
-    --require-kubeconfig
-    --cert-dir=/opt/rainbond/kubernetes/ssl
-    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge
-    --cluster-dns=$DNS_SERVERS
-    --register-node=true
-    --max-pods=10000
-    --custom-config=/opt/rainbond/kubernetes/k8s/custom.conf
-    --network-plugin=cni
-    --network-plugin-dir=/opt/rainbond/cni/bin
-    --cni-conf-dir=/opt/rainbond/cni/net.d
-    --cpu-cfs-quota=false
-    --pod-infra-container-image=goodrain.me/pause-amd64:3.0
-    --logtostderr=true
-    --log-driver=streamlog
-    --maximum-dead-containers-per-container=0
+    --hostname_override={{ grains['uuid'] }}
+    --kubeconfig={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig \
+    --require-kubeconfig \
+    --cert-dir={{ pillar['rbd-path'] }}/etc/kubernetes/ssl \
+    --cluster-domain=cluster.local. --hairpin-mode promiscuous-bridge \
+    --cluster-dns={{ pillar['master-private-ip'] }}
+    --register-node=false
+    --max-pods=10000 \
+    --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf \
+    --network-plugin=cni \
+    --network-plugin-dir={{ pillar['rbd-path'] }}/bin \
+    --cni-conf-dir={{ pillar['rbd-path'] }}/etc/cni/ \
+    --cpu-cfs-quota=false \
+    --pod-infra-container-image=goodrain.me/pause-amd64:3.0 \
+    --logtostderr=true \
+    --log-driver=streamlog \
+    --maximum-dead-containers-per-container=0 \
     --v=2
   restart_policy: always
   restart_sec: 10
@@ -689,7 +726,7 @@ services:
   health:
     name: calico
     model: cmd
-    address: ((`docker ps|grep rainbond/calico-node|wc -l` == 1))
+    address: ((`docker ps|grep calico|wc -l` == 1))
     time_interval: 5
   after:
     - docker
