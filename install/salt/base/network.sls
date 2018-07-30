@@ -4,7 +4,7 @@
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 
 {% if grains['id'] == 'manage01' %}
-init.calico:
+init-calico:
   file.managed:
     - name: {{ pillar['rbd-path'] }}/bin/init.calico
     - source: salt://install/files/network/calico/init.calico
@@ -18,7 +18,7 @@ init_calico:
   cmd.run: 
     - name: bash {{ pillar['rbd-path'] }}/bin/init.calico
     - require:
-      - file: init.calico
+      - file: init-calico
 {% else %}
 pull-calico-image:
   cmd.run:
