@@ -43,22 +43,38 @@ pull_api_image:
     - name: docker pull {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
     - unless: docker inspect {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
 
+rename_api_image:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{ APIIMG }}:{{ APIVER }} {{PRIDOMAIN}}/{{ APIIMG }}:{{ APIVER }}
+
 pull_manager_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
     - unless: docker inspect {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+
+rename_manager_image:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }} {{PRIDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
 
 pull_schedule_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
     - unless: docker inspect {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
 
+rename_schedule_image:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }} {{PRIDOMAIN}}/{{ SDLIMG }}:{{ SDLVER }}
+
 #===================== etcd image ================================
 {% set ETCDIMG = salt['pillar.get']('etcd:server:image') -%}
 {% set ETCDVER = salt['pillar.get']('etcd:server:version') -%}
-docker-pull-etcd-image:
+pull_etcd_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
+
+rename_etcd_image:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }} {{PRIDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
 #===================== network image =============================
 {% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
 {% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
@@ -68,7 +84,7 @@ pull-calico-image:
 
 rename-calico-image:
   cmd.run:
-    - name docker tag {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }} {{PRIDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }} {{PRIDOMAIN}}/{{ CALICOIMG }}:{{ CALICOVER }}
 
 #===================== db image ==================================
 {% set DBIMG = salt['pillar.get']('database:mysql:image') -%}
