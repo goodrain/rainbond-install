@@ -325,7 +325,7 @@ services:
   health:
     name: rbd-eventlog
     model: http
-    address: 127.0.0.1:6363/health
+    address: {{ grains['mip'][0] }}:6363/health
     time_interval: 5
   after:
     - docker
