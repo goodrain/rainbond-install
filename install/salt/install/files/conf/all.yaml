@@ -587,7 +587,7 @@ services:
   start: none
   restart_policy: always
   restart_sec: 10
-{% if grains['id'] = "manage01" %}
+{% if grains['id'] == "manage01" %}
 - name: kubelet
   endpoints:
   - name: KUBELET_ENDPOINTS
