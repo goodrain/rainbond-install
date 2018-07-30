@@ -340,7 +340,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     -v /grdata/downloads/log:/grdata/logs
     -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
-    --cluster.bind.ip={{ grains['mip'][0] }} --db.type=mysql --db.url={{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region --discover.etcd.addr={{ pillar['etcd-endpoints'] }} --eventlog.bind.ip={{ grains['mip'][0] }} --websocket.bind.ip={{ grains['mip'][0] }} --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
+    --cluster.bind.ip={{ grains['mip'][0] }} --db.type=mysql --db.url="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region" --discover.etcd.addr={{ pillar['etcd-endpoints'] }} --eventlog.bind.ip={{ grains['mip'][0] }} --websocket.bind.ip={{ grains['mip'][0] }} --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
   stop: docker stop rbd-eventlog
   restart_policy: always
   restart_sec: 10

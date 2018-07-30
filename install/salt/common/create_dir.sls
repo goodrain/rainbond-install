@@ -88,6 +88,11 @@ etc-k8s-kubecfg-dir:
     - name: {{ DIR }}/etc/kubernetes/kubecfg
     - makedirs: True
 
+health-dir:
+  file.directory:
+    - name: {{ DIR }}/health
+    - makedirs: True
+
 #=========================== rainbond/data directory ===========================
 data-dir:
   file.directory:
