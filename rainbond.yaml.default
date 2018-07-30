@@ -1,10 +1,5 @@
 # rainbond global config
-# use ./scripts/yq maintain
-# example:
-# read:           ./scripts/yq r t.yml etcd.server.members[0].name
-# write/update:   ./scripts/yq w t.yml etcd.server.members[0].name compute01
-# more information: http://mikefarah.github.io/yq/
-rbd-version: 3.6
+rbd-version: 3.7
 rbd-path: /opt/rainbond
 install-type: online
 master-hostname: manage01
@@ -113,7 +108,7 @@ kubernetes:
     version: dev
   cni:
     image: cni
-    version: k8s_v3.6
+    version: k8s_v3.7
   api:
     image: kube-apiserver
     version: v1.6.4
@@ -161,43 +156,43 @@ proxy:
 rainbond-modules:
   rbd-api:
     image: rbd-api
-    version: 3.6
+    version: 3.7
   rbd-dns:       
     image: rbd-dns
-    version: 3.6
+    version: 3.7
   rbd-registry: 
     image: rbd-registry
     version: 2.3.1
   rbd-repo: 
     image: rbd-repo
-    version: 3.6
+    version: 3.7
   rbd-worker: 
     image: rbd-worker
-    version: 3.6
+    version: 3.7
   rbd-eventlog: 
     image: rbd-eventlog
-    version: 3.6
+    version: 3.7
   rbd-entrance: 
     image: rbd-entrance
-    version: 3.6
+    version: 3.7
   rbd-chaos: 
     image: rbd-chaos
-    version: 3.6
+    version: 3.7
   rbd-lb: 
     image: rbd-lb
-    version: 3.6
+    version: 3.7
   rbd-mq: 
     image: rbd-mq
-    version: 3.6
+    version: 3.7
   rbd-webcli: 
     image: rbd-webcli
-    version: 3.6
+    version: 3.7
   rbd-app-ui: 
     image: rbd-app-ui
-    version: 3.6
+    version: 3.7
   rbd-monitor: 
     image: rbd-monitor
-    version: 3.6
+    version: 3.7
   rbd-cni:
     image: cni
-    version: rbd_v3.6
+    version: rbd_v3.7
