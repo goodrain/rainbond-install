@@ -1,18 +1,6 @@
 version: '2.1'
 services:
 {% if 'manage' in grains['id'] %}
-- name: rbd-fs
-  health:
-    name: rbd-fs
-    model: cmd
-    address: ((`df -Th | grep nfs | wc -l` == 1))
-    time_interval: 5
-  after:
-    - network.target
-  requires:
-    - network.target
-  type: oneshot
-  start: ((`df -Th | grep nfs | wc -l` == 1)) || timeout -s 9 9 mount -t nfs -o vers=3,nolock,noatime xxx:/ /grdata
 - name: rbd-dns
   endpoints:
   - name: DNS_ENDPOINTS
@@ -50,9 +38,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-hub
   start: >-
@@ -76,9 +61,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-repo
   start: >-
@@ -184,9 +166,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-api
   start: >-
@@ -217,9 +196,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-chaos
   start: >-
@@ -298,9 +274,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-worker
   start: >-
@@ -332,9 +305,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-monitor
   start: >-
@@ -359,9 +329,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-eventlog
   start: >-
@@ -390,9 +357,6 @@ services:
     time_interval: 5
   after:
     - docker
-    - rbd-fs
-  requires:
-    - rbd-fs
   type: simple
   pre_start: docker rm rbd-app-ui
   start: >-
