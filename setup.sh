@@ -68,20 +68,12 @@ install_func(){
     if [ "$fail_num" -eq 0 ];then
       if $( grep 'install-type: online' /srv/pillar/rainbond.sls >/dev/null );then
         REG_Status || return 0
+        systemctl restart node
       fi
     else
         Echo_Info "install help"
         Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"
     fi
-}
-
-help_func(){
-    echo "help:"
-    echo "check   --- check cmd "
-    echo "offline --- work in offline env cmd"
-    echo "install --- install cmd "
-    echo "dev     --- ignore check install cmd "
-    echo ""
 }
 
 case $1 in
