@@ -416,7 +416,7 @@ services:
     - docker
   type: simple
   pre_start: docker rm etcd
-  start: LOCAL_IP=192.168.8.229 /opt/rainbond/etcd/scripts/start.sh
+  start: LOCAL_IP={{ grains['mip'][0] }} {{ pillar['rbd-path'] }}/scripts/start-etcd.sh
   stop: docker stop etcd
   restart_policy: always
   restart_sec: 10
@@ -538,7 +538,7 @@ services:
   health:
     name: calico
     model: cmd
-    address: ((`docker ps|grep rainbond/calico-node|wc -l` == 1))
+    address: ((`calicoctl node status | grep 'Calico process is running' | wc -l` == 1))
     time_interval: 5
   after:
     - docker
@@ -640,7 +640,7 @@ services:
     - docker
   type: simple
   pre_start: docker rm etcd-proxy
-  start: LOCAL_IP=192.168.8.229 /opt/rainbond/etcd/scripts/start.sh
+  start: MASTER_IP={% for etcdmem in pillar.etcd.server.members %}{{ etcdmem.host}}:2379,{% endfor%} {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
   stop: docker stop etcd-proxy
   restart_policy: always
   restart_sec: 10
@@ -689,7 +689,7 @@ services:
   health:
     name: calico
     model: cmd
-    address: ((`docker ps|grep calico|wc -l` == 1))
+    address: ((`calicoctl node status | grep 'Calico process is running' | wc -l` == 1))
     time_interval: 5
   after:
     - docker
