@@ -34,10 +34,12 @@ prepare_k8s_cni_tools:
 check_or_create_certificates:
   cmd.run:
     - name: docker run --rm -v /srv/salt/install/files/k8s/ssl:/ssl -w /ssl {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }} kip {{ pillar['master-private-ip'] }}
+    - unless: ls /srv/salt/install/files/k8s/ssl/*.pem
 
 check_or_create_kubeconfig:
   cmd.run:
     - name: docker run --rm -v /srv/salt/install/files/k8s/ssl:/etc/goodrain/kubernetes/ssl -v /srv/salt/install/files/k8s/kubecfg:/k8s {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
+    - unless: ls /srv/salt/install/files/k8s/kubecfg/*.kubeconfig
 
 proxy_kubeconfig:
   file.managed:

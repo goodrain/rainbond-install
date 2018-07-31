@@ -29,7 +29,7 @@ kube-ssl-rsync-grdata:
 
 kube-local:
   file.managed:
-    - source: {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig
+    - source: salt://install/files/k8s/kubecfg/admin.kubeconfig
     - name: /root/.kube/config
     - makedirs: True
     - mode: 600
