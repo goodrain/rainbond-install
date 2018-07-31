@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-grafana rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+
+func(){
+    for services in ${ALL_SERVICES}
+    do
+        systemctl $1 $services
+    done
+}
+
+if [ "$1" == "start" ];then
+    func start
+else
+    func stop
+fi

@@ -12,6 +12,13 @@
     - group: root
     - mode: 755
 
+/usr/bin/grclis:
+  file.managed:
+    - source: salt://install/files/init/bin/grclis
+    - user: root
+    - group: root
+    - mode: 755
+
 /usr/bin/din:
   file.managed:
     - source: salt://install/files/init/bin/din
