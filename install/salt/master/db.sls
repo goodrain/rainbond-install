@@ -17,7 +17,7 @@ charset.cnf:
 db-upstart:
   cmd.run:
     - name: dc-compose up -d rbd-db
-    - unless: check_compose rbd-db
+    - unless: docker ps | grep rbd-db
     - require:
       - file: charset.cnf
       - file: my.cnf
@@ -70,8 +70,12 @@ exec_init_sql:
 
 db-stop:
   cmd.run:
-    - name: dc-compose stop 
+    - name: docker stop rbd-db
 
-db-cclear:
+dc-stop:
+  cmd.run:
+    - name: dc-compose stop
+
+all-cclear:
   cmd.run:
     - name: cclear

@@ -41,20 +41,22 @@ rename-pull-hub-image:
     - name: docker tag {{PUBDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }} {{PRIDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
 
 upstart-lb:
-    cmd.run:
-        - name: dc-compose up -d rbd-lb
+  cmd.run:
+    - name: dc-compose up -d rbd-lb
+    - unless: docker ps | grep lb
 
 upstart-hub:
-    cmd.run:
-        - name: dc-compose up -d rbd-hub
+  cmd.run:
+    - name: dc-compose up -d rbd-hub
+    - unless: docker ps | grep lb
 
 push-lb-image:
-    cmd.run:
-        - name: docker push {{PRIDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ LBIMG }}:{{ LBVER }}
 
 push-hub-image:
-    cmd.run:
-        - name: docker push {{PRIDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
+  cmd.run:
+    - name: docker push {{PRIDOMAIN}}/{{ REGISTRYIMG }}:{{ REGISTRYVER }}
 
 #===================== k8s image =================================
 {% set CFSSLIMG = salt['pillar.get']('kubernetes:cfssl:image') -%}
@@ -464,12 +466,12 @@ push-etcd:
     - name: docker push {{PRIDOMAIN}}/{{ ETCDIMG }}:{{ ETCDVER }}
 
 stop-lb:
-    cmd.run:
-        - name: dc-compose stop rbd-lb
+  cmd.run:
+    - name: docker stop rbd-lb
 
 stop-hub:
-    cmd.run:
-        - name: dc-compose stop rbd-hub
+  cmd.run:
+    - name: docker stop rbd-hub
 clear-stop:
     cmd.run:
         - name: cclear
