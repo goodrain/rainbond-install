@@ -123,23 +123,9 @@ proxy_site_ssl:
     - group: root
 
 {% if "manage" in grains['id'] %}
-/usr/local/bin/etcdctl:
-  file.managed:
-    - source: salt://install/files/misc/bin/etcdctl
-    - mode: 755
-    - user: root
-    - group: root
-
 /usr/local/bin/grctl:
   file.managed:
     - source: salt://install/files/misc/bin/grctl
-    - mode: 755
-    - user: root
-    - group: root
-
-/usr/local/bin/kubectl:
-  file.managed:
-    - source: salt://install/files/misc/bin/kubectl
     - mode: 755
     - user: root
     - group: root
@@ -153,6 +139,20 @@ proxy_site_ssl:
     - group: root
 {% endif %}
 {% endif %}
+
+/usr/local/bin/kubectl:
+  file.managed:
+    - source: salt://install/files/misc/bin/kubectl
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/etcdctl:
+  file.managed:
+    - source: salt://install/files/misc/bin/etcdctl
+    - mode: 755
+    - user: root
+    - group: root
 
 /usr/local/bin/kubelet:
   file.managed:

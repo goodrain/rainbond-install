@@ -633,8 +633,8 @@ services:
     port: 2379
   health:
     name: etcd
-    model: http
-    address: 127.0.0.1:2379/health
+    model: cmd
+    address: ((`ETCDCTL_API=3 etcdctl --endpoints=http://127.0.0.1:2379 endpoint health | grep " health" | wc -l` ==1))
     time_interval: 5
   after:
     - docker
