@@ -55,6 +55,7 @@ create_console:
 rbd-app-ui:
   cmd.run:
     - name: dc-compose up -d rbd-app-ui
+    - unless: docker ps | grep rbd-app-ui
 
 update-app-ui:
   cmd.run:
@@ -71,6 +72,10 @@ exec_init_sql:
 db-stop:
   cmd.run:
     - name: docker stop rbd-db
+
+ui-stop:
+  cmd.run:
+    - name: docker stop rbd-app-ui
 
 dc-stop:
   cmd.run:
