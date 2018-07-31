@@ -106,7 +106,7 @@ pull_api_image:
 
 pull_manager_image:
   cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{ CTLMGEIMG }}:{{ APIVER }}
+    - name: docker pull {{PRIDOMAIN}}/{{ CTLMGEIMG }}:{{ CTLMGEVER }}
 
 pull_schedule_image:
   cmd.run:
