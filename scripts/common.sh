@@ -17,6 +17,7 @@ RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="common \
 storage \
 docker \
+image \
 base \
 master \
 worker"
@@ -24,6 +25,7 @@ worker"
 COMPUTE_MODULES="common \
 storage \
 docker \
+image \
 base \
 worker"
 
