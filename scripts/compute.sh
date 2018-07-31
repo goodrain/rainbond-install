@@ -29,54 +29,41 @@
 init_func(){
     Echo_Info "Init compute node config."
     Echo_Info "change hostname"
-    if [ "$1" = "single" ];then
-        echo $@
-        if [ "$#" -lt 4 ];then
-            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/compute.sh init single <hostname> <ip> <passwd/key> <type>"
-        fi
-        grep "$2" /etc/salt/roster > /dev/null
+    # <hostname> <ip>  <password/key-path> <type:ssh>
+        grep "$1" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
-            if [ -z "$5" ];then
+            if [ -z "$4" ];then
                 cat >> /etc/salt/roster <<EOF
-$2:
-  host: $3
+$1:
+  host: $2
   user: root
-  passwd: $4
+  passwd: $3
   sudo: True
+  tty: True
   port: 22
 EOF
         else
             cat >> /etc/salt/roster <<EOF
-$2:
-  host: $3
+$1:
+  host: $2
   user: root
-  priv: ${4:-/root/.ssh/id_rsa}
+  priv: ${3:-/root/.ssh/id_rsa}
   sudo: True
+  tty: True
   port: 22
 EOF
         fi
-        salt-ssh -i $2 state.sls init.init_node
+        salt-ssh -i $1 state.sls common.init_node
 
-        uuid=$(salt-ssh -i $2 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
-        grep "$3" /etc/hosts > /dev/null
-        [ "$?" -ne 0 ] && echo "$3 $2 $uuid" >> /etc/hosts
+        uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+        grep "$2" /etc/hosts > /dev/null
+        [ "$?" -ne 0 ] && echo "$2 $1 $uuid" >> /etc/hosts
         else
             Echo_EXIST $2["$3"]
         fi
-        bash scripts/node_update_hosts.sh $uuid $3 add
-    elif [ "$1" = "multi" ];then
-        if [ "$#" -ne 3 ];then
-            Echo_Error "need 3 args\n like: [$PWD] ./scripts/compute.sh init multi <ip.txt path> <passwd>"
-        fi
-        salt-ssh -i -E "compute" state.sls init.init_node
-    else
-        Echo_Error "not support ${1:-null}"
-    fi
+        bash scripts/node_update_hosts.sh $uuid $2 add
 }
 
-check_func(){
-    Echo_Info "Check Compute func."
-}
 
 install_compute_func(){
     fail_num=0
@@ -141,21 +128,13 @@ help_func(){
     Echo_Info "install <hostname>"
     Echo_Info "offline"
     echo "args: single <hostname> <ip>  <password/key-path>"
-
+    Echo_Info "<hostname> <ip>  <password/key-path> <type:ssh>"
 }
 
 case $1 in
-    init)
-        init_func ${@:2}
-    ;;
-    install)
-        install_compute_func $2 
-    ;;
-    offline)
-        init_func ${@:2} && install_compute_func $3
-    ;;
     *)
-        help_func
+        init_func $@
+        install_compute_func $1
     ;;
 esac
 

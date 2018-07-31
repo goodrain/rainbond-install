@@ -48,7 +48,7 @@ upstart-lb:
 upstart-hub:
   cmd.run:
     - name: dc-compose up -d rbd-hub
-    - unless: docker ps | grep lb
+    - unless: docker ps | grep hub
 
 push-lb-image:
   cmd.run:
@@ -73,23 +73,6 @@ push-hub-image:
 {% set K8SCNIVER = salt['pillar.get']('kubernetes:cni:version') -%}
 {% set RBDCNIIMG = salt['pillar.get']('rainbond-modules:rbd-cni:image') -%}
 {% set RBDCNIVER = salt['pillar.get']('rainbond-modules:rbd-cni:version') -%}
-
-pull_cfssl_image:
-  cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
-
-pull_kubecfg_image:
-  cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
-
-pull_rbd_cni_image:
-  cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }}
-
-
-pull_k8s_cni_image:
-  cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }}
 
 pull_api_image:
   cmd.run:

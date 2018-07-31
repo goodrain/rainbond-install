@@ -23,6 +23,7 @@ worker"
 
 COMPUTE_MODULES="common \
 storage \
+docker \
 base \
 worker"
 

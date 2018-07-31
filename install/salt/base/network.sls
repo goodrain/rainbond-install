@@ -22,5 +22,5 @@ init_calico:
 {% else %}
 pull-calico-image:
   cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
+    - name: docker pull {{PRIDOMAIN}}/{{CALICOIMG}}:{{ CALICOVER }}
 {% endif %}

@@ -29,48 +29,37 @@
 init(){
     Echo_Info "Init manage node config."
     Echo_Info "change hostname"
-    if [ "$1" = "single" ];then
-        echo $@
-        if [ "$#" -lt 4 ];then
-            Echo_Error "need 4 args at least\n like: [$PWD] ./scripts/manage.sh init single <hostname> <ip> <passwd/key> <type>"
-        fi
-        grep "$2" /etc/salt/roster > /dev/null
+
+        grep "$1" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
-            if [ -z "$5" ];then
+            if [ -z "$4" ];then
                 cat >> /etc/salt/roster <<EOF
-$2:
-  host: $3
+$1:
+  host: $2
   user: root
-  passwd: $4
+  passwd: $3
   sudo: True
+  tty: True
   port: 22
 EOF
         else
             cat >> /etc/salt/roster <<EOF
-$2:
-  host: $3
+$1:
+  host: $2
   user: root
-  priv: ${4:-/root/.ssh/id_rsa}
+  priv: ${3:-/root/.ssh/id_rsa}
   sudo: True
+  tty: True
   port: 22
 EOF
         fi
            
-        grep "$3" /etc/hosts > /dev/null
-        [ "$?" -ne 0 ] && echo "$3 $2" >> /etc/hosts
+        grep "$1" /etc/hosts > /dev/null
+        [ "$?" -ne 0 ] && echo "$2 $1" >> /etc/hosts
         else
-            Echo_EXIST $2["$3"]
+            Echo_EXIST $1["$2"]
         fi
-            
-        salt-ssh -i $2 state.sls init.init_node
-    elif [ "$1" = "multi" ];then
-        if [ "$#" -ne 3 ];then
-            Echo_Error "need 3 args\n like: [$PWD] ./scripts/manage.sh init multi <ip.txt path> <passwd>"
-        fi
-        salt-ssh -i -E "manage" state.sls init.init_node
-    else
-        Echo_Error "not support ${1:-null}"
-    fi
+        salt-ssh -i $1 state.sls common.init_node
 }
 update_data(){
     # manage01
@@ -146,6 +135,7 @@ EOF
     yq w -i /srv/pillar/rainbond.sls  etcd-endpoints $ETCD_ENDPOINT
     yq w -i /srv/pillar/rainbond.sls  lb-endpoints $LB_ENDPOINT
 }
+
 install(){
     fail_num=0
     Echo_Info "update salt modules"
@@ -193,33 +183,11 @@ install(){
     fi
 }
 
-help(){
-    Echo_Info "help"
-    Echo_Info "init"
-    echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
-    echo "args: multi <ip.txt path> <password/key-path>"
-    Echo_Info "update"
-    Echo_Info "install"
-    Echo_Info "offline"
-    echo "args: single <hostname> <ip>  <password/key-path>"
-
-}
-
 case $1 in
-    init)
-        init ${@:2}
-    ;;
-    update)
-        update_data
-    ;;
-    install)
-        install $2 
-    ;;
-    offline)
-        init ${@:2} && install ${@:2}
-    ;;
     *)
-        help
+        init $@
+        update_data
+        install $1
     ;;
 esac
 

@@ -22,6 +22,13 @@ node-script:
     - user: root
     - group: root
 
+/usr/local/bin/node:
+  file.managed:
+    - source: salt://install/files/misc/bin/node
+    - mode: 777
+    - user: root
+    - group: root
+
 node:
   service.running:
     - enable: True

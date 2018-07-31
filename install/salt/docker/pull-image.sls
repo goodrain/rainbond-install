@@ -32,11 +32,7 @@ pull_cfssl_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
 
-{% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
-{% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
-pull_kubecfg_image:
-  cmd.run:
-    - name: docker pull {{PUBDOMAIN}}/{{ KUBECFGIMG }}:{{ KUBECFGVER }}
+
 
 pull_api_image:
   cmd.run:

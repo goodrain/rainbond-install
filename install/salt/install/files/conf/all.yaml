@@ -558,7 +558,7 @@ services:
     -e NODENAME=${HOSTNAME} 
     -e CALICO_NETWORKING_BACKEND=bird 
     -e IP6_AUTODETECTION_METHOD=first-found 
-    -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS:-http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379} 
+    -e ETCD_ENDPOINTS=http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379
     -v /var/log/calico:/var/log/calico 
     -v /var/run/calico:/var/run/calico 
     -v /lib/modules:/lib/modules 
@@ -709,7 +709,7 @@ services:
     -e NODENAME=${HOSTNAME} 
     -e CALICO_NETWORKING_BACKEND=bird 
     -e IP6_AUTODETECTION_METHOD=first-found 
-    -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS:-http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379} 
+    -e ETCD_ENDPOINTS=http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379 
     -v /var/log/calico:/var/log/calico 
     -v /var/run/calico:/var/run/calico 
     -v /lib/modules:/lib/modules 
