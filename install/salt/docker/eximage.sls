@@ -176,5 +176,5 @@ pause-pull-image:
 
 runner-pull-image:
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
+    - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
 {% endif %}

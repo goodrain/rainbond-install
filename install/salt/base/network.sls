@@ -2,6 +2,7 @@
 {% set CALICOIMG = salt['pillar.get']('network:calico:image') -%}
 {% set CALICOVER = salt['pillar.get']('network:calico:version') -%}
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
+{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
 {% if grains['id'] == 'manage01' %}
 init-calico:

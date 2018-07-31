@@ -102,7 +102,7 @@ install_compute_func(){
     fi
     
     if [ "$fail_num" -eq 0 ];then
-        dc-compose restart rbd-webcli
+        systemctl restart rbd-webcli
         Echo_Info "install compute node successfully"
         if [ ! -z "$1" ];then
               uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
