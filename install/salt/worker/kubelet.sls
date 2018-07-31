@@ -38,7 +38,6 @@ kubelet-cni-bin:
     - group: root
     - makedirs: True
 
-
 /usr/local/bin/kubelet:
   file.managed:
     - source: salt://install/files/misc/bin/kubelet

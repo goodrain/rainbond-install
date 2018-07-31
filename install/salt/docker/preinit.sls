@@ -40,6 +40,7 @@ compose_plugin_file:
 {% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 
+{% if grains['id'] == "manage01" %}
 pull_cfssl_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}
@@ -55,20 +56,6 @@ pull_rbd_cni_image:
 pull_k8s_cni_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ K8SCNIIMG }}:{{ K8SCNIVER }}
-
-#==================== init lb ====================
-default_http_conf:
-  file.managed:
-    - source: salt://install/files/plugins/proxy.conf
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
-    - template: jinja
-    - makedirs: True
-
-proxy_site_ssl:
-  file.recurse:
-    - source: salt://install/files/ssl/goodrain.me
-    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
-    - makedirs: True
 
 prepare_rbd_cni_tools:
   cmd.run:
@@ -93,6 +80,33 @@ proxy_kubeconfig:
      - source: salt://install/files/k8s/kubecfg/kube-proxy.kubeconfig
      - name: /grdata/kubernetes/kube-proxy.kubeconfig
      - makedirs: True
+
+update_sql:
+  file.managed:
+    - source: salt://install/files/plugins/init.sql
+    - name: /tmp/init.sql
+    - template: jinja
+  
+update_sql_sh:
+  file.managed:
+    - source: salt://install/files/plugins/init.sh
+    - name: /tmp/init.sh
+    - template: jinja
+{% endif %}
+
+#==================== init lb ====================
+default_http_conf:
+  file.managed:
+    - source: salt://install/files/plugins/proxy.conf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
+    - template: jinja
+    - makedirs: True
+
+proxy_site_ssl:
+  file.recurse:
+    - source: salt://install/files/ssl/goodrain.me
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
+    - makedirs: True
 
 /usr/local/bin/calicoctl:
   file.managed:
@@ -140,14 +154,12 @@ proxy_kubeconfig:
 {% endif %}
 {% endif %}
 
-{% if "compute" in grains['id'] %}
 /usr/local/bin/kubelet:
   file.managed:
     - source: salt://install/files/misc/bin/kubelet
     - mode: 755
     - user: root
     - group: root
-{% endif %}
 
 /usr/local/bin/node:
   file.managed:
@@ -169,18 +181,3 @@ proxy_kubeconfig:
     - mode: 755
     - user: root
     - group: root
-
-#==================== init region db ====================
-{% if grains['id'] == "manage01" %}
-update_sql:
-  file.managed:
-    - source: salt://install/files/plugins/init.sql
-    - name: /tmp/init.sql
-    - template: jinja
-  
-update_sql_sh:
-  file.managed:
-    - source: salt://install/files/plugins/init.sh
-    - name: /tmp/init.sh
-    - template: jinja
-{% endif %}

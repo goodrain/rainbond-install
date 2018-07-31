@@ -93,14 +93,12 @@ proxy_kubeconfig:
 {% endif %}
 {% endif %}
 
-{% if "compute" in grains['id'] %}
 /usr/local/bin/kubelet:
   file.managed:
     - source: salt://install/files/misc/bin/kubelet
     - mode: 755
     - user: root
     - group: root
-{% endif %}
 
 /usr/local/bin/node:
   file.managed:
