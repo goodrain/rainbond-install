@@ -364,8 +364,8 @@ builder-pull-image:
 
 builder-tag:  
   cmd.run:
-    - name: docker tag {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - name: docker tag {{PUBDOMAIN}}/{{ BUILDERIMG }}:{{ BUILDERVER }} {{PRIDOMAIN}}/{{BUILDERIMG}}
+    - unless: docker inspect {{PRIDOMAIN}}/{{BUILDERIMG}}
     - require:
         - cmd: builder-pull-image
 
@@ -430,7 +430,7 @@ pause-push-image:
 
 builder-push-image:    
   cmd.run:
-    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - name: docker push {{PRIDOMAIN}}/{{BUILDERIMG}}
 
 push-plugin-tcm:
   cmd.run:
