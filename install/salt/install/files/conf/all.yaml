@@ -21,7 +21,7 @@ services:
     --memory 1024M
     -e VERBOSE=true
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     --kubecfg-file=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
     --v=5
     --healthz-port=8089
@@ -45,7 +45,7 @@ services:
     --network host
     --memory 1024M
     -v /grdata/services/registry/:/var/lib/registry
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-registry']['image'] }}:{{ pillar['rainbond-modules']['rbd-registry']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-registry']['image'] }}:{{ pillar['rainbond-modules']['rbd-registry']['version'] }}
   stop: docker stop rbd-hub
   restart_policy: always
   restart_sec: 10
@@ -68,7 +68,7 @@ services:
     --network host
     --memory 1024M
     -v /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
   stop: docker stop rbd-repo
   restart_policy: always
   restart_sec: 10
@@ -93,7 +93,7 @@ services:
     -e MYSQL_ALLOW_EMPTY_PASSWORD="true"
     -v {{ pillar['rbd-path'] }}/data/rbd-db:/data
     -v {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
   stop: docker stop rbd-db
   restart_policy: always
   restart_sec: 10
@@ -119,7 +119,7 @@ services:
     -e DEFAULT_PORT=80
     -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
     -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
   stop: docker stop rbd-lb
   restart_policy: always
   restart_sec: 10
@@ -144,7 +144,7 @@ services:
     -e DEFAULT_HTTP_PORT=80
     -e DEFAULT_HTTPS_PORT=443
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     --plugin-name=openresty
     --plugin-opts=urls={{ pillar['lb-endpoints'] }}
     --kube-conf=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
@@ -179,7 +179,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     -v {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     -v {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
     --etcd={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
   stop: docker stop rbd-api
   restart_policy: always
@@ -209,7 +209,7 @@ services:
     -v /cache:/cache
     -v /var/run:/var/run
     -v {{ pillar['rbd-path'] }}/etc/rbd-chaos/ssh:/root/.ssh
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     --etcd-endpoints={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
   stop: docker stop rbd-chaos
   restart_policy: always
@@ -232,7 +232,7 @@ services:
     docker run --name rbd-mq
     --network host
     --memory 1024M
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
     --log-level=debug --etcd-endpoints={{ pillar['etcd-endpoints'] }}
   stop: docker stop rbd-mq
   restart_policy: always
@@ -257,7 +257,7 @@ services:
     --memory 1024M
     -v /usr/local/bin/kubectl:/usr/bin/kubectl
     -v /root/.kube:/root/.kube
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
     --hostIP={{ grains['mip'][0] }} --etcd-endpoints={{ pillar['etcd-endpoints'] }}
   stop: docker stop rbd-webcli
   restart_policy: always
@@ -285,7 +285,7 @@ services:
     -e EX_DOMAIN={{ pillar['domain'] }}
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     -v /grdata:/grdata
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
     --log-level=info --etcd-endpoints={{ pillar['etcd-endpoints'] }} --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig" --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
   stop: docker stop rbd-worker
   restart_policy: always
@@ -312,7 +312,7 @@ services:
     --network host
     --memory 1024M
     -v {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
     --etcd-endpoints={{ pillar['etcd-endpoints'] }} --advertise-addr={{ grains['mip'][0] }}:9999  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
   stop: docker stop rbd-monitor
   restart_policy: always
@@ -339,7 +339,7 @@ services:
     -v {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
     -v {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     -v /grdata/downloads/log:/grdata/logs
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     --cluster.bind.ip={{ grains['mip'][0] }} --db.type=mysql --db.url="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region" --discover.etcd.addr={{ pillar['etcd-endpoints'] }} --eventlog.bind.ip={{ grains['mip'][0] }} --websocket.bind.ip={{ grains['mip'][0] }} --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
   stop: docker stop rbd-eventlog
   restart_policy: always
@@ -371,7 +371,7 @@ services:
     -e MYSQL_DB=console
     -v /grdata/services/console:/data
     -v {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log:/tmp/goodrain.log
-    -i {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
   stop: docker stop rbd-app-ui
   restart_policy: always
   restart_sec: 10
@@ -442,7 +442,7 @@ services:
     --net=host 
     --name kube-apiserver 
     --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes 
-    {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['api']['image']}}:{{pillar['kubernetes']['api']['version']}} 
+    {{ pillar['private-image-domain'] }}/{{pillar['kubernetes']['api']['image']}}:{{pillar['kubernetes']['api']['version']}} 
     --insecure-bind-address=127.0.0.1 
     --insecure-port=8181 
     --advertise-address=0.0.0.0 --bind-address=0.0.0.0 
@@ -483,7 +483,7 @@ services:
     --net=host 
     --name kube-scheduler 
     --volume={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:{{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
-    {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['schedule']['image']}}:{{pillar['kubernetes']['schedule']['version']}} 
+    {{ pillar['private-image-domain'] }}/{{pillar['kubernetes']['schedule']['image']}}:{{pillar['kubernetes']['schedule']['version']}} 
     --logtostderr=true 
     --v=5 
     --master=127.0.0.1:8181 
@@ -514,7 +514,7 @@ services:
     --net=host 
     --name kube-controller-manager 
     --volume={{ pillar['rbd-path'] }}/etc/kubernetes:{{ pillar['rbd-path'] }}/etc/kubernetes 
-    {{ pillar['public-image-domain'] }}/{{pillar['kubernetes']['manager']['image']}}:{{pillar['kubernetes']['manager']['version']}} 
+    {{ pillar['private-image-domain'] }}/{{pillar['kubernetes']['manager']['image']}}:{{pillar['kubernetes']['manager']['version']}} 
     --master=127.0.0.1:8181 
     --pod-eviction-timeout=3m0s 
     --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf 

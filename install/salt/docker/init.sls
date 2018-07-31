@@ -1,5 +1,8 @@
 include:
   - docker.install
-  - docker.pull-image
+{% if grains['id'] == 'manage01' %}
+  - docker.image
+{% else %}
+  - docker.eximage
+{% endif %}
   - docker.misc
-  - docker.push-image
