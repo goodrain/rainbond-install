@@ -55,6 +55,62 @@ rbd-pkgs:
     - salt-master
     - salt-minion
 
+rbd-pkgs:
+  centos:
+    - gr-docker-engine
+    - nfs-utils
+    - nfs-kernel-server
+    - nfs-common
+    - glusterfs-server
+    - tar
+    - ntpdate
+    - wget
+    - curl
+    - tree
+    - lsof
+    - htop
+    - nload
+    - net-tools
+    - telnet
+    - rsync
+    - lvm2
+    - git
+    - salt-ssh
+    - perl
+    - bind-utils
+    - dstat 
+    - iproute
+    - bash-completion
+    - salt-master
+    - salt-minion
+  debian:
+    - gr-docker-engine
+    - nfs-utils
+    - nfs-kernel-server
+    - nfs-common
+    - glusterfs-server
+    - tar
+    - ntpdate
+    - wget
+    - curl
+    - tree
+    - lsof
+    - htop
+    - nload
+    - net-tools
+    - telnet
+    - rsync
+    - lvm2
+    - git
+    - salt-ssh
+    - perl
+    - bind-utils
+    - dstat 
+    - iproute
+    - bash-completion
+    - salt-master
+    - salt-minion
+
 # rbd-db
 database:
   type: mysql
