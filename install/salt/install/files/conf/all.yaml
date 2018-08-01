@@ -57,7 +57,7 @@ services:
   health:
     name: rbd-repo
     model: http
-    address: 127.0.0.1:8081/
+    address: lang.goodrain.me
     time_interval: 5
   after:
     - docker
@@ -66,7 +66,6 @@ services:
   start: >-
     docker run --name rbd-repo
     --network host
-    --memory 1024M
     -v /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
   stop: docker stop rbd-repo
