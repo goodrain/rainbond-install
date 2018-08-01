@@ -27,12 +27,8 @@ etcd-endpoints:
 lb-endpoints: 
 
 rbd-pkgs:
-  manage:
+  common:
     - gr-docker-engine
-    - nfs-utils
-    - nfs-kernel-server
-    - nfs-common
-    - glusterfs-server
     - tar
     - ntpdate
     - wget
@@ -44,72 +40,35 @@ rbd-pkgs:
     - net-tools
     - telnet
     - rsync
-    - lvm2
     - git
-    - salt-ssh
-    - perl
-    - bind-utils
     - dstat 
-    - iproute
-    - bash-completion
     - salt-master
     - salt-minion
-
-rbd-pkgs:
+    - salt-ssh
+    - iotop
+    - lvm2
+    - ntpdate
+    - pwgen
   centos:
-    - gr-docker-engine
     - nfs-utils
-    - nfs-kernel-server
-    - nfs-common
+    - portmap
     - glusterfs-server
-    - tar
-    - ntpdate
-    - wget
-    - curl
-    - tree
-    - lsof
-    - htop
-    - nload
-    - net-tools
-    - telnet
-    - rsync
-    - lvm2
-    - git
-    - salt-ssh
     - perl
     - bind-utils
-    - dstat 
     - iproute
     - bash-completion
-    - salt-master
-    - salt-minion
   debian:
-    - gr-docker-engine
-    - nfs-utils
     - nfs-kernel-server
     - nfs-common
-    - glusterfs-server
-    - tar
-    - ntpdate
-    - wget
-    - curl
-    - tree
-    - lsof
-    - htop
-    - nload
-    - net-tools
-    - telnet
-    - rsync
-    - lvm2
-    - git
-    - salt-ssh
-    - perl
-    - bind-utils
-    - dstat 
-    - iproute
-    - bash-completion
-    - salt-master
-    - salt-minion
+    - dnsutils
+    - python-pip
+    - python-apt
+    - apt-transport-https
+    - uuid-runtime
+    - iproute2
+    - systemd
+
+
 
 # rbd-db
 database:
@@ -187,8 +146,12 @@ network:
 plugins:
   image: plugins
   tcm:
+    image: plugins
+    version: tcm
     tag: tcm
   mesh:
+    image: plugins
+    version: mesh
     tag: mesh
     metatag: mesh_plugin
 
@@ -251,3 +214,6 @@ rainbond-modules:
   rbd-cni:
     image: cni
     version: rbd_v3.7
+  k8s-cni:
+    image:cni
+    version: k8s_v3.7
