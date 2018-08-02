@@ -16,7 +16,7 @@ docker:
   version: 1.12.6,fbecf51
   mirrors: 
     enabled: true
-    url: "https://docker.mirrors.ustc.edu.cn/"
+    url: "https://registry.docker-cn.com"
 
 dns:
   current: 
