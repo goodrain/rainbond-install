@@ -194,7 +194,7 @@ EOF
     cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa.pub ~/.ssh/id_rsa.pub
   )
 
-  [ -d /srv/salt ] && rm -rf /srv/salt
+  #[  -d /srv/salt ] && rm -rf /srv/salt
   
   cp -rp $PWD/install/salt /srv/
   
