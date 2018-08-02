@@ -120,10 +120,10 @@ Get_Hardware_Info(){
 
     CPU_STATUS=$(awk -v num1=$CPU_NUM -v num2=2 'BEGIN{print(num1>num2)?"0":"1"}')
     MEM_STATUS=$(awk -v num1=$MEM_SIZE -v num2=3 'BEGIN{print(num1>num2)?"0":"1"}')
-    if [ $CPU_STATUS != '0' -o $MEM_STATUS != '0' ];then
-      Echo_Error "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
-    else
+    if [ $CPU_STATUS == '0' -a $MEM_STATUS == '0' ];then
       Echo_Info "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
+    else
+      Echo_Error "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
     fi
 }
 
