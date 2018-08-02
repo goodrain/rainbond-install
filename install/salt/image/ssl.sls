@@ -1,6 +1,6 @@
 {% if "manage" in grains['id'] %}
 {% if grains['id'] == 'manage01' %}
-{% set sslpath = "/srv/salt/install/files/ssl/region.goodrain.me" %}
+{% set sslpath = "/srv/salt/install/files/ssl/region" %}
 region-ssl-ca:
   cmd.run:
     - name: grcert create --is-ca --ca-name={{ sslpath }}/ca.pem --ca-key-name={{ sslpath }}/ca.key.pem

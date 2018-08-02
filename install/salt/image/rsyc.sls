@@ -1,8 +1,8 @@
 rsync-region-ssl:
   file.recurse:
-    - source: salt://install/files/ssl/region.goodain.me
+    - source: salt://install/files/ssl/region
     - name: {{ pillar['rbd-path'] }}/etc/rbd-api/region.goodrain.me/ssl
-    - makedirs: True
+    - clean: True
 
 config-grctl-yaml:
   file.managed:
