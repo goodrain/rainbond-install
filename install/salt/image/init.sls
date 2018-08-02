@@ -1,5 +1,5 @@
 include:
-{% if grains['type'] == 'offline' %}
+{% if grains['install-type'] == 'offline' %}
   - image.load
   - image.exec
 {% else %}
