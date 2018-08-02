@@ -148,7 +148,7 @@ services:
     --plugin-opts=urls={{ pillar['lb-endpoints'] }}
     --kube-conf=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
     --log-level=debug
-    --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    --etcd-endpoints=${ETCD_ENDPOINTS}
     --run-mode=sync
   stop: docker stop rbd-entrance
   restart_policy: always
@@ -179,7 +179,13 @@ services:
     -v {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     -v {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
-    --etcd={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    --etcd=${ETCD_ENDPOINTS} 
+    --log-level=debug 
+    --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    --api-ssl-enable=true
+    --api-ssl-certfile=/etc/goodrain/region.goodrain.me/ssl/server.pem
+    --api-ssl-keyfile=/etc/goodrain/region.goodrain.me/ssl/server.key.pem
+    --client-ca-file=/etc/goodrain/region.goodrain.me/ssl/ca.pem
   stop: docker stop rbd-api
   restart_policy: always
   restart_sec: 10
@@ -209,7 +215,7 @@ services:
     -v /var/run:/var/run
     -v {{ pillar['rbd-path'] }}/etc/rbd-chaos/ssh:/root/.ssh
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
-    --etcd-endpoints={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    --etcd-endpoints=${ETCD_ENDPOINTS} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
   stop: docker stop rbd-chaos
   restart_policy: always
   restart_sec: 10
@@ -232,7 +238,7 @@ services:
     --network host
     --memory 1024M
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
-    --log-level=debug --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    --log-level=debug --etcd-endpoints=${ETCD_ENDPOINTS}
   stop: docker stop rbd-mq
   restart_policy: always
   restart_sec: 10
@@ -257,7 +263,7 @@ services:
     -v /usr/local/bin/kubectl:/usr/bin/kubectl
     -v /root/.kube:/root/.kube
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
-    --hostIP={{ grains['mip'][0] }} --etcd-endpoints={{ pillar['etcd-endpoints'] }}
+    --hostIP={{ grains['mip'][0] }} --etcd-endpoints=${ETCD_ENDPOINTS}
   stop: docker stop rbd-webcli
   restart_policy: always
   restart_sec: 10
@@ -285,7 +291,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     -v /grdata:/grdata
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
-    --log-level=info --etcd-endpoints={{ pillar['etcd-endpoints'] }} --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig" --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    --log-level=info --etcd-endpoints=${ETCD_ENDPOINTS} --kube-config="/etc/goodrain/kubernetes/admin.kubeconfig" --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
   stop: docker stop rbd-worker
   restart_policy: always
   restart_sec: 10
@@ -312,7 +318,7 @@ services:
     --memory 1024M
     -v {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
-    --etcd-endpoints={{ pillar['etcd-endpoints'] }} --advertise-addr={{ grains['mip'][0] }}:9999  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
+    --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ grains['mip'][0] }}:9999  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
   stop: docker stop rbd-monitor
   restart_policy: always
   restart_sec: 10
@@ -339,7 +345,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
     -v /grdata/downloads/log:/grdata/logs
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
-    --cluster.bind.ip={{ grains['mip'][0] }} --db.type=mysql --db.url="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region" --discover.etcd.addr={{ pillar['etcd-endpoints'] }} --eventlog.bind.ip={{ grains['mip'][0] }} --websocket.bind.ip={{ grains['mip'][0] }} --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
+    --cluster.bind.ip={{ grains['mip'][0] }} --db.type=mysql --db.url="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region" --discover.etcd.addr=${ETCD_ENDPOINTS} --eventlog.bind.ip={{ grains['mip'][0] }} --websocket.bind.ip={{ grains['mip'][0] }} --nodeid-file=/opt/rainbond/etc/node/node_host_uuid.conf
   stop: docker stop rbd-eventlog
   restart_policy: always
   restart_sec: 10
@@ -374,6 +380,7 @@ services:
   stop: docker stop rbd-app-ui
   restart_policy: always
   restart_sec: 10
+{% if grains['id'] == 'manage01' %}
 - name: rbd-grafana
   registry:
   - name: GRAFANA_ENDPOINTS
@@ -397,10 +404,11 @@ services:
     -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     -e GF_SECURITY_ADMIN_PASSWORD={{ pillar['secretkey'] }}
     -v /opt/rainbond/data/rbd-grafana:/var/lib/grafana
-    -i grafana/grafana:5.1.3
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-grafana']['image'] }}:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
   stop: docker stop rbd-grafana
   restart_policy: always
   restart_sec: 10
+{% endif %}
 - name: etcd
   endpoints:
   - name: ETCD_ENDPOINTS
@@ -445,7 +453,7 @@ services:
     --insecure-bind-address=127.0.0.1 
     --insecure-port=8181 
     --advertise-address=0.0.0.0 --bind-address=0.0.0.0 
-    --etcd-servers={{ pillar['etcd-endpoints'] }}
+    --etcd-servers=${ETCD_ENDPOINTS}
     --admission-control=ServiceAccount,NamespaceLifecycle,NamespaceExists,LimitRanger,ResourceQuota 
     --authorization-mode=RBAC 
     --runtime-config=rbac.authorization.k8s.io/v1beta1 
@@ -627,7 +635,7 @@ services:
 {% else %}
 - name: etcd-proxy
   endpoints:
-  - name: ETCD_ENDPOINTS
+  - name: ETCDPROXY_ENDPOINTS
     protocol: http
     port: 2379
   health:

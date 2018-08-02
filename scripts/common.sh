@@ -4,7 +4,6 @@
 
 # ================================Global ENV ================================
 
-YQBIN="./scripts/yq"
 MAIN_SLS="/srv/pillar/rainbond.sls"
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_PKGS="salt-ssh"
@@ -17,6 +16,7 @@ RAINBOND_SERVICE=( etcd node calico )
 MANAGE_MODULES="common \
 storage \
 docker \
+image \
 base \
 master \
 worker"
@@ -24,6 +24,7 @@ worker"
 COMPUTE_MODULES="common \
 storage \
 docker \
+image \
 base \
 worker"
 
@@ -41,13 +42,20 @@ SYS_VER=$(grep "^VERSION_ID=" /etc/os-release | awk -F = '{print $2}'|sed 's/"//
 
 CPU_NUM=$(grep "processor" /proc/cpuinfo | wc -l )
 CPU_LIMIT=2
-MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1 | awk -F '.' '{print $1}')
+MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1)
 MEM_LIMIT=4
 
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep '^10\.|^172.|^192.168' | grep -v '172.30.42.1' | head -1)"
 DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep -v '^10\.|^172.|^192.168|^127.' | head -1)"
 INIT_FILE="./.initialized"
 OFFLINE_FILE="./.offlineprepared"
+
+which yq 2>&1>/dev/null || (
+    curl https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
+    chmod +x /usr/local/bin/yq
+)
+
+YQBIN="/usr/local/bin/yq"
 
 # redhat and centos
 if [ "$SYS_NAME" == "centos" ];then
@@ -122,7 +130,6 @@ END
 fi
 
 SALT_SSH_INSTALLED=$($PKG_BIN salt-ssh > /dev/null 2>&1 && echo 0)
-
 
 
 #======================= Global Functions =============================

@@ -52,8 +52,9 @@ install_func(){
   
     for module in ${MANAGE_MODULES}
     do
-        if [ "$module" = "plugins" -o "$module" = "proxy" ];then
-            Echo_Info "Start install $module(step: $step_num/$all_steps), it will take 3-8 minutes "
+        if [ "$module" = "image" ];then
+            Echo_Info "Start install $module(step: $step_num/$all_steps), it will take 8-15 minutes "
+            Echo_Info "This step will pull/load all docker images"
         else
             Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
         fi
@@ -87,6 +88,7 @@ install_func(){
     else
         Echo_Info "install help"
         Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"
+        exit 1
     fi
 }
 

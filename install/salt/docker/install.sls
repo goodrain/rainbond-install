@@ -12,6 +12,13 @@ docker-envs-old:
     - template: jinja
     - makedirs: True
 
+certificate-signed-goodrainme:
+  file.managed:
+    - source: salt://install/files/ssl/goodrain.me/server.crt
+    - name: /etc/docker/certs.d/goodrain.me/server.crt
+    - template: jinja
+    - makedirs: True
+
 {% if pillar.docker.mirrors.enabled %}
 docker-mirrors:
   file.managed:
