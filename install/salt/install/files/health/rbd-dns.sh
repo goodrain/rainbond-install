@@ -1,8 +1,8 @@
 #!/bin/bash
 
-isExist=`ss -lnu | grep :53 | wc -l`
+isExist=`netstat -pantu | grep ":53 " | grep "kube-dns" | wc -l`
 
-if (($isExist == 1)); then
+if (($isExist != 0)); then
   exit 0
 else
   exit 1
