@@ -75,7 +75,7 @@ etc-prometheus-dir:
 
 etc-api-dir:
   file.directory:
-    - name: {{ DIR }}/etc/rbd-api
+    - name: {{ DIR }}/etc/rbd-api/region.goodrain.me/ssl
     - makedirs: True
 
 etc-k8s-ssl-dir:

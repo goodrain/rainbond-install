@@ -10,3 +10,4 @@ include:
   - image.eximage
 {% endif %}
 {% endif %}
+  - image.misc
