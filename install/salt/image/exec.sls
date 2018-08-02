@@ -107,6 +107,13 @@ proxy_site_ssl:
     - group: root
 
 {% if "manage" in grains['id'] %}
+/usr/local/bin/grcert:
+  file.managed:
+    - source: salt://install/files/misc/bin/grcert
+    - mode: 755
+    - user: root
+    - group: root
+
 /usr/local/bin/grctl:
   file.managed:
     - source: salt://install/files/misc/bin/grctl

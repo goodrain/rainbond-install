@@ -179,7 +179,13 @@ services:
     -v {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs
     -v {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
-    --etcd=${ETCD_ENDPOINTS} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    --etcd=${ETCD_ENDPOINTS} 
+    --log-level=debug 
+    --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
+    --api-ssl-enable=true
+    --api-ssl-certfile=/etc/goodrain/region.goodrain.me/ssl/server.pem
+    --api-ssl-keyfile=/etc/goodrain/region.goodrain.me/ssl/server.key.pem
+    --client-ca-file=/etc/goodrain/region.goodrain.me/ssl/ca.pem
   stop: docker stop rbd-api
   restart_policy: always
   restart_sec: 10

@@ -327,7 +327,7 @@ docker-pull-grafana-image:
 
 rename-pull-grafana-image:
   cmd.run:
-    - name: docker tag docker pull {{PUBDOMAIN}}/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}  goodrain.me/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
+    - name: docker tag {{PUBDOMAIN}}/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}  goodrain.me/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
 
 #===================== builder/runner image ===========================
 

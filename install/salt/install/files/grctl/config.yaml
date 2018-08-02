@@ -1,0 +1,6 @@
+region_api:
+  endpoints:
+    - https://127.0.0.1:8443
+  client-ca-file: {{ pillar['rbd-path'] }}/etc/rbd-api/region.goodrain.me/ssl/ca.pem
+  tls-cert-file:  {{ pillar['rbd-path'] }}/etc/rbd-api/region.goodrain.me/ssl/client.pem
+  tls-private-key-file:  {{ pillar['rbd-path'] }}/etc/rbd-api/region.goodrain.me/ssl/client.key.pem
