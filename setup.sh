@@ -52,9 +52,9 @@ install_func(){
   
     for module in ${MANAGE_MODULES}
     do
-        if [ "$module" = "image"];then
+        if [ "$module" = "image" ];then
             Echo_Info "Start install $module(step: $step_num/$all_steps), it will take 8-15 minutes "
-            Echo_Info "This step will pull all docker images"
+            Echo_Info "This step will pull/load all docker images"
         else
             Echo_Info "Start install $module(step: $step_num/$all_steps) ..."
         fi
