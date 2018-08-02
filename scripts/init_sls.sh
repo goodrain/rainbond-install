@@ -188,7 +188,12 @@ EOF
 [ -f "/etc/salt/pki/master/ssh/salt-ssh.rsa.pub" ] && cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys || (
   salt-ssh "*" w 2>&1 >/dev/null || cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys
 )
-  unalias cp
+  
+  which cp | grep "alias" > /dev/null
+  if [ "$?" -eq 0 ];then
+    unalias cp
+  fi
+
   [ ! -d "~/.ssh/id_rsa" ] && (
     cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa ~/.ssh/id_rsa
     cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa.pub ~/.ssh/id_rsa.pub
