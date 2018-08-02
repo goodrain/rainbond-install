@@ -88,6 +88,7 @@ install_func(){
     else
         Echo_Info "install help"
         Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"
+        exit 1
     fi
 }
 
