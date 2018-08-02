@@ -10,4 +10,7 @@ include:
   - image.eximage
 {% endif %}
 {% endif %}
-  - image.misc
+{% if grains['id'] == 'manage01' %}
+  - image.ssl
+  - image.rsyc
+{% endif %}
