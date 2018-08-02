@@ -36,7 +36,7 @@ Init_system(){
   # reset /etc/hosts
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
   MASTER_HOSTNAME=$(Read_Sls_File master-hostname)
-  hostname $MASTER_HOSTNAME
+  hostname -b $MASTER_HOSTNAME
   echo $MASTER_HOSTNAME > /etc/hostname
   Write_Host "${DEFAULT_LOCAL_IP}" "${MASTER_HOSTNAME}"
 

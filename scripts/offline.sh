@@ -9,6 +9,11 @@ else
     YAML_PATH=../rainbond.yaml.default
 fi
 
+which yq 2>&1>/dev/null || (
+    curl https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
+    chmod +x /usr/local/bin/yq
+)
+
 [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
 [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH 
 

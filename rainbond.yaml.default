@@ -215,5 +215,8 @@ rainbond-modules:
     image: cni
     version: rbd_v3.7
   k8s-cni:
-    image:cni
+    image: cni
     version: k8s_v3.7
+  rbd-grafana:
+    image: grafana
+    version: 5.2.2

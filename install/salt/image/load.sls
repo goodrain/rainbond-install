@@ -20,6 +20,7 @@
 {% set REGISTRYVER = salt['pillar.get']('rainbond-modules:rbd-registry:version') -%}
 {% set LBIMG = salt['pillar.get']('rainbond-modules:rbd-lb:image') -%}
 {% set LBVER = salt['pillar.get']('rainbond-modules:rbd-lb:version') -%}
+{% set GRAFANA = salt['pillar.get']('rainbond-modules:rbd-grafana:version') -%}
 
 docker-load-lb-image:
   cmd.run:
@@ -246,6 +247,9 @@ push-prom-image:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{ P8SIMG }}:{{ P8SVER }}
 
+load-grafana-tcm:
+  cmd.run:
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{ PRIDOMAIN }}_grafana_{{GRAVER}}.gz
 
 #===================== builder/runner image ===========================
 runner-load:
