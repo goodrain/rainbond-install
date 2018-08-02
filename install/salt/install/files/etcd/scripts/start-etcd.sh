@@ -44,7 +44,7 @@ exec /usr/bin/docker \
   --net=host \
   --name etcd \
   --volume={{ pillar['rbd-path'] }}/data/etcd/:/data/etcd/ \
-  {{ pillar['public-image-domain'] }}/{{pillar['etcd']['server']['image']}}:{{pillar['etcd']['server']['version']}} \
+  {{ pillar['private-image-domain'] }}/{{pillar['etcd']['server']['image']}}:{{pillar['etcd']['server']['version']}} \
   /usr/local/bin/etcd \
   --name $LOCAL_NODE \
   --data-dir /data/etcd/ \

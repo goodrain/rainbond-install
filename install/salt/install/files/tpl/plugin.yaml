@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   rbd-entrance:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     container_name: rbd-entrance
     mem_limit: 1024M
     logging:
@@ -24,7 +24,7 @@ services:
     - --etcd-endpoints={{ pillar['etcd-endpoints'] }}
     - --run-mode=sync
   rbd-api:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
     container_name: rbd-api
     mem_limit: 1024M
     environment:
@@ -45,7 +45,7 @@ services:
     network_mode: host
     restart: always
   rbd-chaos:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     container_name: rbd-chaos
     mem_limit: 1024M
     command: --etcd-endpoints={{ pillar['etcd-endpoints'] }} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
@@ -66,7 +66,7 @@ services:
     network_mode: host
     restart: always
   rbd-mq:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
     container_name: rbd-mq
     mem_limit: 1024M
     command: --log-level=debug --etcd-endpoints={{ pillar['etcd-endpoints'] }}
@@ -78,7 +78,7 @@ services:
     network_mode: host
     restart: always
   rbd-webcli:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
     container_name: rbd-webcli
     mem_limit: 1024M
     volumes:
@@ -93,7 +93,7 @@ services:
     network_mode: host
     restart: always
   rbd-worker:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-worker']['image'] }}:{{ pillar['rainbond-modules']['rbd-worker']['version'] }}
     container_name: rbd-worker
     mem_limit: 1024M
     environment:
@@ -112,7 +112,7 @@ services:
     network_mode: host
     restart: always
   rbd-monitor:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
     container_name: rbd-monitor
     volumes:
     - {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
@@ -133,7 +133,7 @@ services:
     network_mode: host
     restart: always
   rbd-eventlog:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-eventlog']['image'] }}:{{ pillar['rainbond-modules']['rbd-eventlog']['version'] }}
     container_name: rbd-eventlog
     mem_limit: 1024M
     environment:

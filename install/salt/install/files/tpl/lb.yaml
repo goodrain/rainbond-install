@@ -1,7 +1,7 @@
 version: '2.1'
 services:  
   rbd-lb:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
     container_name: rbd-lb
     environment:
       DEFAULT_PORT: 80

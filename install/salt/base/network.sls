@@ -15,6 +15,15 @@ init-calico:
     - user: root
     - group: root
 
+check_etcd_status:
+  cmd.run:
+    - name: docker ps  | grep etcd
+    - retry:
+        attempts: 20
+        until: True
+        interval: 3
+        splay: 3
+
 init_calico:
   cmd.run: 
     - name: bash {{ pillar['rbd-path'] }}/bin/init.calico

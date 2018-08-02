@@ -7,8 +7,6 @@
 {% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
 {% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
 {% set MESHTAG_META = salt['pillar.get']('plugins:mesh:metatag') -%}
-{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
-{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 {% set RUNNERIMG = salt['pillar.get']('proxy:runner:image') -%}
 {% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
 {% set ADAPTERIMG = salt['pillar.get']('proxy:adapter:image') -%}
@@ -406,8 +404,7 @@ retag-plugin-mesh:
 {% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}
 {% set MESHTAG = salt['pillar.get']('plugins:mesh:tag') -%}
 {% set MESHTAG_META = salt['pillar.get']('plugins:mesh:metatag') -%}
-{% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
-{% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
+
 {% set RUNNERIMG = salt['pillar.get']('proxy:runner:image') -%}
 {% set RUNNERVER = salt['pillar.get']('proxy:runner:version') -%}
 {% set ADAPTERIMG = salt['pillar.get']('proxy:adapter:image') -%}

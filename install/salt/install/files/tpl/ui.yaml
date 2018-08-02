@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   rbd-app-ui:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
     container_name: rbd-app-ui
     environment:
       MANAGE_SECRET_KEY: {{ pillar['secretkey'] }}

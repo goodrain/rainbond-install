@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   rbd-dns:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     container_name: rbd-dns
     mem_limit: 1024M
     environment:
@@ -22,7 +22,7 @@ services:
     network_mode: host
     restart: always
   rbd-hub:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-registry']['image'] }}:{{ pillar['rainbond-modules']['rbd-registry']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-registry']['image'] }}:{{ pillar['rainbond-modules']['rbd-registry']['version'] }}
     container_name: rbd-hub
     volumes:
     - /grdata/services/registry:/var/lib/registry
@@ -34,7 +34,7 @@ services:
     network_mode: host
     restart: always
   rbd-repo:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-repo']['image'] }}:{{ pillar['rainbond-modules']['rbd-repo']['version'] }}
     container_name: rbd-repo
     volumes:
     - /grdata/services/artifactory-{{ grains['nodename'] }}:/var/opt/jfrog/artifactory
@@ -47,7 +47,7 @@ services:
     restart: always
 {% if grains['id'] == "manage01" %}
   rbd-db:
-    image: {{ pillar['public-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
+    image: {{ pillar['private-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
     container_name: rbd-db
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"

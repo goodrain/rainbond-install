@@ -43,26 +43,7 @@ kubelet-cni-bin:
     - source: salt://install/files/misc/bin/kubelet
     - mode: 755
 
-{% if grains['id'] == 'manage01' %}
-
-pull-pause-img:
-  cmd.run:
-  {% if pillar['install-type']!="offline" %}
-    - name: docker pull {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-  {% else %}
-    - name: docker load -i {{ pillar['install-script-path'] }}/install/imgs/{{PUBDOMAIN}}_{{ PAUSEIMG }}_{{ PAUSEVER }}.gz
-  {% endif %}
-    - unless: docker inspect {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-
-rename-pause-img:
-  cmd.run: 
-    - name: docker tag {{PUBDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }} {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-    - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-    - require:
-      - cmd: pull-pause-img
-{% else %}
 pull-pause-img:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
     - unless: docker inspect {{PRIDOMAIN}}/{{ PAUSEIMG }}:{{ PAUSEVER }}
-{% endif %}
