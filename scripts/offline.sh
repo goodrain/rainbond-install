@@ -18,6 +18,8 @@ init_repo(){
     git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git $REPO_PATH
     [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
     [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH
+    curl https://pkg.rainbond.com/releases/common/v3.7.0rc/grctl-linux-amd64 -O $REPO_PATH/grctl
+    chmod +x /usr/local/bin/yq
 }
 
 debian_pkg(){

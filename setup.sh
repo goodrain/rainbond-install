@@ -62,14 +62,24 @@ git )
 trap 'Exit_Clear; exit' SIGINT SIGHUP
 clear
 
+which cp | grep "alias" > /dev/null
+if [ "$?" -eq 0 ];then
+    unalias cp
+fi
+
 [ ! -d "/srv/pillar/" ] && (
     mkdir -p /srv/pillar/
     cp rainbond.yaml.default ${MAIN_CONFIG}
 )
 
 which yq >/dev/null 2>&1 || (
-    curl https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
-    chmod +x /usr/local/bin/yq
+    if [ "$INSTALL_TYPE" == "online" ];then
+        curl -s https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
+        chmod +x /usr/local/bin/yq
+    else
+        cp -a ./script/yq /usr/local/bin/yq
+        chmod +x /usr/local/bin/yq
+    fi
 )
 
 YQBIN="/usr/local/bin/yq"
@@ -624,10 +634,7 @@ EOF
   salt-ssh "*" w >/dev/null 2>&1 || cat /etc/salt/pki/master/ssh/salt-ssh.rsa.pub >> /root/.ssh/authorized_keys
 )
   
-  which cp | grep "alias" > /dev/null
-  if [ "$?" -eq 0 ];then
-    unalias cp
-  fi
+ 
 
   [ ! -d "~/.ssh/id_rsa" ] && (
     cp -a /etc/salt/pki/master/ssh/salt-ssh.rsa ~/.ssh/id_rsa
