@@ -7,7 +7,7 @@ IMG_PATH=/opt/rainbond/install/install/imgs
 YAML_PATH=$REPO_PATH/rainbond.yaml.default
 
 
-which yq 2>&1>/dev/null || (
+which yq >/dev/null 2>&1 || (
     curl https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
     chmod +x /usr/local/bin/yq
 )
@@ -26,7 +26,7 @@ debian_pkg(){
     common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
     for pkg in ${dpkg[@]} ${common_pkg[@]}
     do
-        apt install ${pkg} -d  2>&1>/dev/null
+        apt install ${pkg} -d  >/dev/null 2>&1
         cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/debian/
         echo "download debian $pkg ok"
     done
@@ -38,8 +38,8 @@ centos_pkg(){
     common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
     for pkg in ${cpkg[@]} ${common_pkg[@]}
     do
-        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH/centos/ 2>&1>/dev/null
-        ls $PKG_PATH/centos/ | grep "$pkg" 2>&1>/dev/null
+        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH/centos/ >/dev/null 2>&1
+        ls $PKG_PATH/centos/ | grep "$pkg" >/dev/null 2>&1
         if [ "$?" == 0 ];then
             echo "download centos $pkg ok"
         else
@@ -82,8 +82,8 @@ download_img(){
 
         #echo "$Moudles $Img $Ver $Pub_Img"
         echo "docker pull $Pub_Img"
-        docker pull $Pub_Img 2>&1>/dev/null
-        docker tag $Pub_Img $Pri_Img 2>&1>/dev/null
+        docker pull $Pub_Img >/dev/null 2>&1
+        docker tag $Pub_Img $Pri_Img >/dev/null 2>&1
         echo "docker save $Pri_Img"
         docker save $Pri_Img | gzip > $IMG_PATH/goodrainme_${Img}_${Ver}.gz
     done

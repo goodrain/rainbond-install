@@ -1,6 +1,3 @@
-# add records to /etc/hosts file
-
-# get master(manage01) ip address
 {% if "manage" in grains['id'] %}
 {% set hostip = pillar['vip'] %}
 rbd-repo-domain:
@@ -87,13 +84,18 @@ uuid-domain:
 {% endif %}
 
 # Modify /etc/resolv.conf
-/etc/resolv.conf:
+add_master_dns:
   file.append:
+    - name: /etc/resolv.conf
     - text:
-      - "nameserver {{ pillar.dns.master }}"
-      - "nameserver {{ pillar.master-private-ip }}"
+      - "nameserver {{ pillar.dns.get('current','114.114.114.114') }}"
 
-# 注释domain search
+add_manage_dns:
+  file.append:
+    - name: /etc/resolv.conf
+    - text:
+      - "nameserver {{ pillar['master-private-ip'] }}"
+
 domain-resolv:
   file.replace:
     - name: /etc/resolv.conf
