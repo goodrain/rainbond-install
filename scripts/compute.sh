@@ -22,9 +22,65 @@
 # debug
 [[ $DEBUG ]] && set -x
 
-[ -f "common.sh" ] && cd ..
+COMPUTE_MODULES="common \
+storage \
+docker \
+image \
+base \
+worker"
 
-. scripts/common.sh
+#================================= base func =======================
+if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
+            # Enable colors
+            TPUT_RESET="$(tput sgr 0)"
+            TPUT_BLACK="$(tput setaf 0)"
+            TPUT_RED="$(tput setaf 1)"
+            TPUT_GREEN="$(tput setaf 2)"
+            TPUT_YELLOW="$(tput setaf 3)"
+            TPUT_BLUE="$(tput setaf 4)"
+            TPUT_PURPLE="$(tput setaf 5)"
+            TPUT_CYAN="$(tput setaf 6)"
+            TPUT_WHITE="$(tput setaf 7)"
+            TPUT_BGBLACK="$(tput setab 0)"
+            TPUT_BGRED="$(tput setab 1)"
+            TPUT_BGGREEN="$(tput setab 2)"
+            TPUT_BGYELLOW="$(tput setab 3)"
+            TPUT_BGBLUE="$(tput setab 4)"
+            TPUT_BGPURPLE="$(tput setab 5)"
+            TPUT_BGCYAN="$(tput setab 6)"
+            TPUT_BGWHITE="$(tput setab 7)"
+            TPUT_BOLD="$(tput bold)"
+            TPUT_DIM="$(tput dim)"
+            TPUT_UNDERLINED="$(tput smul)"
+            TPUT_BLINK="$(tput blink)"
+            TPUT_INVERTED="$(tput rev)"
+            TPUT_STANDOUT="$(tput smso)"
+            TPUT_BELL="$(tput bel)"
+            TPUT_CLEAR="$(tput clear)"
+fi
+
+Echo_Failed() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+}
+
+Echo_Error() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+    exit 1
+}
+
+Echo_EXIST() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} EXIST ${TPUT_RESET} ${*} \n\n"
+}
+
+Echo_Info() {
+    echo >&2 " --- ${TPUT_DIM}${TPUT_BOLD}${*}${TPUT_RESET} --- "
+}
+
+Echo_Ok() {
+   printf >&2 "${TPUT_BGGREEN}${TPUT_WHITE}${TPUT_BOLD} OK ${TPUT_RESET} ${*} \n\n"
+}
+
+#======================================================================================
 
 init_func(){
     Echo_Info "Init compute node config."
@@ -119,16 +175,6 @@ install_compute_func(){
             Echo_Info "you need up compute node"
         fi
     fi
-}
-
-help_func(){
-    Echo_Info "help"
-    Echo_Info "init"
-    echo "args: single <hostname> <ip>  <password/key-path> <type:ssh>"
-    Echo_Info "install <hostname>"
-    Echo_Info "offline"
-    echo "args: single <hostname> <ip>  <password/key-path>"
-    Echo_Info "<hostname> <ip>  <password/key-path> <type:ssh>"
 }
 
 case $1 in
