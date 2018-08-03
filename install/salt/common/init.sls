@@ -11,11 +11,11 @@ include:
   - common.dns
   - common.pkg
   - common.envs
-  - common.node_conf
   - common.health
 {% if grains['id'] == "manage01" %}
   - common.domain
 {% endif %} 
+  - common.node_conf
 {% else %}
   - common.user
   - common.create_dir

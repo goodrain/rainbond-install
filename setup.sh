@@ -730,11 +730,18 @@ install_func(){
         if [ "$INSTALL_TYPE" == "online" ];then
             REG_Status || return 0
         fi
-        systemctl restart node
+        
         uuid=$(salt '*' grains.get uuid | grep "-" | awk '{print $1}')
-        notready=$(grctl  node list | grep $uuid | grep offline)
-        if [ "$notready" != "" ];then
+        if [ -z "$uuid" ];then
+            Echo_Error "Please check node status, Just Run systemctl status node"
+            exit 1
+        fi
+        notready=$(grctl node list | grep $uuid | grep offline)
+        if [ ! -z $notready ];then
             grctl node up $uuid
+        else
+            Echo_Error "Please check node status, Just Run systemctl status node"
+            exit 1
         fi
         Echo_Info "Install Rainbond successfully"
         public_ip=$(yq r /srv/pillar/rainbond.sls master-public-ip)
