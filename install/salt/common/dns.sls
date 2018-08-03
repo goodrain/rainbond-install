@@ -91,6 +91,7 @@ uuid-domain:
   file.append:
     - text:
       - "nameserver {{ pillar.dns.master }}"
+      - "nameserver {{ pillar.master-private-ip }}"
 
 # 注释domain search
 domain-resolv:
