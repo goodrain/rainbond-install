@@ -736,15 +736,21 @@ install_func(){
         if [ "$notready" != "" ];then
             grctl node up $uuid
         fi
-        Echo_Info "install successfully"
+        Echo_Info "Install Rainbond successfully"
         public_ip=$(yq r /srv/pillar/rainbond.sls master-public-ip)
         private_ip=$(yq r /srv/pillar/rainbond.sls master-private-ip)
-        
-        if [ ! -z "$public_ip" ];then
-            echo_banner "http://${public_ip}:7070"
-        else
-            echo_banner "http://${private_ip}:7070"
-        fi
+        for ((i=1;i<=60;i++ ));do
+            sleep 1
+            status_code=$(curl -s -I http://127.0.0.1:7070  | head -1 | awk '{print $2}')
+            check_code=$(awk -v num1=$status_code -v num2=400 'BEGIN{print(num1<num2)?"0":"1"}')
+            [ "$check_code" == "0" ] && (
+                if [ ! -z "$public_ip" ];then
+                    echo_banner "http://${public_ip}:7070"
+                else
+                    echo_banner "http://${private_ip}:7070"
+                fi
+            ) && break
+        done
     else
         Echo_Info "install help"
         Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"
