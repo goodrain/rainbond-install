@@ -4,7 +4,9 @@
 
 [[ $DEBUG ]] && set -x
 
-INSTALL_TYPE=$(Read_Sls_File install-type)
+INSTALL_TYPE=${1:online}
+
+Write_Sls_File install-type $INSTALL_TYPE
 
 # Name   : Get_Hostname and version
 # Args   : hostname
@@ -15,7 +17,7 @@ Local_Repo(){
     cat > /etc/yum.repos.d/rainbond_local.repo << EOF
 [rainbond_local]
 name=rainbond_offline_install_repo
-baseurl=file:///root/rainbond-install/install/pkgs
+baseurl=file:///opt/rainbond/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF

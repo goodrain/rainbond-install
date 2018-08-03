@@ -1,7 +1,7 @@
 # rainbond global config
 rbd-version: 3.7
 rbd-path: /opt/rainbond
-install-type: online
+install-type: 
 master-hostname: manage01
 master-private-ip: 
 master-public-ip: 

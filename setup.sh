@@ -94,6 +94,6 @@ install_func(){
 
 case $1 in
     *)
-        check_func && init_config && install_func ${@:2}
+        check_func && init_config ${1:-online} && install_func ${@:2}
     ;;
 esac
