@@ -37,9 +37,14 @@ Plugins Version:
 
 ```Bash
 # Develop dev 
+
 git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git
 cd rainbond-install
 ./setup.sh
+
+or
+
+grctl init 
 
 # Mainline v3.6
 
