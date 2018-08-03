@@ -52,11 +52,13 @@ rbd-pkgs:
   centos:
     - nfs-utils
     - portmap
-    - glusterfs-server
     - perl
     - bind-utils
     - iproute
     - bash-completion
+    - createrepo
+    - centos-release-gluster
+    - glusterfs-server
   debian:
     - nfs-kernel-server
     - nfs-common

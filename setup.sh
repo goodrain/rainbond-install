@@ -77,7 +77,7 @@ which yq >/dev/null 2>&1 || (
         curl -s https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
         chmod +x /usr/local/bin/yq
     else
-        cp -a ./script/yq /usr/local/bin/yq
+        cp -a ./scripts/yq /usr/local/bin/yq
         chmod +x /usr/local/bin/yq
     fi
 )
@@ -115,10 +115,16 @@ END
     cat > /etc/yum.repos.d/rainbond_local.repo << EOF
 [rainbond_local]
 name=rainbond_offline_install_repo
-baseurl=file:///opt/rainbond/install/pkgs/centos/
+baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm
+
+    createrepo /opt/rainbond/install/install/pkgs/centos/
     fi
 
 else
@@ -626,6 +632,8 @@ manage01:
   host: $inet_ip
   port: 22
   user: root
+  sudo: True
+  tty: True
   priv: /etc/salt/pki/master/ssh/salt-ssh.rsa
 EOF
 

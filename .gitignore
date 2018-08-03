@@ -4,4 +4,4 @@ install/pkgs/*
 .initialized
 LOCAL_IP
 rainbond.yaml
-
+grctl

@@ -1,4 +1,3 @@
-{% if grains['id'] == "manage01" %}
 salt-master-install:
   pkg.installed:
     - pkgs:
@@ -28,49 +27,12 @@ master_service:
     - enable: True
     - require:
       - file: salt-master-conf
-{% endif%}
-
-salt-repo:
-  pkgrepo.managed:
-  {% if grains['os_family']|lower == 'redhat' %}
-    {% if pillar['install-type']=='offline' %}
-      {% if grains['id']=="manage01" %}
-    - humanname: local_repo
-    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs
-    - enabled: 1
-    - gpgcheck: 0
-      # compute
-      {% else %}
-    - humanname: local_repo
-    - baseurl: http://repo.goodrain.me/
-    - enabled: 1
-    - gpgcheck: 0
-      {% endif %}
-    # online
-    {% else %}
-    - humanname: SaltStack repo for RHEL/CentOS $releasever
-    - baseurl: https://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2018.3.2
-    - enabled: 1
-    - gpgcheck: 0
-    - gpgkey: https://mirrors.ustc.edu.cn/salt/yum/redhat/7/$basearch/archive/2018.3.2/SALTSTACK-GPG-KEY.pub
-    {% endif %}
-  # debian or ubuntu
-  {% else %}
-    - name: deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
-    - file: /etc/apt/sources.list.d/salt.list
-    - key_url: http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3/SALTSTACK-GPG-KEY.pub
-  {% endif %}  
-    - require_in:
-      - pkg: salt-minion-install
-      - pkg: salt-master-install
 
 salt-minion-install:
   pkg.installed:
     - pkgs:
       - salt-minion
     - refresh: True
-    - require:
-      - pkgrepo: salt-repo
   {% if grains['os_family']|lower == 'redhat' %}
     - unless: rpm -qa | grep salt-minion
   {% else %}
@@ -111,6 +73,7 @@ minion_service:
     - require:
       - file: salt-minion-conf
       - cmd: salt-minion-exconf
+
 
 {% if grains['os_family']|lower == 'debian' %}
 
