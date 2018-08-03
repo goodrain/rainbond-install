@@ -1,30 +1,29 @@
 #!/bin/bash
 
-PKG_PATH=/opt/rainbond/install/pkgs
-IMG_PATH=/opt/rainbond/install/imgs
+REPO_PATH=/opt/rainbond/install
+PKG_PATH=/opt/rainbond/install/install/pkgs
+IMG_PATH=/opt/rainbond/install/install/imgs
 
-if [ -f  "$PWD/rainbond.yaml.default" ];then
-    YAML_PATH=./rainbond.yaml.default
-else
-    YAML_PATH=../rainbond.yaml.default
-fi
+YAML_PATH=$REPO_PATH/rainbond.yaml.default
+
 
 which yq 2>&1>/dev/null || (
     curl https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
     chmod +x /usr/local/bin/yq
 )
 
-[ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
-[ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH 
+[ -d "$REPO_PATH" ] || mkdir -p $REPO_PATH
 
 init_repo(){
-
+    git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git $REPO_PATH
+    [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
+    [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH
 }
 
 debian_pkg(){
     echo "download debian/ubuntu offline package"
-    dpkg=$(yq r rainbond.yaml.default rbd-pkgs.debian | awk '{print $2}')
-    common_pkg=$(yq r rainbond.yaml.default rbd-pkgs.common | awk '{print $2}')
+    dpkg=$(yq r $YAML_PATH rbd-pkgs.debian | awk '{print $2}')
+    common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
     for pkg in ${dpkg[@]} ${common_pkg[@]}
     do
         apt install ${pkg} -d  2>&1>/dev/null
@@ -35,12 +34,17 @@ debian_pkg(){
 
 centos_pkg(){
     echo "download centos offline package"
-    cpkg=$(yq r rainbond.yaml.default rbd-pkgs.centos | awk '{print $2}')
-    common_pkg=$(yq r rainbond.yaml.default rbd-pkgs.common | awk '{print $2}')
+    cpkg=$(yq r $YAML_PATH rbd-pkgs.centos | awk '{print $2}')
+    common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
     for pkg in ${cpkg[@]} ${common_pkg[@]}
     do
-        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH/centos/ 
-        echo "download centos $pkg ok"
+        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH/centos/ 2>&1>/dev/null
+        ls $PKG_PATH/centos/ | grep "$pkg" 2>&1>/dev/null
+        if [ "$?" == 0 ];then
+            echo "download centos $pkg ok"
+        else
+            echo "download centos $pkg failed"
+        fi
     done
 }
 
@@ -61,8 +65,8 @@ download_img(){
     k8s=(cfssl kubecfg api static manager schedule server calico)
     for Moudles in ${rbd_plugins[@]} ${rbd_runtimes[@]} ${k8s[@]}
     do
-        Img=$( yq r rainbond.yaml.default *.$Moudles.image | grep -v null | awk '{print $2}')
-        Ver=$( yq r rainbond.yaml.default *.$Moudles.version | grep -v null | awk '{print $2}')
+        Img=$( yq r $YAML_PATH *.$Moudles.image | grep -v null | awk '{print $2}')
+        Ver=$( yq r $YAML_PATH *.$Moudles.version | grep -v null | awk '{print $2}')
         if [  -z "$Img" -o -z "$Ver" ];then
             echo "not found $Moudles, skip..."
             continue
@@ -70,7 +74,7 @@ download_img(){
         Pub_Img=rainbond/$Img:$Ver
         if [ "$Img" == "builder" ];then
             Pri_Img=goodrain.me/$Img
-        elif [ "$Img" == "mesh" ]
+        elif [ "$Img" == "mesh" ];then
             Pri_Img=goodrain.me/$Img:mesh_plugin
         else
             Pri_Img=goodrain.me/$Img:$Ver
@@ -86,11 +90,12 @@ download_img(){
 }
 
 offline_tgz(){
-    echo ""
+    tar zcvf install.v3.7.$(date +%F).tgz /opt/rainbond/install
 }
 
 case $1 in
     *)
+    init_repo
     download_pkg ${1:-centos}
     download_img ${2:-3.7}
     offline_tgz

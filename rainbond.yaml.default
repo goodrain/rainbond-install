@@ -165,7 +165,7 @@ proxy:
     version: 3.6
   pause:
     image: pause-amd64
-    version: '3.0'
+    version: 3.0
   builder:
     image: builder
     version: 3.7

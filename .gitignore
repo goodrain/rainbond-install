@@ -1,7 +1,6 @@
 # offline directory
 install/imgs/*
 install/pkgs/*
-tools
 .initialized
 LOCAL_IP
 rainbond.yaml
