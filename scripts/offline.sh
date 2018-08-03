@@ -66,7 +66,11 @@ download_img(){
     for Moudles in ${rbd_plugins[@]} ${rbd_runtimes[@]} ${k8s[@]}
     do
         Img=$( yq r $YAML_PATH *.$Moudles.image | grep -v null | awk '{print $2}')
-        Ver=$( yq r $YAML_PATH *.$Moudles.version | grep -v null | awk '{print $2}')
+        if [ "$Img" == "pause-amd64" ];then
+            Ver=3.0
+        else
+            Ver=$( yq r $YAML_PATH *.$Moudles.version | grep -v null | awk '{print $2}')
+        fi
         if [  -z "$Img" -o -z "$Ver" ];then
             echo "not found $Moudles, skip..."
             continue
@@ -75,7 +79,7 @@ download_img(){
         if [ "$Img" == "builder" ];then
             Pri_Img=goodrain.me/$Img
         elif [ "$Img" == "mesh" ];then
-            Pri_Img=goodrain.me/$Img:mesh_plugin
+            Pri_Img=goodrain.me/$Img:mesh_plugin    
         else
             Pri_Img=goodrain.me/$Img:$Ver
         fi
