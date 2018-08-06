@@ -81,6 +81,16 @@ Echo_Ok() {
 }
 
 #======================================================================================
+add_uid(){
+    # Todo
+    # add uid
+    DO_UID=$1
+    DO_IP=$2
+    grep "$DO_UID" /etc/hosts > /dev/null
+    if [ $? -ne 0 ];then
+        sed -i "s/$DO_IP/$DO_IP $DO_UID/g" /etc/hosts
+    fi
+}
 
 init_func(){
     Echo_Info "Init compute node config."
@@ -117,9 +127,8 @@ EOF
         else
             Echo_EXIST $1["$2"]
         fi
-        bash scripts/node_update_hosts.sh $uuid $2 add
+        add_uid $uuid $2
 }
-
 
 install_compute_func(){
     fail_num=0
