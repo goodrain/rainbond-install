@@ -753,8 +753,10 @@ install_func(){
             [ "$check_code" == "0" ] && (
                 if [ ! -z "$public_ip" ];then
                     echo_banner "http://${public_ip}:7070"
+                    echo "${public_ip}" > /opt/rainbond/envs/.exip
                 else
                     echo_banner "http://${private_ip}:7070"
+                    echo "${private_ip}" > /opt/rainbond/envs/.exip
                 fi
             ) && break
         done
