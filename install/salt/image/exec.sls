@@ -41,6 +41,22 @@ compose_plugin_file:
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 
 {% if grains['id'] == "manage01" %}
+docker_load_rbd-cni:
+  cmd.run:
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ RBDCNIIMG }}_{{ RBDCNIVER }}.gz
+
+docker_load_k8s-cni:
+  cmd.run:
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ K8SCNIIMG }}_{{ K8SCNIVER }}.gz
+
+docker_load_cfssl:
+  cmd.run:
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ CFSSLIMG }}_{{ CFSSLVER }}.gz
+
+docker_load_kubecfg:
+  cmd.run:
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ KUBECFGIMG }}_{{ KUBECFGVER }}.gz
+
 prepare_rbd_cni_tools:
   cmd.run:
     - name: docker run --rm -v /srv/salt/install/files/misc:/sysdir {{PRIDOMAIN}}/{{ RBDCNIIMG }}:{{ RBDCNIVER }} tar zxf /pkg.tgz -C /sysdir

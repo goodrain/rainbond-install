@@ -34,7 +34,7 @@ docker-repo:
     {% if pillar['install-type']=="offline" %}
       {% if grains['id']=="manage01" %}
     - humanname: local_repo
-    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs
+    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs/centos/
     - enabled: 1
     - gpgcheck: 0
       {% else %}

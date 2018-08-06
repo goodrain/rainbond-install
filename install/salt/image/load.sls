@@ -24,12 +24,11 @@
 
 docker-load-lb-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ LBIMG }}_{{ LBVER }}.gz
-
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ LBIMG }}_{{ LBVER }}.gz
 
 docker-load-hub-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ REGISTRYIMG }}_{{ REGISTRYVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ REGISTRYIMG }}_{{ REGISTRYVER }}.gz
 
 upstart-lb:
   cmd.run:
@@ -60,14 +59,11 @@ push-hub-image:
 {% set SDLVER = salt['pillar.get']('kubernetes:schedule:version') -%}
 {% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
-{% set K8SCNIIMG = salt['pillar.get']('kubernetes:cni:image') -%}
-{% set K8SCNIVER = salt['pillar.get']('kubernetes:cni:version') -%}
-{% set RBDCNIIMG = salt['pillar.get']('rainbond-modules:rbd-cni:image') -%}
-{% set RBDCNIVER = salt['pillar.get']('rainbond-modules:rbd-cni:version') -%}
+
 
 load_api_image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ APIIMG }}_{{ APIVER }}.gz
 
 push_api_image:
   cmd.run:
@@ -77,7 +73,7 @@ push_api_image:
 
 load_manager_image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ CTLMGEIMG }}_{{ APIVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ CTLMGEIMG }}_{{ APIVER }}.gz
 
 push_manager_image:
   cmd.run:
@@ -86,7 +82,7 @@ push_manager_image:
 
 load_schedule_image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ SDLIMG }}_{{ SDLVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ SDLIMG }}_{{ SDLVER }}.gz
 
 push_schedule_image:
   cmd.run:
@@ -98,7 +94,7 @@ push_schedule_image:
 
 load_etcd_image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ ETCDIMG }}_{{ ETCDVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ ETCDIMG }}_{{ ETCDVER }}.gz
 
 push_etcd_image:
   cmd.run:
@@ -111,7 +107,7 @@ push_etcd_image:
 
 load-calico-image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ CALICOIMG }}_{{ CALICOVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ CALICOIMG }}_{{ CALICOVER }}.gz
 
 push-calico-image:
   cmd.run:
@@ -124,7 +120,7 @@ push-calico-image:
 
 load-db-image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ DBIMG }}_{{ DBVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ DBIMG }}_{{ DBVER }}.gz
 
 push-db-image:
   cmd.run:
@@ -136,7 +132,7 @@ push-db-image:
 {% set DNSVER = salt['pillar.get']('rainbond-modules:rbd-dns:version') -%}
 load-pull-dns-image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ DNSIMG }}_{{ DNSVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ DNSIMG }}_{{ DNSVER }}.gz
 
 push-dns-image:
   cmd.run:
@@ -146,7 +142,7 @@ push-dns-image:
 {% set REPOVER = salt['pillar.get']('rainbond-modules:rbd-repo:version') -%}
 load-pull-repo-image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ REPOIMG }}_{{ REPOVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ REPOIMG }}_{{ REPOVER }}.gz
 
 push-repo-image:
   cmd.run:
@@ -158,7 +154,7 @@ push-repo-image:
 {% set WORKERVER = salt['pillar.get']('rainbond-modules:rbd-worker:version') -%}
 load-pull-worker-image:
   cmd.run:
-    - name:  docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ WORKERIMG }}_{{ WORKERVER }}.gz
+    - name:  docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ WORKERIMG }}_{{ WORKERVER }}.gz
 
 push-worker-image:
   cmd.run:
@@ -168,7 +164,7 @@ push-worker-image:
 {% set EVLOGVER = salt['pillar.get']('rainbond-modules:rbd-eventlog:version') -%}
 load-pull-eventlog-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ EVLOGIMG }}_{{ EVLOGVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ EVLOGIMG }}_{{ EVLOGVER }}.gz
 
 push-eventlog-image:
   cmd.run:
@@ -178,7 +174,7 @@ push-eventlog-image:
 {% set ENTRANCEVER = salt['pillar.get']('rainbond-modules:rbd-entrance:version') -%}
 load-pull-entrance-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ ENTRANCEIMG }}_{{ ENTRANCEVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ ENTRANCEIMG }}_{{ ENTRANCEVER }}.gz
 
 push-entrance-image:
   cmd.run:
@@ -188,7 +184,7 @@ push-entrance-image:
 {% set CHAOSVER = salt['pillar.get']('rainbond-modules:rbd-chaos:version') -%}
 load-pull-chaos-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ CHAOSIMG }}_{{ CHAOSVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ CHAOSIMG }}_{{ CHAOSVER }}.gz
 
 push-chaos-image:
   cmd.run:
@@ -199,7 +195,7 @@ push-chaos-image:
 {% set APIVER = salt['pillar.get']('rainbond-modules:rbd-api:version') -%}
 load-pull-api-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ APIIMG }}_{{ APIVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ APIIMG }}_{{ APIVER }}.gz
 
 push-api-image:
   cmd.run:
@@ -209,7 +205,7 @@ push-api-image:
 {% set APPUIVER = salt['pillar.get']('rainbond-modules:rbd-app-ui:version') -%}
 load-pull-app-ui-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ APPUIIMG }}_{{ APPUIVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ APPUIIMG }}_{{ APPUIVER }}.gz
 
 push-app-ui-image:
   cmd.run:
@@ -219,7 +215,7 @@ push-app-ui-image:
 {% set MQVER = salt['pillar.get']('rainbond-modules:rbd-mq:version') -%}
 load-pull-mq-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ MQIMG }}_{{ MQVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ MQIMG }}_{{ MQVER }}.gz
 
 push-mq-image:
   cmd.run:
@@ -230,7 +226,7 @@ push-mq-image:
 {% set WEBCLIVER = salt['pillar.get']('rainbond-modules:rbd-webcli:version') -%}
 load-pull-webcli-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ WEBCLIIMG }}_{{ WEBCLIVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ WEBCLIIMG }}_{{ WEBCLIVER }}.gz
 
 push-webcli-image:
   cmd.run:
@@ -241,7 +237,7 @@ push-webcli-image:
 {% set P8SVER = salt['pillar.get']('rainbond-modules:rbd-monitor:version') -%}
 load-pull-prom-image:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ P8SIMG }}_{{ P8SVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ P8SIMG }}_{{ P8SVER }}.gz
 
 push-prom-image:
   cmd.run:
@@ -249,35 +245,43 @@ push-prom-image:
 
 load-grafana-tcm:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{ PRIDOMAIN }}_grafana_{{GRAVER}}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{ PRIDOMAIN }}_grafana_{{GRAFANA}}.gz
 
 #===================== builder/runner image ===========================
 runner-load:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{RUNNERIMG}}_{{ RUNNERVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{RUNNERIMG}}_{{ RUNNERVER }}.gz
 
 adapter-load:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{ADAPTERIMG}}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ADAPTERIMG}}_{{ ADAPTERVER }}.gz
 
 pause-load:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{PAUSEIMG}}_{{ PAUSEVER }}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{PAUSEIMG}}_{{ PAUSEVER }}.gz
 
 builder-load:  
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{BUILDERIMG}}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{BUILDERIMG}}_{{BUILDERVER}}.gz
 
 #===================== addons image ==============================
 
 
 load-plugin-tcm:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{ PRIDOMAIN }}_{{TCMTAG}}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_plugins_tcm.gz
+
+tcm-rename:
+  cmd.run:
+    - name: docker tag goodrain.me/plugins:tcm goodrain.me/tcm
 
 load-plugin-mesh:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{PRIDOMAIN}}_{{MESHTAG_META}}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_plugins_mesh.gz
+
+mesh-rename:
+  cmd.run:
+    - name: docker tag goodrain.me/plugins:mesh goodrain.me/mesh_plugin
 
 {% set PLUGINIMG = salt['pillar.get']('plugins:image') -%}
 {% set TCMTAG = salt['pillar.get']('plugins:tcm:tag') -%}

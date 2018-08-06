@@ -1,7 +1,7 @@
 include:
 {% if pillar['install-type'] == 'offline' %}
-  - image.load
   - image.exec
+  - image.load
 {% else %}
   - image.preinit
 {% if grains['id'] == 'manage01' %}
