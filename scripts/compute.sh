@@ -88,12 +88,12 @@ init_func(){
     # <hostname> <ip>  <password/key-path> <type:ssh>
         grep "$1" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
-            if [ -z "$4" ];then
+            if [ "$3" == "pass" ];then
                 cat >> /etc/salt/roster <<EOF
 $1:
   host: $2
   user: root
-  passwd: $3
+  passwd: $4
   sudo: True
   tty: True
   port: 22
@@ -103,7 +103,7 @@ EOF
 $1:
   host: $2
   user: root
-  priv: ${3:-/root/.ssh/id_rsa}
+  priv: ${4:-/root/.ssh/id_rsa}
   sudo: True
   tty: True
   port: 22
@@ -115,7 +115,7 @@ EOF
         grep "$2" /etc/hosts > /dev/null
         [ "$?" -ne 0 ] && echo "$2 $1 $uuid" >> /etc/hosts
         else
-            Echo_EXIST $2["$3"]
+            Echo_EXIST $1["$2"]
         fi
         bash scripts/node_update_hosts.sh $uuid $2 add
 }

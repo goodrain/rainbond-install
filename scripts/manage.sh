@@ -89,12 +89,12 @@ init(){
 
         grep "$1" /etc/salt/roster > /dev/null
         if [ "$?" -ne 0 ];then
-            if [ -z "$4" ];then
+            if [ "$3" == "pass" ];then
                 cat >> /etc/salt/roster <<EOF
 $1:
   host: $2
   user: root
-  passwd: $3
+  passwd: $4
   sudo: True
   tty: True
   port: 22
@@ -104,7 +104,7 @@ EOF
 $1:
   host: $2
   user: root
-  priv: ${3:-/root/.ssh/id_rsa}
+  priv: ${4:-/root/.ssh/id_rsa}
   sudo: True
   tty: True
   port: 22
