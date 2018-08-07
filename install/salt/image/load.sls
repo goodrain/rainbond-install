@@ -309,6 +309,10 @@ runner-push-image:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
 
+adapter-rename-image:    
+  cmd.run:
+    - name: docker tag  {{PRIDOMAIN}}/{{ADAPTERIMG}}:{{ ADAPTERVER }} {{PRIDOMAIN}}/{{ADAPTERIMG}}
+
 adapter-push-image:    
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{ADAPTERIMG}}
