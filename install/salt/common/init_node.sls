@@ -18,7 +18,7 @@ backup-repo-dir:
 backup-repo:
   cmd.run:
     - name: mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
-#config local repo
+
 local-repo:
   pkgrepo.managed:
     - humanname: local_repo

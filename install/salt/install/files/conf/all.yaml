@@ -118,6 +118,7 @@ services:
     -e DEFAULT_PORT=80
     -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
     -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
+    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
   stop: docker stop rbd-lb
   restart_policy: always
