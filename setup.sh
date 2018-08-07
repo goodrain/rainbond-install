@@ -119,12 +119,12 @@ baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm >/dev/null 2>&1
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm  >/dev/null 2>&1
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm  >/dev/null 2>&1
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm  >/dev/null 2>&1
 
-    createrepo /opt/rainbond/install/install/pkgs/centos/
+    createrepo /opt/rainbond/install/install/pkgs/centos/  >/dev/null 2>&1
     fi
 
 else
@@ -457,7 +457,11 @@ System_Check(){
 )
 
   Echo_Info "Checking internet connect ..."
-  Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
+  if [ "$INSTALL_TYPE" == "online" ];then
+        Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
+  else
+        Echo_Ok
+  fi
 
   Echo_Info "Check system environment..."
   Check_Docker_Version && Echo_Ok

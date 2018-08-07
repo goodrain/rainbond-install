@@ -245,7 +245,7 @@ push-prom-image:
 
 load-grafana-tcm:
   cmd.run:
-    - name: docker load -i {{ pillar['rbd-path'] }}/install/imgs/{{ PRIDOMAIN }}_grafana_{{GRAFANA}}.gz
+    - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_grafana_{{GRAFANA}}.gz
 
 #===================== builder/runner image ===========================
 runner-load:

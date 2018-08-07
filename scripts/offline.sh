@@ -62,7 +62,7 @@ download_pkg(){
 }
 
 download_img(){
-    rbd_plugins=(mysql rbd-api rbd-dns rbd-registry rbd-repo rbd-worker rbd-eventlog rbd-entrance rbd-chaos rbd-lb rbd-mq rbd-webcli rbd-app-ui rbd-monitor)
+    rbd_plugins=(mysql rbd-api rbd-dns rbd-registry rbd-repo rbd-worker rbd-eventlog rbd-entrance rbd-chaos rbd-lb rbd-mq rbd-webcli rbd-app-ui rbd-monitor rbd-grafana)
     rbd_runtimes=(tcm mesh runner adapter builder pause rbd-cni k8s-cni)
     k8s=(cfssl kubecfg api static manager schedule server calico)
     for Moudles in ${rbd_plugins[@]} ${rbd_runtimes[@]} ${k8s[@]}
