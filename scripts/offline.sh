@@ -14,11 +14,12 @@ which yq >/dev/null 2>&1 || (
 
 [ -d "$REPO_PATH" ] || mkdir -p $REPO_PATH
 
-init_repo(){
+init(){
     git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git $REPO_PATH
     [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
     [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH
     curl https://pkg.rainbond.com/releases/common/v3.7.0rc/grctl -o $REPO_PATH/grctl
+    cp $REPO_PATH/install/rainbond.yaml.default $REPO_PATH/rainbond.yaml.default
     chmod +x $REPO_PATH/grctl
 }
 
@@ -66,6 +67,16 @@ download_pkg(){
 }
 
 download_img(){
+    which docker > /deb/null 2>&1 || (
+        curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+        cat > /etc/docker/daemon.json <<EOF
+{
+  "registry-mirrors": ["https://registry.docker-cn.com"]
+}        
+EOF
+    systemctl restart docker
+    )
+
     rbd_plugins=(mysql rbd-api rbd-dns rbd-registry rbd-repo rbd-worker rbd-eventlog rbd-entrance rbd-chaos rbd-lb rbd-mq rbd-webcli rbd-app-ui rbd-monitor rbd-grafana)
     rbd_runtimes=(tcm mesh runner adapter builder pause rbd-cni k8s-cni)
     k8s=(cfssl kubecfg api static manager schedule server calico)
@@ -104,10 +115,30 @@ offline_tgz(){
 }
 
 case $1 in
+    init)
+        init
+    ;;
+    ubuntu)
+        download_pkg ubuntu
+    ;;
+    debian)
+        download_pkg debian
+    ;;
+    centos)
+        download_pkg centos
+    ;;
+    image)
+        download_img
+    ;;
+    tgz)
+        offline_tgz
+    ;;
     *)
-    init_repo
-    download_pkg ${1:-centos}
-    download_img ${2:-3.7}
-    offline_tgz
+        init
+        download_pkg ubuntu
+        download_pkg debian
+        download_pkg centos
+        download_img 3.7
+        offline_tgz
     ;;
 esac
