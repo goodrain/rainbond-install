@@ -5,7 +5,7 @@ if [ "$1"  == "bash" ];then
 else
     YAML_PATH=/opt/rainbond/install/rainbond.yaml.default
     PKG_PATH=/opt/rainbond/install/install/pkgs
-
+    apt update
     echo "download ubuntu offline package"
     dpkg=$(yq r $YAML_PATH rbd-pkgs.debian | awk '{print $2}')
     common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
