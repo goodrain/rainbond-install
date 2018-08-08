@@ -15,6 +15,9 @@ which yq >/dev/null 2>&1 || (
 [ -d "$REPO_PATH" ] || mkdir -p $REPO_PATH
 
 init(){
+    which git > /dev/null 2>&1 || (
+        yum install -y git
+    )
     git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git $REPO_PATH
     [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
     [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH
@@ -24,46 +27,18 @@ init(){
 }
 
 debian_pkg(){
-    echo "download debian/ubuntu offline package"
-    dpkg=$(yq r $YAML_PATH rbd-pkgs.debian | awk '{print $2}')
-    common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
-    for pkg in ${dpkg[@]} ${common_pkg[@]}
-    do
-        apt install ${pkg} -d  >/dev/null 2>&1
-        cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/debian/
-        echo "download debian $pkg ok"
-    done
+    echo "download debian offline package"
+    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/debian:${PKG_PATH}/debian rainbond/pkg-download:debian-95
+}
+
+ubuntu_pkg(){
+    echo "download ubuntu offline package"
+    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/ubuntu:${PKG_PATH}/ubuntu rainbond/pkg-download:ubuntu-1604
 }
 
 centos_pkg(){
     echo "download centos offline package"
-    curl -o /etc/yum.repos.d/docker.repo https://pkg.rainbond.com/releases/common/repo/docker.repo
-    curl -o /etc/yum.repos.d/salt.repo https://pkg.rainbond.com/releases/common/repo/salt.repo
-    yum makecache
-    cpkg=$(yq r $YAML_PATH rbd-pkgs.centos | awk '{print $2}')
-    common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
-    for pkg in ${cpkg[@]} ${common_pkg[@]}
-    do
-        yum install ${pkg} --downloadonly --downloaddir=$PKG_PATH/centos/ >/dev/null 2>&1
-        ls $PKG_PATH/centos/ | grep "$pkg" >/dev/null 2>&1
-        if [ "$?" == 0 ];then
-            echo "download centos $pkg ok"
-        else
-            echo "download centos $pkg failed"
-        fi
-    done
-    yum install -y gr-docker-engine
-}
-
-download_pkg(){
-    if [ "$1" == "all" ];then
-        centos_pkg
-        debian_pkg
-    elif [ "$1" == "debian" -o "$1" == "ubuntu" ];then
-        debian_pkg
-    else
-        centos_pkg
-    fi
+    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/centos:${PKG_PATH}/centos rainbond/pkg-download:centos-1708
 }
 
 download_img(){
@@ -119,13 +94,13 @@ case $1 in
         init
     ;;
     ubuntu)
-        download_pkg ubuntu
+        ubuntu_pkg
     ;;
     debian)
-        download_pkg debian
+        debian_pkg
     ;;
     centos)
-        download_pkg centos
+        centos_pkg
     ;;
     image)
         download_img
@@ -135,10 +110,10 @@ case $1 in
     ;;
     *)
         init
-        download_pkg ubuntu
-        download_pkg debian
-        download_pkg centos
-        download_img 3.7
+        download_img
+        ubuntu_pkg
+        debian_pkg
+        centos_pkg
         offline_tgz
     ;;
 esac
