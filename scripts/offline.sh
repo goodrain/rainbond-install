@@ -36,6 +36,9 @@ debian_pkg(){
 
 centos_pkg(){
     echo "download centos offline package"
+    curl -o /etc/yum.repos.d/docker.repo https://pkg.rainbond.com/releases/common/repo/docker.repo
+    curl -o /etc/yum.repos.d/salt.repo https://pkg.rainbond.com/releases/common/repo/salt.repo
+    yum makecache
     cpkg=$(yq r $YAML_PATH rbd-pkgs.centos | awk '{print $2}')
     common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
     for pkg in ${cpkg[@]} ${common_pkg[@]}
@@ -48,6 +51,7 @@ centos_pkg(){
             echo "download centos $pkg failed"
         fi
     done
+    yum install -y gr-docker-engine
 }
 
 download_pkg(){

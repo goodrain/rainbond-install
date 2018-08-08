@@ -1,0 +1,6 @@
+[saltstack-repo]
+name=SaltStack repo for RHEL/CentOS $releasever
+baseurl=https://repo.saltstack.com/yum/redhat/$releasever/$basearch/archive/2018.3.2
+enabled=1
+gpgcheck=0
+gpgkey=https://repo.saltstack.com/yum/redhat/$releasever/$basearch/archive/2018.3.2/SALTSTACK-GPG-KEY.pub

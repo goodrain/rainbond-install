@@ -21,7 +21,7 @@ config_repo(){
 gpgcheck=0
 gpgkey=http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
 enabled=1
-baseurl=http://repo.goodrain.com/centos/$releasever/3.5/$basearch
+baseurl=http://repo.goodrain.com/centos/$releasever/3.6/$basearch
 name=Goodrain CentOS-$releasever - for x86_64
 EOF
     yum makecache fast -q
