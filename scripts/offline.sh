@@ -22,7 +22,7 @@ init(){
     [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
     [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH
     curl https://pkg.rainbond.com/releases/common/v3.7.0rc/grctl -o $REPO_PATH/grctl
-    cp $REPO_PATH/install/rainbond.yaml.default $REPO_PATH/rainbond.yaml.default
+    #cp $REPO_PATH/install/rainbond.yaml.default $REPO_PATH/rainbond.yaml.default
     chmod +x $REPO_PATH/grctl
 }
 
@@ -42,7 +42,7 @@ centos_pkg(){
 }
 
 download_img(){
-    which docker > /deb/null 2>&1 || (
+    which docker > /dev/null 2>&1 || (
         curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
         cat > /etc/docker/daemon.json <<EOF
 {
