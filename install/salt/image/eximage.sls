@@ -175,4 +175,59 @@ pause-pull-image:
 runner-pull-image:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
+
+default_http_conf:
+  file.managed:
+    - source: salt://install/files/plugins/proxy.conf
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
+    - template: jinja
+    - makedirs: True
+
+proxy_site_ssl:
+  file.recurse:
+    - source: salt://install/files/ssl/goodrain.me
+    - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
+    - makedirs: True
+
+/usr/local/bin/calicoctl:
+  file.managed:
+    - source: salt://install/files/misc/bin/calicoctl
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/docker-compose:
+  file.managed:
+    - source: salt://install/files/misc/bin/docker-compose
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/kubectl:
+  file.managed:
+    - source: salt://install/files/misc/bin/kubectl
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/etcdctl:
+  file.managed:
+    - source: salt://install/files/misc/bin/etcdctl
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/ctop:
+  file.managed:
+    - source: salt://install/files/misc/bin/ctop
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/yq:
+  file.managed:
+    - source: salt://install/files/misc/bin/yq
+    - mode: 755
+    - user: root
+    - group: root
 {% endif %}

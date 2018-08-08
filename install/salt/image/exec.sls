@@ -122,31 +122,6 @@ proxy_site_ssl:
     - user: root
     - group: root
 
-{% if "manage" in grains['id'] %}
-/usr/local/bin/grcert:
-  file.managed:
-    - source: salt://install/files/misc/bin/grcert
-    - mode: 755
-    - user: root
-    - group: root
-
-/usr/local/bin/grctl:
-  file.managed:
-    - source: salt://install/files/misc/bin/grctl
-    - mode: 755
-    - user: root
-    - group: root
-
-{% if grains['id'] == "manage01"  %}
-/usr/local/bin/domain-cli:
-  file.managed:
-    - source: salt://install/files/misc/bin/domain-cli
-    - mode: 755
-    - user: root
-    - group: root
-{% endif %}
-{% endif %}
-
 /usr/local/bin/kubectl:
   file.managed:
     - source: salt://install/files/misc/bin/kubectl
@@ -188,3 +163,28 @@ proxy_site_ssl:
     - mode: 755
     - user: root
     - group: root
+
+{% if "manage" in grains['id'] %}
+/usr/local/bin/grcert:
+  file.managed:
+    - source: salt://install/files/misc/bin/grcert
+    - mode: 755
+    - user: root
+    - group: root
+
+/usr/local/bin/grctl:
+  file.managed:
+    - source: salt://install/files/misc/bin/grctl
+    - mode: 755
+    - user: root
+    - group: root
+
+{% if grains['id'] == "manage01"  %}
+/usr/local/bin/domain-cli:
+  file.managed:
+    - source: salt://install/files/misc/bin/domain-cli
+    - mode: 755
+    - user: root
+    - group: root
+{% endif %}
+{% endif %}
