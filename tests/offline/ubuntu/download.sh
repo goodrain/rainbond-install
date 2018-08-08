@@ -12,7 +12,7 @@ else
     for pkg in ${dpkg[@]} ${common_pkg[@]}
     do
         apt install ${pkg} -d  >/dev/null 2>&1
-        cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/ubuntu/
+        #cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/ubuntu/
         echo "download ubuntu $pkg ok"
     done
 fi
