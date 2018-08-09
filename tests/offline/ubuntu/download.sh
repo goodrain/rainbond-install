@@ -15,6 +15,7 @@ else
         #cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/ubuntu/
         echo "download ubuntu $pkg ok"
     done
+    cp -a /var/cache/apt/archives/*.deb /tmp/
     apt-get install reprepro -y
     mkdir -p /opt/rainbond/install/install/pkgs/ubuntu/16/conf/
     touch /opt/rainbond/install/install/pkgs/ubuntu/16/conf/{distributions,options,override.local}
@@ -30,10 +31,10 @@ EOF
 verbose
 basedir /opt/rainbond/install/install/pkgs/ubuntu/16/
 EOF
-    for deb in /var/cache/apt/archives/*
+    for deb in /tmp/*
     do  
         echo $deb | grep ".deb" && (
-            reprepro -Vb /opt/rainbond/install/install/pkgs/ubuntu/16  -C main -P optional -S net  includedeb local /var/cache/apt/archives/$deb 
+            reprepro -Vb /opt/rainbond/install/install/pkgs/ubuntu/16  -C main -P optional -S net  includedeb local $deb 
         )
     done
 fi
