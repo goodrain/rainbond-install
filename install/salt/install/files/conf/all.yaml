@@ -381,35 +381,6 @@ services:
   stop: docker stop rbd-app-ui
   restart_policy: always
   restart_sec: 10
-{% if grains['id'] == 'manage01' %}
-- name: rbd-grafana
-  registry:
-  - name: GRAFANA_ENDPOINTS
-    protocol: http
-    port: 3000
-  health:
-    name: rbd-grafana
-    model: tcp
-    address: 127.0.0.1:3000
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm rbd-grafana
-  start: >-
-    docker run
-    --name rbd-grafana
-    --network host
-    --memory 1024M
-    --user 0
-    -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
-    -e GF_SECURITY_ADMIN_PASSWORD={{ pillar['secretkey'] }}
-    -v /opt/rainbond/data/rbd-grafana:/var/lib/grafana
-    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-grafana']['image'] }}:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
-  stop: docker stop rbd-grafana
-  restart_policy: always
-  restart_sec: 10
-{% endif %}
 - name: etcd
   endpoints:
   - name: ETCD_ENDPOINTS

@@ -1,6 +1,6 @@
 /etc/default/grub:
   file.append:
-    - text: 'GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1 net.ifnames=0 biosdevname=0"'
+    - text: 'GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"'
 
 grub:
   cmd.run:
