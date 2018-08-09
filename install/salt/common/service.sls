@@ -27,10 +27,12 @@ remove_pkgs:
       - cmd: dnsmasq
 #      - cmd: kill-dhclient
 
+{% if grains['os_family']|lower == 'debian' %}
 NetworkManager:
   service.dead:
     - name: NetworkManager
     - enable: False
+{% endif %}
 
 iptables:
   cmd.run:
