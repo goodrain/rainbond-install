@@ -17,7 +17,7 @@ else
     done
     apt-get install reprepro -y
     mkdir -p /opt/rainbond/install/install/pkgs/ubuntu/16/conf/
-    touch /opt/rainbond/install/install/pkgs/ubuntu/16/conf/{distributions,options,override.hack}
+    touch /opt/rainbond/install/install/pkgs/ubuntu/16/conf/{distributions,options,override.local}
     cat > /opt/rainbond/install/install/pkgs/ubuntu/16/conf/distributions <<EOF
 Origin: rainbond
 Label: rainbond
@@ -30,5 +30,10 @@ EOF
 verbose
 basedir /opt/rainbond/install/install/pkgs/ubuntu/16/
 EOF
-    reprepro -Vb /opt/rainbond/install/install/pkgs/ubuntu/16  -C main -P optional -S net  includedeb hack /var/cache/apt/archives/*.deb
+    for deb in /var/cache/apt/archives/*
+    do  
+        echo $deb | grep ".deb" && (
+            reprepro -Vb /opt/rainbond/install/install/pkgs/ubuntu/16  -C main -P optional -S net  includedeb local /var/cache/apt/archives/$deb 
+        )
+    done
 fi

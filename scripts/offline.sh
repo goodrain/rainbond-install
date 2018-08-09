@@ -1,5 +1,6 @@
 #!/bin/bash
 
+VERSION=v3.7.0rc
 REPO_PATH=/opt/rainbond/install
 PKG_PATH=/opt/rainbond/install/install/pkgs
 IMG_PATH=/opt/rainbond/install/install/imgs
@@ -86,7 +87,7 @@ EOF
 }
 
 offline_tgz(){
-    tar zcvf install.v3.7.$(date +%F).tgz /opt/rainbond/install
+    tar zcvf install.offline.${VERSION}.$(date +%F).tgz /opt/rainbond/install
 }
 
 case $1 in
