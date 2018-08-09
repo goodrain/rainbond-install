@@ -12,7 +12,7 @@ else
     for pkg in ${dpkg[@]} ${common_pkg[@]}
     do
         apt install ${pkg} -d -y  >/dev/null 2>&1
-        cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/debian/
+        #cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/debian/
         echo "download debian $pkg ok"
     done
 fi
