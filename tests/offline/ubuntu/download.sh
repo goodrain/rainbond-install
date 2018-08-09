@@ -15,4 +15,20 @@ else
         #cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/ubuntu/
         echo "download ubuntu $pkg ok"
     done
+    apt-get install reprepro -y
+    mkdir -p /opt/rainbond/install/install/pkgs/ubuntu/16/conf/
+    touch /opt/rainbond/install/install/pkgs/ubuntu/16/conf/{distributions,options,override.hack}
+    cat > /opt/rainbond/install/install/pkgs/ubuntu/16/conf/distributions <<EOF
+Origin: rainbond
+Label: rainbond
+Codename: local
+Architectures: amd64
+Components: main pre
+Description: rainbond ubuntu package local repo 
+EOF
+    cat > /opt/rainbond/install/install/pkgs/ubuntu/16/conf/options <<EOF
+verbose
+basedir /opt/rainbond/install/install/pkgs/ubuntu/16/
+EOF
+    reprepro -Vb /opt/rainbond/install/install/pkgs/ubuntu/16  -C main -P optional -S net  includedeb hack /var/cache/apt/archives/*.deb
 fi

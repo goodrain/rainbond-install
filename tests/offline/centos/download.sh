@@ -17,4 +17,6 @@ else
             echo "download centos $pkg failed"
         fi
     done
+    yum install -y createrepo >/dev/null 2>&1
+    createrepo /opt/rainbond/install/install/pkgs/centos/  >/dev/null 2>&1
 fi

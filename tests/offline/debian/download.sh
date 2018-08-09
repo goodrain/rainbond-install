@@ -15,4 +15,20 @@ else
         #cp -a /var/cache/apt/archives/$pkg* $PKG_PATH/debian/
         echo "download debian $pkg ok"
     done
+    apt-get install reprepro -y
+    mkdir -p /opt/rainbond/install/install/pkgs/debian/9/conf/
+    touch /opt/rainbond/install/install/pkgs/debian/9/conf/{distributions,options,override.hack}
+    cat > /opt/rainbond/install/install/pkgs/debian/9/conf/distributions <<EOF
+Origin: rainbond
+Label: rainbond
+Codename: local
+Architectures: amd64
+Components: main pre
+Description: rainbond debian package local repo 
+EOF
+    cat > /opt/rainbond/install/install/pkgs/debian/9/conf/options <<EOF
+verbose
+basedir /opt/rainbond/install/install/pkgs/debian/9/
+EOF
+    reprepro -Vb /opt/rainbond/install/install/pkgs/debian/9  -C main -P optional -S net  includedeb hack /var/cache/apt/archives/*.deb
 fi
