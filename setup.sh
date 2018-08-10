@@ -108,6 +108,8 @@ END
 
         [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
             curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+        ) || (
+            
         )     
     else
         mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
@@ -119,12 +121,12 @@ baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm >/dev/null 2>&1
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm  >/dev/null 2>&1
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm  >/dev/null 2>&1
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm  >/dev/null 2>&1
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm 1>/dev/null 
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm  1>/dev/null 
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm  1>/dev/null 
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm  1>/dev/null
 
-    createrepo /opt/rainbond/install/install/pkgs/centos/  >/dev/null 2>&1
+    createrepo /opt/rainbond/install/install/pkgs/centos/  1>/dev/null
     fi
 
 else
