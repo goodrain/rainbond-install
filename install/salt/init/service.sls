@@ -11,21 +11,14 @@ dnsmasq:
     - name: killall -9 dnsmasq
     - onlyif: pgrep dnsmasq
 
-kill-dhclient:
-  cmd.run:
-    - name: pkill -9 dhclient
-    - onlyif: pgrep dhclient
-
 remove_pkgs:
   pkg.removed:
     - pkgs:
       - nscd
       - dnsmasq
-      - dhclient
     - require:
       - service: dnsmasq
       - cmd: dnsmasq
-      - cmd: kill-dhclient
     
 {% if grains['os_family']|lower == 'debian' %}
 NetworkManager:
