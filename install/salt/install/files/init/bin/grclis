@@ -1,16 +1,23 @@
 #!/bin/bash
 
-ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
 
 func(){
-    for services in ${ALL_SERVICES}
+    for service in ${ALL_SERVICES[@]}
     do
-        systemctl $1 $services
+        [ -f "/etc/systemd/system/$service.service" ] && (
+            systemctl $1 $service
+            [ "$?" -eq 0 ] && echo "stop $service successful" || echo "stop $service failure"
+        ) || (
+            echo "not found.skip stop $service"
+        )
     done
 }
 
 if [ "$1" == "start" ];then
     func start
-else
+elif [ "$1" == "stop" ];then
     func stop
+else
+    echo "grclis <start|stop>"
 fi

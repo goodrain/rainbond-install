@@ -108,6 +108,8 @@ END
 
         [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
             curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+        ) || (
+            
         )     
     else
         mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
@@ -119,12 +121,12 @@ baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm >/dev/null 2>&1
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm  >/dev/null 2>&1
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm  >/dev/null 2>&1
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm  >/dev/null 2>&1
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm 1>/dev/null 
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm  1>/dev/null 
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm  1>/dev/null 
+    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm  1>/dev/null
 
-    createrepo /opt/rainbond/install/install/pkgs/centos/  >/dev/null 2>&1
+    createrepo /opt/rainbond/install/install/pkgs/centos/  1>/dev/null
     fi
 
 else
@@ -238,7 +240,7 @@ REG_Status(){
     uid=$( Read_Sls_File reg-uuid $MAIN_SLS )
     iip=$( Read_Sls_File master-private-ip $MAIN_SLS )
     eip=$( Read_Sls_File master-public-ip $MAIN_SLS )
-    if [ ! -z $eip ];then
+    if [ ! -z "$eip" ];then
         ip=$eip
     else
         ip=$iip
@@ -326,7 +328,7 @@ Exit_Clear() {
     if (which salt-run > /dev/null 2>&1);then
         rbdpath=$(salt '*' pillar.item rbd-path --output=yaml | grep rbd-path | awk '{print $2}')
         if [ "$rbdpath" != "" ];then
-            [ -d $rbdpath/data ] && rm -rf $rbdpath/data && Echo_Ok
+            [ -d "$rbdpath/data" ] && rm -rf $rbdpath/data && Echo_Ok
         fi
     fi
     
@@ -334,7 +336,7 @@ Exit_Clear() {
 
 # check python urllib3 for aliyun (CentOS 7.x)
 Check_Python_Urllib(){
-    if [ ! -f $INIT_FILE ];then
+    if [ ! -f "$INIT_FILE" ];then
         if ( which pip > /dev/null 2>&1 );then
             if ( pip show urllib3 > /dev/null 2>&1 );then
                 if [ "$SYS_NAME" == "centos" ];then
@@ -351,7 +353,7 @@ Check_Python_Urllib(){
 Check_Internet(){
   check_url=$1
   curl -s --connect-timeout 15 $check_url -o /dev/null 2>/dev/null
-  if [ $? -eq 0 ];then
+  if [ "$?" -eq 0 ];then
     return 0
   else
     Echo_Error "Unable to connect to internet."
@@ -439,7 +441,7 @@ Get_Hardware_Info(){
 
     CPU_STATUS=$(awk -v num1=$CPU_NUM -v num2=2 'BEGIN{print(num1>=num2)?"0":"1"}')
     MEM_STATUS=$(awk -v num1=$MEM_SIZE -v num2=3 'BEGIN{print(num1>num2)?"0":"1"}')
-    if [ $CPU_STATUS == '0' -a $MEM_STATUS == '0' ];then
+    if [ "$CPU_STATUS" == '0' -a "$MEM_STATUS" == '0' ];then
       Echo_Info "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
     else
       Echo_Error "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
@@ -619,7 +621,7 @@ Install_Salt(){
   Check_Service_State salt-minion && systemctl stop salt-minion
 
   # check and install salt 
-  if [ ! $SALT_SSH_INSTALLED ];then
+  if [ ! "$SALT_SSH_INSTALLED" ];then
     # update repo mate
     Echo_Info "Installing salt ..."
     $Cache_PKG > /dev/null
@@ -668,7 +670,7 @@ EOF
     echo -e -n "."
     sleep 1
     uuid=$(timeout 3 salt "*" grains.get uuid | grep '-' | awk '{print $1}')
-    [ ! -z $uuid ] && (
+    [ ! -z "$uuid" ] && (
       Write_Sls_File reg-uuid "$uuid" $MAIN_SLS
       Write_Host "$DEFAULT_LOCAL_IP" "$uuid"
     ) && break
@@ -702,7 +704,7 @@ check_func(){
 }
 
 init_config(){
-    if [ ! -f $INIT_FILE ];then
+    if [ ! -f "$INIT_FILE" ];then
         Echo_Info "Init rainbond configure."
         Init_Config_Func && touch $INIT_FILE
     fi

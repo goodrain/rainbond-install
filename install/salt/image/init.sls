@@ -7,14 +7,16 @@ include:
   - image.eximage
 {% endif %}
 {% else %}
-  - image.preinit
 {% if grains['id'] == 'manage01' %}
+  - image.preinit
   - image.image
 {% else %}
   - image.eximage
 {% endif %}
 {% endif %}
+{% if "manage" in grains['id'] %}
 {% if grains['id'] == 'manage01' %}
   - image.ssl
-  - image.rsyc
+{% endif %}
+  - image.rsync
 {% endif %}

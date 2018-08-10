@@ -71,58 +71,6 @@ services:
   stop: docker stop rbd-repo
   restart_policy: always
   restart_sec: 10
-- name: rbd-db
-  endpoints:
-  - name: DB_ENDPOINTS
-    protocol: tcp
-    port: 3306
-  health:
-    name: rbd-db
-    model: tcp
-    address: 127.0.0.1:3306
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm rbd-db
-  start: >-
-    docker run --name rbd-db
-    --network host
-    --memory 1024M
-    -e MYSQL_ALLOW_EMPTY_PASSWORD="true"
-    -v {{ pillar['rbd-path'] }}/data/rbd-db:/data
-    -v {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
-    -i {{ pillar['private-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
-  stop: docker stop rbd-db
-  restart_policy: always
-  restart_sec: 10
-- name: rbd-lb
-  endpoints:
-  - name: LB_ENDPOINTS
-    protocol: http
-    port: 80
-  health:
-    name: rbd-lb
-    model: http
-    address: 127.0.0.1:10002/health
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm rbd-lb
-  start: >-
-    docker run --name rbd-lb
-    --network host
-    --memory 1024M
-    -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
-    -e DEFAULT_PORT=80
-    -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
-    -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
-    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
-    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
-  stop: docker stop rbd-lb
-  restart_policy: always
-  restart_sec: 10
 - name: rbd-entrance
   endpoints:
   - name: ENTRANCE_ENDPOINTS
@@ -566,6 +514,31 @@ services:
   restart_policy: always
   restart_sec: 10
 {% if grains['id'] == "manage01" %}
+- name: rbd-db
+  endpoints:
+  - name: DB_ENDPOINTS
+    protocol: tcp
+    port: 3306
+  health:
+    name: rbd-db
+    model: tcp
+    address: 127.0.0.1:3306
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-db
+  start: >-
+    docker run --name rbd-db
+    --network host
+    --memory 1024M
+    -e MYSQL_ALLOW_EMPTY_PASSWORD="true"
+    -v {{ pillar['rbd-path'] }}/data/rbd-db:/data
+    -v {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
+  stop: docker stop rbd-db
+  restart_policy: always
+  restart_sec: 10
 - name: kubelet
   endpoints:
   - name: KUBELET_ENDPOINTS
@@ -603,8 +576,64 @@ services:
     --v=2
   restart_policy: always
   restart_sec: 10
+{% if grains['id'] == 'manage01' %}
+- name: rbd-lb
+  endpoints:
+  - name: LB_ENDPOINTS
+    protocol: http
+    port: 80
+  health:
+    name: rbd-lb
+    model: http
+    address: 127.0.0.1:10002/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-lb
+  start: >-
+    docker run --name rbd-lb
+    --network host
+    --memory 1024M
+    -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
+    -e DEFAULT_PORT=80
+    -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
+    -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
+    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
+  stop: docker stop rbd-lb
+  restart_policy: always
+  restart_sec: 10
+{% endif %}
 {% endif %}
 {% else %}
+- name: rbd-lb
+  endpoints:
+  - name: LB_ENDPOINTS
+    protocol: http
+    port: 80
+  health:
+    name: rbd-lb
+    model: http
+    address: 127.0.0.1:10002/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-lb
+  start: >-
+    docker run --name rbd-lb
+    --network host
+    --memory 1024M
+    -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
+    -e DEFAULT_PORT=80
+    -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
+    -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
+    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
+  stop: docker stop rbd-lb
+  restart_policy: always
+  restart_sec: 10
 - name: etcd-proxy
   endpoints:
   - name: ETCDPROXY_ENDPOINTS
