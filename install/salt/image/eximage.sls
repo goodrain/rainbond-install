@@ -84,7 +84,7 @@ pull-etcd:
 {% if "manage" in grains['id'] %}
 builder-pull-image:    
   cmd.run:
-    - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}:{{ BUILDERVER }}
+    - name: docker pull {{PRIDOMAIN}}/{{BUILDERIMG}}
 
 pull-prom-image:
   cmd.run:
