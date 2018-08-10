@@ -109,7 +109,8 @@ END
         [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
             curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
         ) || (
-            
+            yum install epel-release
+            yum update
         )     
     else
         mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
