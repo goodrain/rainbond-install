@@ -189,6 +189,8 @@ proxy_site_ssl:
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
     - makedirs: True
 
+{% endif %}
+
 /usr/local/bin/calicoctl:
   file.managed:
     - source: salt://install/files/misc/bin/calicoctl
@@ -230,4 +232,3 @@ proxy_site_ssl:
     - mode: 755
     - user: root
     - group: root
-{% endif %}
