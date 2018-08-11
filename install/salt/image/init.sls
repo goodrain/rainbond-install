@@ -12,5 +12,6 @@ include:
   - image.ssl
 {% else %}
   - image.eximage
+  - image.tools
 {% endif %}
   - image.rsync
