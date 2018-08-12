@@ -640,7 +640,7 @@ services:
     protocol: http
     port: 2379
   health:
-    name: etcd
+    name: etcd-proxy
     model: cmd
     address: ((`ETCDCTL_API=3 etcdctl --endpoints=http://127.0.0.1:2379 endpoint health | grep " health" | wc -l` ==1))
     time_interval: 5
