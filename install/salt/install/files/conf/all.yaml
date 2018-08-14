@@ -324,6 +324,7 @@ services:
     -e MYSQL_PASS={{ pillar['database']['mysql']['pass'] }}
     -e MYSQL_DB=console
     -v /grdata/services/console:/data
+    -v {{ pillar['rbd-path'] }}/etc/rbd-api:/etc/goodrain
     -v {{ pillar['rbd-path'] }}/logs/rbd-app-ui/goodrain.log:/tmp/goodrain.log
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-app-ui']['image'] }}:{{ pillar['rainbond-modules']['rbd-app-ui']['version'] }}
   stop: docker stop rbd-app-ui
