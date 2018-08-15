@@ -223,3 +223,7 @@ rainbond-modules:
     enabled: 
     image: grafana
     version: 5.2.2
+  rbd-scope:
+    enabled:
+    image: scope
+    version: 1.9.1
