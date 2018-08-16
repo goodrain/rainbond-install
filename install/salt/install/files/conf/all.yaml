@@ -31,10 +31,14 @@ services:
   restart_policy: always
   restart_sec: 10
 - name: rbd-hub
+  endpoints:
+  - name: HUB_ENDPOINTS
+    protocol: http
+    port: 5000
   health:
     name: rbd-hub
     model: http
-    address: 127.0.0.1:5000/
+    address: 127.0.0.1:5000
     time_interval: 5
   after:
     - docker
@@ -53,7 +57,7 @@ services:
   endpoints:
   - name: REPO_ENDPOINTS
     protocol: http
-    port:
+    port: 8081
   health:
     name: rbd-repo
     model: http
