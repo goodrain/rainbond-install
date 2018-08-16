@@ -10,3 +10,10 @@ config-grctl-yaml:
     - name: /root/.rbd/grctl.yaml
     - makedirs: True
     - template: jinja
+
+rename-compose:
+  file.rename:
+    - name: /opt/rainbond/compose_bak
+    - source: /opt/rainbond/compose
+    - force: True
+    - makedirs: True
