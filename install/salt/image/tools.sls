@@ -75,3 +75,11 @@
     - mode: 755
     - user: root
     - group: root
+
+/usr/local/bin/scope:
+  file.managed:
+    - source: salt://install/files/misc/bin/scope
+    - mode: 755
+    - user: root
+    - group: root
+

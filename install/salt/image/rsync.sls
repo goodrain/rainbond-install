@@ -10,3 +10,4 @@ config-grctl-yaml:
     - name: /root/.rbd/grctl.yaml
     - makedirs: True
     - template: jinja
+
