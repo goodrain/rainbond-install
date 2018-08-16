@@ -7,7 +7,20 @@ if [ "$?" -ne 0 ];then
     docker rm -f rbd-lb
 fi
 
-if [ ! -f "$PROXY_PATH" ];then
+if [[ "$HUB" =~ ',' ]];then
+
+for node in $(echo $NODES | tr " " "\n" | sort -u)
+do
+	NAME=${node%%:*}
+	IP=${node#*:}
+	member="$NAME=http://$IP:2380"
+	if [ -z $INITIAL_CLUSTER ];then
+		INITIAL_CLUSTER=$member
+	else
+		INITIAL_CLUSTER="$INITIAL_CLUSTER,$member"
+	fi
+done
+
     rm -rf "$PROXY_PATH"
     echo $HUB $REPO
     cat > $PROXY_PATH <<EOF

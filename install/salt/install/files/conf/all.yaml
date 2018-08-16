@@ -33,7 +33,7 @@ services:
 - name: rbd-hub
   endpoints:
   - name: HUB_ENDPOINTS
-    protocol: http
+    protocol: 
     port: 5000
   health:
     name: rbd-hub
@@ -56,7 +56,7 @@ services:
 - name: rbd-repo
   endpoints:
   - name: REPO_ENDPOINTS
-    protocol: http
+    protocol: 
     port: 8081
   health:
     name: rbd-repo
