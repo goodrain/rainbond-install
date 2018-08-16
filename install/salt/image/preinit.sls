@@ -107,4 +107,3 @@ proxy_site_ssl:
     - source: salt://install/files/ssl/goodrain.me
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
     - makedirs: True
-

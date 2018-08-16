@@ -189,5 +189,13 @@ proxy_site_ssl:
     - name: {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_certs/goodrain.me
     - makedirs: True
 
+proxy_lb_init:
+  file.managed:
+    - source: salt://install/files/plugins/init-lb.sh
+    - name: {{ pillar['rbd-path'] }}/scripts/init-lb.sh
+    - mode: 755
+    - template: jinja
+    - makedirs: True
+
 {% endif %}
 

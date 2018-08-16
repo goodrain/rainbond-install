@@ -595,7 +595,7 @@ services:
   after:
     - docker
   type: simple
-  pre_start: docker rm rbd-lb
+  pre_start: HUB=${HUB_ENDPOINTS} REPO=${REPO_ENDPOINTS} {{ pillar['rbd-path'] }}/scripts/init-lb.sh
   start: >-
     docker run --name rbd-lb
     --network host
@@ -625,7 +625,7 @@ services:
   after:
     - docker
   type: simple
-  pre_start: docker rm rbd-lb
+  pre_start: HUB=${HUB_ENDPOINTS} REPO=${REPO_ENDPOINTS} {{ pillar['rbd-path'] }}/scripts/init-lb.sh
   start: >-
     docker run --name rbd-lb
     --network host
