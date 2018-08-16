@@ -581,7 +581,7 @@ services:
     --v=2
   restart_policy: always
   restart_sec: 10
-{% if grains['id'] == 'manage01' %}
+#{% if grains['id'] == 'manage01' %}
 - name: rbd-lb
   endpoints:
   - name: LB_ENDPOINTS
@@ -609,7 +609,7 @@ services:
   stop: docker stop rbd-lb
   restart_policy: always
   restart_sec: 10
-{% endif %}
+#{% endif %}
 {% endif %}
 {% else %}
 - name: rbd-lb
