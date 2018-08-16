@@ -7,33 +7,43 @@ if [ "$?" -ne 0 ];then
     docker rm -f rbd-lb
 fi
 
-if [[ "$HUB" =~ ',' ]];then
+HUB_CLUSTER=""
+REPO_CLUSTER=""
 
-for node in $(echo $NODES | tr " " "\n" | sort -u)
+for hub in $(echo $HUB | tr "," "\n" | sort -u)
 do
-	NAME=${node%%:*}
-	IP=${node#*:}
-	member="$NAME=http://$IP:2380"
-	if [ -z $INITIAL_CLUSTER ];then
-		INITIAL_CLUSTER=$member
+	member="server $hub;"
+	if [ -z $HUB_CLUSTER ];then
+		HUB_CLUSTER=$member
 	else
-		INITIAL_CLUSTER="$INITIAL_CLUSTER,$member"
+		HUB_CLUSTER="$HUB_CLUSTER $member"
 	fi
 done
 
-    rm -rf "$PROXY_PATH"
-    echo $HUB $REPO
-    cat > $PROXY_PATH <<EOF
+for repo in $(echo $REPO | tr "," "\n" | sort -u)
+do
+	member="server $repo;"
+	if [ -z $REPO_CLUSTER ];then
+		REPO_CLUSTER=$member
+	else
+		REPO_CLUSTER="$REPO_CLUSTER $member"
+	fi
+done
+
+if [ ! -z "$REPO_CLUSTER" -a ! -z "$HUB_CLUSTER" ];then
+rm -rf "$PROXY_PATH"
+echo $HUB $REPO
+cat > $PROXY_PATH <<EOF
 upstream lang {
-    server 127.0.0.1:8081;
+    $REPO_CLUSTER
 }
 
 upstream maven {
-    server 127.0.0.1:8081;
+    $REPO_CLUSTER
 }
 
 upstream registry {
-    server 127.0.0.1:5000;
+    $HUB_CLUSTER
 }
 
 server {
@@ -104,4 +114,5 @@ server {
 
 }
 EOF
+
 fi
