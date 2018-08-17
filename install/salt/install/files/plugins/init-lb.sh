@@ -3,7 +3,7 @@
 PROXY_PATH={{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics/dynamic_servers/default.http.conf
 
 docker ps -a | grep rbd-lb >/dev/null 2>&1
-if [ "$?" -ne 0 ];then
+if [ "$?" -eq 0 ];then
     docker rm -f rbd-lb
 fi
 
