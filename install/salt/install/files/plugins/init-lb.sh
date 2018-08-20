@@ -43,6 +43,7 @@ upstream maven {
 }
 
 upstream registry {
+    ip_hash;
     $HUB_CLUSTER
 }
 
