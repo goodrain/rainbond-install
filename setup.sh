@@ -490,8 +490,13 @@ Init_system(){
   DEFAULT_LOCAL_IP=${LOCAL_IP:-$DEFAULT_LOCAL_IP}
   Write_Sls_File master-private-ip $DEFAULT_LOCAL_IP
   Write_Sls_File vip $DEFAULT_LOCAL_IP
-  Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
-  
+  if [[ "$DEFAULT_PUBLIC_IP" == "0.0.0.0" ]];then
+    DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep -v '^10\.|^172.|^192.168|^127.' | head -1)"
+    Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
+  else
+    Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
+  fi
+
   # configure hostname and hosts
   # reset /etc/hosts
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
