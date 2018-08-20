@@ -1,9 +1,9 @@
 #!/bin/bash
 #======================================================================================================================
 #
-#          FILE: install.sh
+#          FILE: setup.sh
 #
-#   DESCRIPTION: Install
+#   DESCRIPTION: Install Rainbond Cluster
 #
 #          BUGS: https://github.com/goodrain/rainbond-install/issues
 #
@@ -15,6 +15,7 @@
 [[ $DEBUG ]] && set -x
 
 INSTALL_TYPE=${1:-"online"}
+
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_PKGS="salt-ssh"
 MAIN_CONFIG="/srv/pillar/rainbond.sls"
@@ -30,10 +31,10 @@ CPU_LIMIT=2
 MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1)
 MEM_LIMIT=4
 DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep '^10\.|^172.|^192.168' | grep -v '172.30.42.1' | head -1)"
-DEFAULT_PUBLIC_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep -v '^10\.|^172.|^192.168|^127.' | head -1)"
+DEFAULT_PUBLIC_IP=${2:-"$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep -v '^10\.|^172.|^192.168|^127.' | head -1)"}
 INIT_FILE="./.initialized"
 OFFLINE_FILE="./.offlineprepared"
-
+DOMAIN=$3
 MANAGE_MODULES="common \
 storage \
 docker \
@@ -490,7 +491,7 @@ Init_system(){
   Write_Sls_File master-private-ip $DEFAULT_LOCAL_IP
   Write_Sls_File vip $DEFAULT_LOCAL_IP
   Write_Sls_File master-public-ip "${DEFAULT_PUBLIC_IP}"
-
+  
   # configure hostname and hosts
   # reset /etc/hosts
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
@@ -516,6 +517,11 @@ Init_system(){
     ntpdate ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com > /dev/null 2>&1 && Echo_Ok
   else
     return 0
+  fi
+
+  #config domain
+  if [ ! -z "$DOMAIN" ];then
+        Write_Sls_File domain $DOMAIN
   fi
 }
 
