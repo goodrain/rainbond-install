@@ -8,6 +8,11 @@ nfs_client:
     - unless: dpkg -l | grep nfs-common
    {% endif %}
 
+grdata-dir:
+  file.directory:
+    - name: /grdata
+    - makedirs: True
+
 /etc/fstab:
   file.append:
     - text:
