@@ -45,12 +45,14 @@ salt-minion-install:
   {% endif %}
 
 {% if grains['os_family']|lower == 'redhat' %}
+{% if pillar['install-type']=='online' %}
 epel-install:
   pkg.installed:
     - pkgs:
       - epel-release
     - refresh: True
     - unless: rpm -qa | grep epel-release
+{% endif %}
 {% endif %}
 
 salt-minion-conf:
