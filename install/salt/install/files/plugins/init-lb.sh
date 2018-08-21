@@ -103,15 +103,8 @@ server {
 # repo.goodrain.me
 server {
     listen 80;
-
     root /opt/rainbond/install/install/pkgs/centos/;
-    index index.html index.htm;
-
     server_name repo.goodrain.me;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
 
 }
 EOF
