@@ -117,18 +117,16 @@ END
     else
         mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
     mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
-    cat > /etc/yum.repos.d/rainbond_local.repo << EOF
-[rainbond_local]
+    cat > /etc/yum.repos.d/rbd-local.repo << EOF
+[rbd-local]
 name=rainbond_offline_install_repo
 baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/deltarpm-*.rpm 1>/dev/null 
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/libxml2-python-*.rpm  1>/dev/null 
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/python-deltarpm-*.rpm  1>/dev/null 
-    rpm -ivh /opt/rainbond/install/install/pkgs/centos/createrepo-*.rpm  1>/dev/null
 
+    yum makecache fast >/dev/null 2>&1
+    yum install createrepo -y 1>/dev/null
     createrepo /opt/rainbond/install/install/pkgs/centos/  1>/dev/null
     fi
 
@@ -147,6 +145,7 @@ else
     cat > /etc/apt/sources.list.d/salt.list << END
 deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
 END
+
 fi
 
 #=================== base show func ==========================================
@@ -755,7 +754,7 @@ install_func(){
             Echo_Error "Please check node status[uuid], Just Run systemctl status node"
             exit 1
         fi
-        for ((i=1;i<=30;i++ ));do
+        for ((i=1;i<=60;i++ ));do
             sleep 1
             notready=$(grctl node list | grep $uuid | grep offline)
             [ ! -z "$notready" ] && (

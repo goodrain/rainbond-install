@@ -28,10 +28,17 @@ remove_pkgs:
 #      - cmd: kill-dhclient
 
 {% if grains['os_family']|lower == 'debian' %}
-NetworkManager:
-  service.dead:
-    - name: NetworkManager
-    - enable: False
+#NetworkManager:
+#  service.dead:
+#    - name: NetworkManager
+#    - enable: False
+NetworkManager-conf:
+  file.managed:
+    - source: salt://install/files/network/system/calico.conf
+    - name: /etc/NetworkManager/conf.d/calico.conf
+    - template: jinja
+    - mode: 755
+    - makedirs: True
 {% endif %}
 
 iptables:
