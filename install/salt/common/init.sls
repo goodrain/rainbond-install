@@ -3,7 +3,7 @@ include:
   - common.key
   - common.user
   - common.limits
-  - common.swap
+#  - common.swap
   - common.create_dir
   - common.service
   - common.plugins
@@ -18,7 +18,7 @@ include:
 {% else %}
   - common.user
   - common.create_dir
-  - common.swap
+#  - common.swap
   - common.limits
   - common.service
   - common.key
