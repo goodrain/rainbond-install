@@ -32,12 +32,7 @@ docker-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}
     {% if pillar['install-type']=="offline" %}
-      {% if grains['id']=="manage01" %}
-    - humanname: local_repo
-    - baseurl: file://{{ pillar['install-script-path' ]}}/install/pkgs/centos/
-    - enabled: 1
-    - gpgcheck: 0
-      {% else %}
+      {% if grains['id']!= "manage01" %}
     - humanname: local_repo
     - baseurl: http://repo.goodrain.me/
     - enabled: 1
