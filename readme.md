@@ -15,12 +15,12 @@ Support for:
 Plugins Version:
 
 - [Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution)
-- [Kubernetes v1.6.4](https://github.com/goodrain/kubernetes)
-- [Docker v1.12.6](https://github.com/goodrain/moby)
+- [Kubernetes v1.10.4](https://github.com/goodrain/kubernetes)
+- [Docker v17.05](https://github.com/goodrain/moby)
 - Calico v2.4.1
 - Etcd v3.2.13
-- [Rainbond Core Plugins v3.7](https://github.com/goodrain/rainbond)
-- [Rainbond UI v3.7](https://github.com/goodrain/rainbond-ui)
+- [Rainbond Core Plugins v5.0](https://github.com/goodrain/rainbond)
+- [Rainbond UI v5.0](https://github.com/goodrain/rainbond-ui)
 - Salt v2018.3.2
 
 ## Operations Guide
