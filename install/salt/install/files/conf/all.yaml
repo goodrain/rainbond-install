@@ -628,7 +628,7 @@ services:
     --name rbd-grafana
     --network host
     --memory 1024M
-    --user 200
+    --user 0
     -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     -e GF_SECURITY_ADMIN_PASSWORD={{ pillar['secretkey'] }}
     -v /opt/rainbond/data/rbd-grafana:/var/lib/grafana
