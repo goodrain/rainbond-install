@@ -52,18 +52,23 @@ upstream registry {
     $HUB_CLUSTER
 }
 
+{% if pillar['master-public-ip'] %}
 server {
   listen 80;
-  server_name $UI_EIP $UI_IIP;
-{% if pillar['master-public-ip'] %}
+  server_name $UI_EIP;
   if ( \$server_addr = $UI_EIP ){
     return 301 \$scheme://$UI_EIP:7070\$request_uri;
   }
-{% endif %}
+}
+{% else %}
+server {
+  listen 80;
+  server_name $UI_IIP;
   if ( \$server_addr = $UI_IIP ){
     return 301 \$scheme://$UI_IIP:7070\$request_uri;
   }
 }
+{% endif %}
 
 server {
     listen 80;
