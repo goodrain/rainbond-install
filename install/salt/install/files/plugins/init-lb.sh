@@ -7,6 +7,12 @@ if [ "$?" -eq 0 ];then
     docker rm -f rbd-lb
 fi
 
+{% if pillar['master-public-ip'] %}
+UI_IP={{ pillar['master-public-ip'] }}
+{% else %}
+UI_IP={{ grains['mip'][0] }}
+{% endif %}
+
 HUB_CLUSTER=""
 REPO_CLUSTER=""
 
@@ -45,6 +51,12 @@ upstream maven {
 upstream registry {
     ip_hash;
     $HUB_CLUSTER
+}
+
+server {
+  listen 80 default_server;
+  server_name _;
+  return 301 \$scheme://$UI:7070\$request_uri;
 }
 
 server {
