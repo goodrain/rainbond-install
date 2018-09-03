@@ -8,10 +8,9 @@ if [ "$?" -eq 0 ];then
 fi
 
 {% if pillar['master-public-ip'] %}
-UI_IP={{ pillar['master-public-ip'] }}
-{% else %}
-UI_IP={{ grains['mip'][0] }}
+UI_EIP={{ pillar['master-public-ip'] }}
 {% endif %}
+UI_IIP={{ grains['mip'][0] }}
 
 HUB_CLUSTER=""
 REPO_CLUSTER=""
@@ -54,9 +53,16 @@ upstream registry {
 }
 
 server {
-  listen 80 default_server;
-  server_name _;
-  return 301 \$scheme://$UI_IP:7070\$request_uri;
+  listen 80;
+  server_name $UI_EIP $UI_IIP;
+{% if pillar['master-public-ip'] %}
+  if ( \$server_addr = $UI_EIP ){
+    return 301 \$scheme://$UI_EIP:7070\$request_uri;
+  }
+{% endif %}
+  if ( \$server_addr = $UI_IIP ){
+    return 301 \$scheme://$UI_IIP:7070\$request_uri;
+  }
 }
 
 server {
