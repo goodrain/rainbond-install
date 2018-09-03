@@ -319,13 +319,17 @@ push-prom-image:
     - name: docker push {{PRIDOMAIN}}/{{ P8SIMG }}:{{ P8SVER }}
 
 
-#docker-pull-grafana-image:
-#  cmd.run:
-#    - name: docker pull {{PUBDOMAIN}}/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
+docker-pull-grafana-image:
+  cmd.run:
+    - name: docker pull {{PUBDOMAIN}}/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
 
-#rename-pull-grafana-image:
-#  cmd.run:
-#    - name: docker tag {{PUBDOMAIN}}/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}  goodrain.me/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
+rename-pull-grafana-image:
+  cmd.run:
+    - name: docker tag {{PUBDOMAIN}}/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}  goodrain.me/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
+
+push-grafana-image:
+  cmd.run:
+    - name: docker push goodrain.me/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
 
 #===================== builder/runner image ===========================
 
