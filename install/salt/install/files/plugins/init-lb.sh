@@ -56,7 +56,7 @@ upstream registry {
 server {
   listen 80 default_server;
   server_name _;
-  return 301 \$scheme://$UI:7070\$request_uri;
+  return 301 \$scheme://$UI_IP:7070\$request_uri;
 }
 
 server {
