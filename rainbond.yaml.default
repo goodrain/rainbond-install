@@ -200,7 +200,7 @@ rainbond-modules:
     version: 3.7.1
   rbd-lb: 
     image: rbd-lb
-    version: 3.7.1
+    version: 3.7
   rbd-mq: 
     image: rbd-mq
     version: 3.7.1
