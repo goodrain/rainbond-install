@@ -610,33 +610,6 @@ services:
     --v=2
   restart_policy: always
   restart_sec: 10
-- name: rbd-grafana
-  registry:
-  - name: GRAFANA_ENDPOINTS
-    protocol: http
-    port: 3000
-  health:
-    name: rbd-grafana
-    model: tcp
-    address: 127.0.0.1:3000
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm rbd-grafana
-  start: >-
-    docker run
-    --name rbd-grafana
-    --network host
-    --memory 1024M
-    --user 0
-    -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
-    -e GF_SECURITY_ADMIN_PASSWORD={{ pillar['secretkey'] }}
-    -v /opt/rainbond/data/rbd-grafana:/var/lib/grafana
-    -i goodrain.me/grafana:{{ pillar['rainbond-modules']['rbd-grafana']['version'] }}
-  stop: docker stop rbd-grafana
-  restart_policy: always
-  restart_sec: 10
 {% endif %}
 {% else %}
 - name: rbd-lb
