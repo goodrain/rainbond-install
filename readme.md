@@ -1,4 +1,4 @@
-[![Docs](https://img.shields.io/badge/docs-v3.7-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
+[![Docs](https://img.shields.io/badge/docs-v3.7.1-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
 
 ## Description
 
@@ -19,8 +19,8 @@ Plugins Version:
 - [Docker v1.12.6](https://github.com/goodrain/moby)
 - Calico v2.4.1
 - Etcd v3.2.13
-- [Rainbond Core Plugins v3.7](https://github.com/goodrain/rainbond)
-- [Rainbond UI v3.7](https://github.com/goodrain/rainbond-ui)
+- [Rainbond Core Plugins v3.7.1](https://github.com/goodrain/rainbond)
+- [Rainbond UI v3.7.1](https://github.com/goodrain/rainbond-ui)
 - Salt v2018.3.2
 
 ## Operations Guide
@@ -36,7 +36,7 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# Mainline v3.7.0
+# Mainline v3.7.1
 
 git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git /opt/rainbond/install
 cd /opt/rainbond/install
