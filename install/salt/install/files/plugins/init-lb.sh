@@ -7,6 +7,11 @@ if [ "$?" -eq 0 ];then
     docker rm -f rbd-lb
 fi
 
+{% if pillar['master-public-ip'] %}
+UI_EIP={{ pillar['master-public-ip'] }}
+{% endif %}
+UI_IIP={{ grains['mip'][0] }}
+
 HUB_CLUSTER=""
 REPO_CLUSTER=""
 
@@ -46,6 +51,24 @@ upstream registry {
     ip_hash;
     $HUB_CLUSTER
 }
+
+{% if pillar['master-public-ip'] %}
+server {
+  listen 80;
+  server_name $UI_EIP;
+  if ( \$server_addr = $UI_EIP ){
+    return 301 \$scheme://$UI_EIP:7070\$request_uri;
+  }
+}
+{% else %}
+server {
+  listen 80;
+  server_name $UI_IIP;
+  if ( \$server_addr = $UI_IIP ){
+    return 301 \$scheme://$UI_IIP:7070\$request_uri;
+  }
+}
+{% endif %}
 
 server {
     listen 80;
