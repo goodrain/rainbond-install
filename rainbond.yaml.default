@@ -2,7 +2,7 @@
 rbd-version: 3.7.1
 rbd-path: /opt/rainbond
 install-type: 
-master-hostname: manage02
+master-hostname: manage01
 master-private-ip: 
 master-public-ip: 
 vip: 
