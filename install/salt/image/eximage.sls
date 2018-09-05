@@ -176,6 +176,8 @@ runner-pull-image:
   cmd.run:
     - name: docker pull {{PRIDOMAIN}}/{{RUNNERIMG}}:{{ RUNNERVER }}
 
+{% endif %}
+
 default_http_conf:
   file.managed:
     - source: salt://install/files/plugins/proxy.conf
@@ -196,6 +198,3 @@ proxy_lb_init:
     - mode: 755
     - template: jinja
     - makedirs: True
-
-{% endif %}
-

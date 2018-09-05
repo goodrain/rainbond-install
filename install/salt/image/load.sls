@@ -243,7 +243,7 @@ push-prom-image:
   cmd.run:
     - name: docker push {{PRIDOMAIN}}/{{ P8SIMG }}:{{ P8SVER }}
 
-load-grafana-tcm:
+load-grafana-image:
   cmd.run:
     - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_grafana_{{GRAFANA}}.gz
 

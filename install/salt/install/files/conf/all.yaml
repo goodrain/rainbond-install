@@ -127,6 +127,7 @@ services:
     -e LicenseSwitch="off"
     -e EX_DOMAIN={{ pillar['domain'] }}
     -v /grdata:/grdata
+    -v /grdata/downloads/log:/grdata/logs
     -v {{ pillar['rbd-path'] }}/etc/rbd-api:/etc/goodrain
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/etc/goodrain/kubernetes
     -v {{ pillar['rbd-path'] }}/logs/docker_logs:/data/docker_logs

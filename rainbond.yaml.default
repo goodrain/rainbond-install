@@ -1,5 +1,5 @@
 # rainbond global config
-rbd-version: 3.7
+rbd-version: 5.0.0
 rbd-path: /opt/rainbond
 install-type: 
 master-hostname: manage01
@@ -174,9 +174,6 @@ proxy:
 
 # rainbond components
 rainbond-modules:
-  rbd-api:
-    image: rbd-api
-    version: 3.7
   rbd-dns:       
     image: rbd-dns
     version: 3.7
@@ -186,41 +183,43 @@ rainbond-modules:
   rbd-repo: 
     image: rbd-repo
     version: 3.7
+  rbd-api:
+    image: rbd-api
+    version: 3.7.1
   rbd-worker: 
     image: rbd-worker
-    version: 3.7
+    version: 3.7.1
   rbd-eventlog: 
     image: rbd-eventlog
-    version: 3.7
+    version: 3.7.1
   rbd-entrance: 
     image: rbd-entrance
-    version: 3.7
+    version: 3.7.1
   rbd-chaos: 
     image: rbd-chaos
-    version: 3.7
+    version: 3.7.1
   rbd-lb: 
     image: rbd-lb
     version: 3.7
   rbd-mq: 
     image: rbd-mq
-    version: 3.7
+    version: 3.7.1
   rbd-webcli: 
     image: rbd-webcli
-    version: 3.7
+    version: 3.7.1
   rbd-app-ui: 
     image: rbd-app-ui
-    version: 3.7
+    version: 3.7.1
   rbd-monitor: 
     image: rbd-monitor
-    version: 3.7
+    version: 3.7.1
   rbd-cni:
     image: cni
-    version: rbd_v3.7
+    version: rbd_v3.7.1
   k8s-cni:
     image: cni
     version: k8s_v3.7
   rbd-grafana:
-    enabled: 
     image: grafana
     version: 5.2.2
   rbd-scope:

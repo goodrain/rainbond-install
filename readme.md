@@ -1,4 +1,4 @@
-[![Docs](https://img.shields.io/badge/docs-v3.7-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
+[![Docs](https://img.shields.io/badge/docs-v5.0.0-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
 
 ## Description
 
@@ -36,7 +36,13 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# Mainline v3.7.0
+# Dev v5.0
+
+git clone --depth 1 -b v5.0 https://github.com/goodrain/rainbond-install.git /opt/rainbond/install
+cd /opt/rainbond/install
+./setup.sh
+
+# Mainline v3.7.1
 
 git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git /opt/rainbond/install
 cd /opt/rainbond/install
