@@ -644,9 +644,10 @@ Install_Salt(){
   fi
 
   inet_ip=$(Read_Sls_File "master-private-ip" )
+  host_name=$(Read_Sls_File "master-hostname")
 
 cat > /etc/salt/roster <<EOF
-pillar['master-hostname']:
+$host_name:
   host: $inet_ip
   port: 22
   user: root
