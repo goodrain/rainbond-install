@@ -40,7 +40,7 @@ compose_plugin_file:
 {% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 docker_load_rbd-cni:
   cmd.run:
     - name: docker load -i {{ pillar['rbd-path'] }}/install/install/imgs/goodrainme_{{ RBDCNIIMG }}_{{ RBDCNIVER }}.gz

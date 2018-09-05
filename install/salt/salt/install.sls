@@ -1,4 +1,4 @@
-{% if grains['id'] != "manage01" %}
+{% if grains['id'] != pillar['master-hostname'] %}
 salt-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}

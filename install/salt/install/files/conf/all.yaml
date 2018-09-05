@@ -547,7 +547,7 @@ services:
   restart_policy: always
   restart_sec: 10
 
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 - name: rbd-db
   endpoints:
   - name: DB_ENDPOINTS

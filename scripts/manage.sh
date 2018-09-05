@@ -119,7 +119,7 @@ EOF
         salt-ssh -i $1 state.sls common.init_node
 }
 update_data(){
-    # manage01
+    # pillar['master-hostname']
     [ -f "/tmp/mnode" ] && rm -rf /tmp/mnode
     [ -f "/tmp/minfo" ] && rm -rf /tmp/minfo
     [ -f "/tmp/mip" ] && rm -rf /tmp/mip

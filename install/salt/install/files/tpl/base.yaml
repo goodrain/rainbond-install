@@ -45,7 +45,7 @@ services:
         max-file: '3'
     network_mode: host
     restart: always
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
   rbd-db:
     image: {{ pillar['private-image-domain'] }}/{{ pillar['database']['mysql']['image'] }}:{{ pillar['database']['mysql']['version'] }}
     container_name: rbd-db

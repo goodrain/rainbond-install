@@ -1,6 +1,6 @@
 {% set path = pillar['rbd-path'] %}
 
-{% if grains['id']  == 'manage01' %}
+{% if grains['id']  == 'pillar['master-hostname']' %}
 key_build:
   cmd.run:
     - name: ssh-keygen -t rsa -f /root/.ssh/id_rsa -P ""

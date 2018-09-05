@@ -40,7 +40,7 @@ compose_plugin_file:
 {% set KUBECFGIMG = salt['pillar.get']('kubernetes:kubecfg:image') -%}
 {% set KUBECFGVER = salt['pillar.get']('kubernetes:kubecfg:version') -%}
 
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 pull_cfssl_image:
   cmd.run:
     - name: docker pull {{PUBDOMAIN}}/{{ CFSSLIMG }}:{{ CFSSLVER }}

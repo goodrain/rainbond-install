@@ -14,8 +14,8 @@ prepare(){
 }
 
 install_salt(){
-   hostname manage01
-   echo "manage01" > /etc/hostname
+   hostname pillar['master-hostname']
+   echo pillar['master-hostname'] > /etc/hostname
    curl -L ${DOWNLOAD_URL}/bootstrap-salt.sh -o /tmp/install_salt.sh
    chmod +x /tmp/install_salt.sh
    bash /tmp/install_salt.sh

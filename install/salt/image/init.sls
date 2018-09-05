@@ -1,5 +1,5 @@
 include:
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 {% if pillar['install-type'] == 'offline' %}
   - image.exec
   - image.tools

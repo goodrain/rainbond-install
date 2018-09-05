@@ -1,7 +1,7 @@
 #!/bin/bash
 
 {% if "manage" in grains['id'] %}
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 NODE_OPTS="--log-level=debug --kube-conf={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig --nodeid-file={{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf --static-task-path={{ pillar['rbd-path'] }}/etc/rbd-node/tasks/ --etcd=http://127.0.0.1:2379   --hostIP={{ grains['mip'][0] }} --service-list-file={{ pillar['rbd-path'] }}/conf/master.yaml --run-mode master --noderule manage,compute"
 {% else %}
 NODE_OPTS="--log-level=debug --kube-conf={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg/admin.kubeconfig --nodeid-file={{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf --static-task-path={{ pillar['rbd-path'] }}/etc/rbd-node/tasks/ --etcd=http://127.0.0.1:2379   --hostIP={{ grains['mip'][0] }} --service-list-file={{ pillar['rbd-path'] }}/conf/master.yaml --run-mode master --noderule manage"

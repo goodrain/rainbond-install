@@ -1,5 +1,5 @@
 {% if "manage" in grains['id'] %}
-{% if grains['id'] == 'manage01' %}
+{% if grains['id'] == 'pillar['master-hostname']' %}
 {% set sslpath = "/srv/salt/install/files/ssl/region" %}
 region-ssl-ca:
   cmd.run:

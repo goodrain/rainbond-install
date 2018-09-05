@@ -4,7 +4,7 @@
 {% set PUBDOMAIN = salt['pillar.get']('public-image-domain') -%}
 {% set PRIDOMAIN = salt['pillar.get']('private-image-domain') -%}
 
-{% if grains['id'] == 'manage01' %}
+{% if grains['id'] == 'pillar['master-hostname']' %}
 init-calico:
   file.managed:
     - name: {{ pillar['rbd-path'] }}/bin/init.calico

@@ -32,7 +32,7 @@ docker-repo:
   pkgrepo.managed:
   {% if grains['os_family']|lower == 'redhat' %}
     {% if pillar['install-type']=="offline" %}
-      {% if grains['id']!= "manage01" %}
+      {% if grains['id']!= pillar['master-hostname'] %}
     - humanname: local_repo
     - baseurl: http://repo.goodrain.me/
     - enabled: 1

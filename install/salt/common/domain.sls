@@ -1,4 +1,4 @@
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 {% if not pillar.get('domain','') %}
 make_domain_prepare:
   cmd.run:

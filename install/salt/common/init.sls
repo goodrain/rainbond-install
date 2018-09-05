@@ -12,7 +12,7 @@ include:
   - common.pkg
   - common.envs
   - common.health
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
   - common.domain
 {% endif %} 
 {% else %}

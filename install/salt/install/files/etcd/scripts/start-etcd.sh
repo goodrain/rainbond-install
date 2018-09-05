@@ -1,7 +1,7 @@
 #!/bin/sh
 LOCAL_NODE={{ grains['nodename'] }}
 
-{% if grains['id'] == "manage01" %}
+{% if grains['id'] == pillar['master-hostname'] %}
 INITIAL_CLUSTER_STATE=""
 {% else %}
 INITIAL_CLUSTER_STATE="existing"
