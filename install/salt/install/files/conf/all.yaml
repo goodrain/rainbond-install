@@ -25,6 +25,7 @@ services:
     --kubecfg-file=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
     --v=5
     --healthz-port=8089
+    --dns-bind-address={{ grains['mip'][0] }}
     --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
     --recoders=goodrain.me={{ pillar['master-private-ip'] }},*.goodrain.me={{ pillar['master-private-ip'] }}
   stop: docker stop rbd-dns
@@ -134,6 +135,8 @@ services:
     -v {{ pillar['rbd-path'] }}/logs/rbd-api:/logs
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-api']['image'] }}:{{ pillar['rainbond-modules']['rbd-api']['version'] }}
     --etcd=${ETCD_ENDPOINTS} 
+    --api-addr-ssl={{ grains['mip'][0] }}:8443
+    --api-addr={{ grains['mip'][0] }}:8888
     --log-level=debug 
     --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
     --api-ssl-enable=true
@@ -312,7 +315,7 @@ services:
   health:
     name: rbd-app-ui
     model: http
-    address: 127.0.0.1:7070/
+    address: 127.0.0.1:7070
     time_interval: 5
   after:
     - docker
