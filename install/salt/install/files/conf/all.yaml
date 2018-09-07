@@ -115,7 +115,7 @@ services:
   health:
     name: rbd-api
     model: http
-    address: 127.0.0.1:8888/v2/health
+    address: {{ grains['mip'][0] }}:8888/v2/health
     time_interval: 5
   after:
     - docker
