@@ -306,7 +306,6 @@ services:
   stop: docker stop rbd-eventlog
   restart_policy: always
   restart_sec: 10
-
 - name: rbd-app-ui
   endpoints:
   - name: APP_UI_ENDPOINTS
@@ -466,90 +465,6 @@ services:
   stop: docker stop kube-controller-manager
   restart_policy: always
   restart_sec: 10
-- name: calico
-  endpoints:
-  - name: CALICO_ENDPOINTS
-    protocol:
-    port: 187
-  health:
-    name: calico
-    model: cmd
-    address: ((`calicoctl node status | grep 'Calico process is running' | wc -l` == 1))
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm calico
-  start: >-
-    /usr/bin/docker run --net=host 
-    --privileged 
-    --name=calico  
-    --restart=always 
-    -e NO_DEFAULT_POOLS= 
-    -e CALICO_LIBNETWORK_ENABLED=true 
-    -e IP={{ grains['mip'][0] }} 
-    -e CALICO_LIBNETWORK_CREATE_PROFILES=true 
-    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false 
-    -e CALICO_LIBNETWORK_IFPREFIX=cali 
-    -e NODENAME=${HOSTNAME} 
-    -e CALICO_NETWORKING_BACKEND=bird 
-    -e IP6_AUTODETECTION_METHOD=first-found 
-    -e ETCD_ENDPOINTS=http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379
-    -v /var/log/calico:/var/log/calico 
-    -v /var/run/calico:/var/run/calico 
-    -v /lib/modules:/lib/modules 
-    -v /run/docker/plugins:/run/docker/plugins 
-    -v /var/run/docker.sock:/var/run/docker.sock 
-    {{ pillar['private-image-domain'] }}/{{ pillar['network']['calico']['image'] }}:{{ pillar['network']['calico']['version'] }}
-  stop: docker stop calico
-  restart_policy: always
-  restart_sec: 10
-- name: docker
-  endpoints:
-  - name: DOCKER_ENDPOINTS
-    protocol: http
-    port: 2376
-  health:
-    name: docker
-    model: http
-    address: 127.0.0.1:2376/version
-    time_interval: 5
-  after:
-    - network.target
-  requires:
-    - network.target
-  type: notify
-  start: none
-  restart_policy: always
-  restart_sec: 10
-- name: rbd-lb
-  endpoints:
-  - name: LB_ENDPOINTS
-    protocol: http
-    port: 80
-  health:
-    name: rbd-lb
-    model: http
-    address: 127.0.0.1:10002/health
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: HUB=${HUB_ENDPOINTS} REPO=${REPO_ENDPOINTS} {{ pillar['rbd-path'] }}/scripts/init-lb.sh
-  start: >-
-    docker run --name rbd-lb
-    --network host
-    --memory 1024M
-    -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
-    -e DEFAULT_PORT=80
-    -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
-    -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
-    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
-    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
-  stop: docker stop rbd-lb
-  restart_policy: always
-  restart_sec: 10
-
 {% if grains['id'] == "manage01" %}
 - name: rbd-db
   endpoints:
@@ -615,33 +530,6 @@ services:
   restart_sec: 10
 {% endif %}
 {% else %}
-- name: rbd-lb
-  endpoints:
-  - name: LB_ENDPOINTS
-    protocol: http
-    port: 80
-  health:
-    name: rbd-lb
-    model: http
-    address: 127.0.0.1:10002/health
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: HUB=${HUB_ENDPOINTS} REPO=${REPO_ENDPOINTS} {{ pillar['rbd-path'] }}/scripts/init-lb.sh
-  start: >-
-    docker run --name rbd-lb
-    --network host
-    --memory 1024M
-    -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
-    -e DEFAULT_PORT=80
-    -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
-    -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
-    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
-    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
-  stop: docker stop rbd-lb
-  restart_policy: always
-  restart_sec: 10
 - name: etcd-proxy
   endpoints:
   - name: ETCDPROXY_ENDPOINTS
@@ -735,6 +623,7 @@ services:
   stop: docker stop calico
   restart_policy: always
   restart_sec: 10
+{% endif %}
 - name: docker
   endpoints:
   - name: DOCKER_ENDPOINTS
@@ -753,4 +642,82 @@ services:
   start: none
   restart_policy: always
   restart_sec: 10
-{% endif %}
+- name: calico
+  endpoints:
+  - name: CALICO_ENDPOINTS
+    protocol:
+    port: 187
+  health:
+    name: calico
+    model: cmd
+    address: ((`calicoctl node status | grep 'Calico process is running' | wc -l` == 1))
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm calico
+  start: >-
+    /usr/bin/docker run --net=host 
+    --privileged 
+    --name=calico  
+    --restart=always 
+    -e NO_DEFAULT_POOLS= 
+    -e CALICO_LIBNETWORK_ENABLED=true 
+    -e IP={{ grains['mip'][0] }} 
+    -e CALICO_LIBNETWORK_CREATE_PROFILES=true 
+    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false 
+    -e CALICO_LIBNETWORK_IFPREFIX=cali 
+    -e NODENAME=${HOSTNAME} 
+    -e CALICO_NETWORKING_BACKEND=bird 
+    -e IP6_AUTODETECTION_METHOD=first-found 
+    -e ETCD_ENDPOINTS=http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379
+    -v /var/log/calico:/var/log/calico 
+    -v /var/run/calico:/var/run/calico 
+    -v /lib/modules:/lib/modules 
+    -v /run/docker/plugins:/run/docker/plugins 
+    -v /var/run/docker.sock:/var/run/docker.sock 
+    {{ pillar['private-image-domain'] }}/{{ pillar['network']['calico']['image'] }}:{{ pillar['network']['calico']['version'] }}
+  stop: docker stop calico
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-lb
+  endpoints:
+  - name: LB_ENDPOINTS
+    protocol: http
+    port: 80
+  health:
+    name: rbd-lb
+    model: http
+    address: 127.0.0.1:10002/health
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: HUB=${HUB_ENDPOINTS} REPO=${REPO_ENDPOINTS} {{ pillar['rbd-path'] }}/scripts/init-lb.sh
+  start: >-
+    docker run --name rbd-lb
+    --network host
+    --memory 1024M
+    -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
+    -e DEFAULT_PORT=80
+    -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
+    -v {{ pillar['rbd-path'] }}/logs/rbd-lb:/usr/local/openresty/nginx/logs
+    -v {{ pillar['rbd-path'] }}/install/install/pkgs/centos:/opt/rainbond/install/install/pkgs/centos
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-lb']['image'] }}:{{ pillar['rainbond-modules']['rbd-lb']['version'] }}
+  stop: docker stop rbd-lb
+  restart_policy: always
+  restart_sec: 10
+- name: storage
+  health:
+    name: storage
+    model: cmd
+    address: /opt/rainbond/health/storage.sh
+    time_interval: 5
+  after:
+    - network.target
+  requires:
+    - network.target
+  type: notify
+  start: none
+  restart_policy: always
+  restart_sec: 10
