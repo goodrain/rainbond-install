@@ -779,7 +779,7 @@ install_func(){
             ) && break
         done
     else
-        Echo_Info "install help"
+        Echo_Info "Install help"
         Echo_Info "https://www.rainbond.com/docs/stable/operation-manual/trouble-shooting/install-issue.html"
         exit 1
     fi
