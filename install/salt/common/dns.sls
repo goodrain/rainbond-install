@@ -19,11 +19,11 @@
 #    - names:
 #      - region.goodrain.me
 
-#rbd-registry-domain:
-#  host.present:
-#    - ip: {{ hostip }}
-#    - names:
-#      - goodrain.me
+rbd-registry-domain:
+  host.present:
+    - ip: {{ hostip }}
+    - names:
+      - goodrain.me
 
 #rbd-app-ui-domain:
 #  host.present:
