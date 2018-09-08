@@ -83,11 +83,11 @@ uuid-domain:
 {% endif %}
 
 # Modify /etc/resolv.conf
-add_master_dns:
-  file.append:
+disable_old_dns:
+  file.replace:
     - name: /etc/resolv.conf
-    - text:
-      - "nameserver {{ pillar.dns.get('current','114.114.114.114') }}"
+    - pattern: "^nameserver "
+    - repl: "#nameserver "
 
 add_local_dns:
   file.append:
@@ -100,6 +100,12 @@ add_manage_dns:
     - name: /etc/resolv.conf
     - text:
       - "nameserver {{ pillar['master-private-ip'] }}"
+
+add_master_dns:
+  file.append:
+    - name: /etc/resolv.conf
+    - text:
+      - "nameserver {{ pillar.dns.get('current','114.114.114.114') }}"
 
 domain-resolv:
   file.replace:
