@@ -1,36 +1,6 @@
 version: '2.1'
 services:
 {% if 'manage' in grains['id'] %}
-- name: rbd-dns
-  endpoints:
-  - name: DNS_ENDPOINTS
-    protocol: udp
-    port: 53
-  health:
-    name: rbd-dns
-    model: cmd
-    address: /opt/rainbond/health/rbd-dns.sh
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm rbd-dns
-  start: >-
-    docker run --name rbd-dns
-    --network host
-    --memory 1024M
-    -e VERBOSE=true
-    -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
-    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
-    --kubecfg-file=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
-    --v=5
-    --healthz-port=8089
-    --dns-bind-address={{ grains['mip'][0] }}
-    --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
-    --recoders=goodrain.me={{ pillar['master-private-ip'] }},*.goodrain.me={{ pillar['master-private-ip'] }}
-  stop: docker stop rbd-dns
-  restart_policy: always
-  restart_sec: 10
 - name: rbd-hub
   endpoints:
   - name: HUB_ENDPOINTS
@@ -62,7 +32,7 @@ services:
   health:
     name: rbd-repo
     model: http
-    address: lang.goodrain.me
+    address: 127.0.0.1:8081/artifactory/libs-release
     time_interval: 5
   after:
     - docker
@@ -719,5 +689,35 @@ services:
     - network.target
   type: notify
   start: none
+  restart_policy: always
+  restart_sec: 10
+- name: rbd-dns
+  endpoints:
+  - name: DNS_ENDPOINTS
+    protocol: udp
+    port: 53
+  health:
+    name: rbd-dns
+    model: cmd
+    address: /opt/rainbond/health/rbd-dns.sh
+    time_interval: 5
+  after:
+    - docker
+  type: simple
+  pre_start: docker rm rbd-dns
+  start: >-
+    docker run --name rbd-dns
+    --network host
+    --memory 1024M
+    -e VERBOSE=true
+    -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
+    -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
+    --kubecfg-file=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
+    --v=5
+    --healthz-port=8089
+    --dns-bind-address={{ grains['mip'][0] }}
+    --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
+    --recoders=goodrain.me={{ pillar['master-private-ip'] }},*.goodrain.me={{ pillar['master-private-ip'] }}
+  stop: docker stop rbd-dns
   restart_policy: always
   restart_sec: 10
