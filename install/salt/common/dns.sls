@@ -7,11 +7,11 @@
 #      - lang.goodrain.me
 #      - maven.goodrain.me
 
-#kube-apiserver-domain:
-#  host.present:
-#    - ip: {{ hostip }}
-#    - names:
-#      - kubeapi.goodrain.me
+kube-apiserver-domain:
+  host.present:
+    - ip: {{ hostip }}
+    - names:
+      - kubeapi.goodrain.me
 
 #rbd-api-domain:
 #  host.present:
@@ -89,17 +89,17 @@ disable_old_dns:
     - pattern: "^nameserver "
     - repl: "#nameserver "
 
-add_local_dns:
-  file.append:
-    - name: /etc/resolv.conf
-    - text:
-      - "nameserver {{ grains['mip'][0] }}"
-
 add_manage_dns:
   file.append:
     - name: /etc/resolv.conf
     - text:
       - "nameserver {{ pillar['master-private-ip'] }}"
+
+add_local_dns:
+  file.append:
+    - name: /etc/resolv.conf
+    - text:
+      - "nameserver {{ grains['mip'][0] }}"
 
 add_master_dns:
   file.append:
