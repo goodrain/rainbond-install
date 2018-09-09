@@ -28,32 +28,32 @@ docker-mirrors:
     - makedirs: True
 {% endif %}
 
-docker-repo:
-  pkgrepo.managed:
-  {% if grains['os_family']|lower == 'redhat' %}
-    {% if pillar['install-type']=="offline" %}
-      {% if grains['id']!= "manage01" %}
-    - humanname: local_repo
-    - baseurl: http://repo.goodrain.me/
-    - enabled: 1
-    - gpgcheck: 0
-      {% endif %}
-    #online
-    {% else %}
-    - humanname: Goodrain CentOS-$releasever - for x86_64
-    - baseurl: http://repo.goodrain.com/centos/$releasever/3.6/$basearch
-    - enabled: 1
-    - gpgcheck: 0
-    - gpgkey: http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
-    {% endif %}
+#docker-repo:
+#  pkgrepo.managed:
+#  {% if grains['os_family']|lower == 'redhat' %}
+#    {% if pillar['install-type']=="offline" %}
+#      {% if grains['id']!= "manage01" %}
+#    - humanname: local_repo
+#    - baseurl: http://repo.goodrain.me/
+#    - enabled: 1
+#    - gpgcheck: 0
+#      {% endif %}
+#    #online
+#    {% else %}
+#    - humanname: Goodrain CentOS-$releasever - for x86_64
+#    - baseurl: http://repo.goodrain.com/centos/$releasever/3.6/$basearch
+#    - enabled: 1
+#    - gpgcheck: 0
+#    - gpgkey: http://repo.goodrain.com/gpg/RPM-GPG-KEY-CentOS-goodrain
+#    {% endif %}
   # debain or ubuntu
-  {% else %}
-    - name: deb http://repo.goodrain.com/debian/9 3.6 main
-    - file: /etc/apt/sources.list.d/docker.list
-    - key_url: http://repo.goodrain.com/gpg/goodrain-C4CDA0B7
-  {% endif %}  
-    - require_in:
-      - pkg: gr-docker-engine
+#  {% else %}
+#    - name: deb http://repo.goodrain.com/debian/9 3.6 main
+#    - file: /etc/apt/sources.list.d/docker.list
+#    - key_url: http://repo.goodrain.com/gpg/goodrain-C4CDA0B7
+#  {% endif %}  
+#    - require_in:
+#      - pkg: gr-docker-engine
 
 gr-docker-engine:
   pkg.installed:
