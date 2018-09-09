@@ -82,6 +82,13 @@ uuid-domain:
 
 {% endif %}
 
+# repo.goodrain.me
+local-domain:
+  host.present:
+    - ip: {{ pillar['master-private-ip'] }}
+    - names:
+      - repo.goodrain.me
+
 # Modify /etc/resolv.conf
 disable_old_dns:
   file.replace:
