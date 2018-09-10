@@ -14,10 +14,16 @@ func(){
     done
 }
 
+core(){
+    
+}
+
 if [ "$1" == "start" ];then
     func start
 elif [ "$1" == "stop" ];then
     func stop
+elif [ "$1" == "update" ];then
+    core update $2
 else
     echo "grclis <start|stop>"
 fi

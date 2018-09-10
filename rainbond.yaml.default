@@ -16,7 +16,7 @@ docker:
   version: 1.12.6,fbecf51
   mirrors: 
     enabled: true
-    url: "https://registry.docker-cn.com"
+    url: "https://bf3asb4c.mirror.aliyuncs.com"
 
 dns:
   current: 
