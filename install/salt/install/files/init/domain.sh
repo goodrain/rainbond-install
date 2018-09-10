@@ -9,7 +9,7 @@ DOMAIN_TYPE=False
 DOMAIN_TYPE={{ pillar['install-type'] }}
 
 if [[ "$DOMAIN_TYPE" != "offline" ]];then
-    curl -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/new > $DOMAIN_LOG
+    curl --connect-timeout 20  -d 'ip='"$DOMAIN_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/new > $DOMAIN_LOG
 fi
 
 [ -f $DOMAIN_LOG ] && wilddomain=$(cat $DOMAIN_LOG )
