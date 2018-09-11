@@ -7,9 +7,9 @@ func(){
     do
         [ -f "/etc/systemd/system/$service.service" ] && (
             systemctl $1 $service
-            [ "$?" -eq 0 ] && echo "stop $service successful" || echo "stop $service failure"
+            [ "$?" -eq 0 ] && echo "$1 $service successful" || echo "$1 $service failure"
         ) || (
-            echo "not found.skip stop $service"
+            echo "not found.skip $1 $service"
         )
     done
 }
