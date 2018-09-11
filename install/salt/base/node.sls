@@ -12,6 +12,18 @@ node-conf:
     - user: root
     - group: root
 
+{% if "manage" in grains['id'] %}    
+node-monitor-conf:
+  file.managed:
+    - source: salt://install/files/conf/monitor.yaml
+    - name: {{ pillar['rbd-path'] }}/conf/monitor.yaml
+    - template: jinja
+    - makedirs: True
+    - mode: 644
+    - user: root
+    - group: root
+{% endif %}
+
 node-uuid-conf:
   file.managed:
     - source: salt://install/files/node/node_host_uuid.conf

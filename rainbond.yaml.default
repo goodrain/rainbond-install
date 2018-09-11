@@ -222,7 +222,9 @@ rainbond-modules:
   rbd-grafana:
     image: grafana
     version: 5.2.2
+  rbd-alert:
+    image: rbd-alert
+    version: v0.15.2
   rbd-scope:
-    enabled:
     image: scope
     version: 1.9.1

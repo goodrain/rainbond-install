@@ -68,9 +68,9 @@ etc-db-dir:
     - name: {{ DIR }}/etc/rbd-db
     - makedirs: True
 
-etc-prometheus-dir:
+etc-monitor-dir:
   file.directory:
-    - name: {{ DIR }}/etc/prometheus
+    - name: {{ DIR }}/etc/rbd-monitor
     - makedirs: True
 
 etc-api-dir:

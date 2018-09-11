@@ -234,6 +234,8 @@ install(){
         done
     fi
     if [ "$fail_num" -eq 0 ];then
+        Echo_Info "update node config"
+        salt -E "manage" cmd.run 'systemctl status node | grep Active' >/tmp/install_manage 2>&1
         Echo_Info "install manage node successfully"
     else
         Echo_Error "reinstall manage node"

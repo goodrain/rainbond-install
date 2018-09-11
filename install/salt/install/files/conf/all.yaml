@@ -69,7 +69,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     --plugin-name=openresty
-    --plugin-opts=urls=${MLB_ENDPOINTS}
+    --plugin-opts=urls=${MLB_ENDPOINTS|-}
     --kube-conf=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
     --log-level=debug
     --etcd-endpoints=${ETCD_ENDPOINTS}
