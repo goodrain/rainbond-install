@@ -167,16 +167,18 @@ install_compute_func(){
     fi
     
     if [ "$fail_num" -eq 0 ];then
-        systemctl restart kube-apiserver
+        
         Echo_Info "install compute node successfully"
         if [ ! -z "$1" ];then
               uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
-              for ((i=1;i<=15;i++ )); do
-                sleep 1
+              for ((i=1;i<=30;i++ )); do
+                sleep 2
                 grctl node list | grep "$uuid" > /dev/null 2>&1
                 [ "$?" -eq 0 ] && (
-                 grctl node up $uuid
+                 grctl node up $uuid && (
                  Echo_Info "compute node($uuid) added to the cluster"
+                 echo "$1 $uuid up" >> /tmp/.node_status
+                )
                 ) && break
               done
             # Echo_Info "compute node($uuid) has been added to the cluster"
