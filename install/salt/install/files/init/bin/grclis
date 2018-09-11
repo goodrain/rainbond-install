@@ -3,6 +3,7 @@
 ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
 
 func(){
+    systemctl daemon-reload
     for service in ${ALL_SERVICES[@]}
     do
         [ -f "/etc/systemd/system/$service.service" ] && (

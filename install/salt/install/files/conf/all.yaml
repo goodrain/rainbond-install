@@ -69,7 +69,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-entrance']['image'] }}:{{ pillar['rainbond-modules']['rbd-entrance']['version'] }}
     --plugin-name=openresty
-    --plugin-opts=urls={{ pillar['lb-endpoints'] }}
+    --plugin-opts=urls=${MLB_ENDPOINTS}
     --kube-conf=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
     --log-level=debug
     --etcd-endpoints=${ETCD_ENDPOINTS}
@@ -652,9 +652,15 @@ services:
   restart_sec: 10
 - name: rbd-lb
   endpoints:
+{% if 'manage' in grains['id'] %}
+  - name: MLB_ENDPOINTS
+    protocol: http
+    port: 10002
+{% else %}
   - name: LB_ENDPOINTS
     protocol: http
     port: 80
+{% endif %}
   health:
     name: rbd-lb
     model: http
