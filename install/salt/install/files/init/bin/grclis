@@ -50,10 +50,26 @@ update_all(){
     done
 }
 
+reload(){
+    reload_services="kube-apiserver rbd-eventlog rbd-monitor rbd-worker rbd-webcli rbd-mq rbd-chaos rbd-api rbd-entrance"
+    for reload_service in ${reload_services[@]}
+    do
+        echo "systemctl restart $reload_service" >> /tmp/.reload_services
+        systemctl restart $reload_service
+        [ "$?" -eq 0 ] && (
+            echo "restart $reload_service ok" >> /tmp/.reload_services
+        ) || (
+            echo "restart $reload_service failed" >> /tmp/.reload_services
+        )
+    done
+}
+
 if [ "$1" == "start" ];then
     func start
 elif [ "$1" == "stop" ];then
     func stop
+elif [ "$1" == "reload" ];then
+    reload
 elif [ "$1" == "update" ];then
     if [ "$2" == "all" ];then
         update_all
