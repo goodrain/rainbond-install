@@ -15,7 +15,38 @@ func(){
 }
 
 core(){
-    
+    local update_img=$1
+    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui"
+    local time=0
+    for img in ${all[@]}
+    do
+        if [ "$img" == "$update_img" ];then
+            echo "update ${update_img}"
+            docker pull rainbond/${update_img}:3.7.1
+            docker tag rainbond/${update_img}:3.7.1 goodrain.me/${update_img}:3.7.1
+            docker push goodrain.me/${update_img}:3.7.1
+            echo "restart ${update_img}"
+            systemctl restart ${update_img}
+            time=1
+        fi
+    done
+    if [ "$time" != 1 ];then
+        echo "not support ${update_img}"
+        echo "only support ${all}"
+    fi
+}
+
+update_all(){
+    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui"
+    for update_img in ${all[@]}
+    do
+        echo "update ${update_img}"
+        docker pull rainbond/${update_img}:3.7.1
+        docker tag rainbond/${update_img}:3.7.1 goodrain.me/${update_img}:3.7.1
+        docker push goodrain.me/${update_img}:3.7.1
+        echo "restart ${update_img}"
+        systemctl restart ${update_img}
+    done
 }
 
 if [ "$1" == "start" ];then
@@ -23,7 +54,11 @@ if [ "$1" == "start" ];then
 elif [ "$1" == "stop" ];then
     func stop
 elif [ "$1" == "update" ];then
-    core update $2
+    if [ "$2" == "all" ];then
+        update_all
+    else
+        core update $2
+    fi
 else
     echo "grclis <start|stop>"
 fi
