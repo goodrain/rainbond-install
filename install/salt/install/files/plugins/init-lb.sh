@@ -56,7 +56,7 @@ upstream registry {
 server {
   listen 80;
   server_name $UI_EIP;
-  if ( \$server_addr = $UI_EIP ){
+  if ( \$host = $UI_EIP ){
     return 301 \$scheme://$UI_EIP:7070\$request_uri;
   }
 }
@@ -64,7 +64,7 @@ server {
 server {
   listen 80;
   server_name $UI_IIP;
-  if ( \$server_addr = $UI_IIP ){
+  if ( \$host = $UI_IIP ){
     return 301 \$scheme://$UI_IIP:7070\$request_uri;
   }
 }

@@ -16,7 +16,7 @@ docker:
   version: 1.12.6,fbecf51
   mirrors: 
     enabled: true
-    url: "https://registry.docker-cn.com"
+    url: "https://bf3asb4c.mirror.aliyuncs.com"
 
 dns:
   current: 
@@ -222,7 +222,9 @@ rainbond-modules:
   rbd-grafana:
     image: grafana
     version: 5.2.2
+  rbd-alert:
+    image: rbd-alert
+    version: v0.15.2
   rbd-scope:
-    enabled:
     image: scope
     version: 1.9.1

@@ -117,8 +117,8 @@ END
     else
         mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
     mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
-    cat > /etc/yum.repos.d/rbd-local.repo << EOF
-[rbd-local]
+    cat > /etc/yum.repos.d/rainbond.repo << EOF
+[rainbond]
 name=rainbond_offline_install_repo
 baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
@@ -762,6 +762,9 @@ install_func(){
             ) && break
         done
         Echo_Info "Install Rainbond successfully"
+
+        docker images | grep "rainbond" | awk '{print $1":"$2}' | xargs -I {} docker rmi {} >/dev/null 2>&1
+
         public_ip=$(yq r /srv/pillar/rainbond.sls master-public-ip)
         private_ip=$(yq r /srv/pillar/rainbond.sls master-private-ip)
         for ((i=1;i<=60;i++ ));do
