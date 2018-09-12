@@ -235,7 +235,7 @@ install(){
     fi
     if [ "$fail_num" -eq 0 ];then
         Echo_Info "update node config"
-        salt -E "manage" cmd.run 'systemctl restart rbd-node' >/dev/null 2>&1
+        salt -E "manage" cmd.run 'systemctl restart node' >/dev/null 2>&1
         salt -E "manage" cmd.run 'systemctl daemon-reload' >/dev/null 2>&1
         salt -E "manage" cmd.run 'grclis reload' >/dev/null 2>&1
         Echo_Info "install manage node successfully"
