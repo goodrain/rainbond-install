@@ -133,7 +133,7 @@ services:
   start: >-
     docker run --name rbd-chaos
     --network host
-    --memory 1024M
+    --memory 2048M
     -e SOURCE_DIR="/cache/source"
     -e CACHE_DIR="/cache"
     -v /logs:/logs
