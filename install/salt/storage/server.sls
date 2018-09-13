@@ -36,3 +36,7 @@ update_exports:
 show_exports:
   cmd.run:
     - name: showmount -e 127.0.0.1
+
+write_health_check:
+  cmd.run:
+    - name: echo "{{ pillar['secretkey'] }}" > /grdata/.check
