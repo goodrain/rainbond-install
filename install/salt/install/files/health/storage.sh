@@ -10,5 +10,6 @@ if [ -f "/grdata/.check" ];then
         exit 1
     fi
 else
+    cat /grdata/services/storage/health.check > /grdata/.check
     exit 1
 fi
