@@ -38,5 +38,15 @@ show_exports:
     - name: showmount -e 127.0.0.1
 
 write_health_check:
+  file.managed:
+    - name: /tmp/.check_storage
+    - source: salt://install/files/storage/check.sh
+    - template: jinja
+    - makedirs: True
+    - user: root
+    - group: root
+    - mode: 777
+
+init_health_check:
   cmd.run:
-    - name: echo "{{ pillar['secretkey'] }}" > /grdata/.check
+    - name: bash  /tmp/.check_storage
