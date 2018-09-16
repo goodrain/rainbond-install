@@ -6,8 +6,8 @@ A collection of Salt states used to provision an application-centric platform [R
 
 Support for:
 
-- Rainbond Manage node - single node with Mysql database
-- Rainbond Compute node - it is not automatically added to Rainbond environment
+- Rainbond Manage node
+- Rainbond Compute node
 - Rainbond environment support - support Kubernetes
 - Docker registry - automatically provisioned on Manage start
 - Support for different provision
@@ -17,8 +17,8 @@ Plugins Version:
 - [Distribution](https://github.com/goodrain/rainbond-install/wiki/Select-Distribution)
 - [Kubernetes v1.10.4](https://github.com/goodrain/kubernetes)
 - [Docker v17.05](https://github.com/goodrain/moby)
-- Calico v2.4.1
-- Etcd v3.2.13
+- Calico v3.2
+- Etcd v3.2.24
 - [Rainbond Core Plugins v5.0](https://github.com/goodrain/rainbond)
 - [Rainbond UI v5.0](https://github.com/goodrain/rainbond-ui)
 - Salt v2018.3.2

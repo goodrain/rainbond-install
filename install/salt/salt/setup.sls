@@ -9,6 +9,17 @@ salt-master-install:
     - unless: dpkg -l | grep salt-master
   {% endif %}
 
+salt-api-install:
+  pkg.installed:
+    - pkgs:
+      - salt-api
+    - refresh: True
+  {% if grains['os_family']|lower == 'redhat' %}
+    - unless: rpm -qa | grep salt-api
+  {% else %}
+    - unless: dpkg -l | grep salt-api
+  {% endif %}
+
 salt-master-conf:
   file.managed:
     - name: /etc/salt/master.d/master.conf
@@ -74,6 +85,37 @@ minion_service:
       - file: salt-minion-conf
       - cmd: salt-minion-exconf
 
+salt-api-conf:
+  file.managed:
+    - name: /etc/salt/master.d/api.conf
+    - source: salt://salt/install/conf/api.conf
+    - user: root
+    - group: root
+    - mode: 644
+    - template: jinja
+    - makedirs: True
+    - require:
+      - pkg: salt-master-install
+      - pkg: salt-api-install
+      - pkg: salt-minion-install
+
+# create user for salt-api
+saltapi:
+  user.present:
+    - password: {{ pillar['secretkey'] }}
+
+#salt-call --local tls.create_self_signed_cert:
+#  cmd.run:
+#    - creates: /etc/pki/tls/certs/localhost.key
+#    - creates: /etc/pki/tls/certs/localhost.crt
+
+salt-api:
+  service.running:
+    - enable: True
+    - require:
+        - file: /etc/salt/master.d/api.conf
+    - watch:
+        - file: /etc/salt/master.d/api.conf
 
 {% if grains['os_family']|lower == 'debian' %}
 
@@ -87,4 +129,13 @@ salt-minion-restart:
     - require:
       - cmd: salt-master-restart
 
+salt-api-restart:
+  cmd.run:
+    - name: systemctl restart salt-api.service
+    - require:
+      - cmd: salt-master-restart
 {% endif %}
+
+test_token:
+  cmd.run:
+    - name: bash /srv/salt/salt/install/script/token_check.sh

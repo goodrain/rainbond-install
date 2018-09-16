@@ -94,3 +94,4 @@ salt-minion-restart:
     - name: systemctl restart salt-minion.service
 
 {% endif %}
+

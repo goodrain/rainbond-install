@@ -15,7 +15,7 @@
 [[ $DEBUG ]] && set -x
 
 INSTALL_TYPE=${1:-"online"}
-
+YQBIN="/usr/local/bin/yq"
 RBD_VERSION=$(cat ./VERSION 2> /dev/null)
 SALT_PKGS="salt-ssh"
 MAIN_CONFIG="/srv/pillar/rainbond.sls"
@@ -63,92 +63,6 @@ git )
 trap 'Exit_Clear; exit' SIGINT SIGHUP
 clear
 
-which cp | grep "alias" > /dev/null
-if [ "$?" -eq 0 ];then
-    unalias cp
-fi
-
-[ ! -d "/srv/pillar/" ] && (
-    mkdir -p /srv/pillar/
-    cp rainbond.yaml.default ${MAIN_CONFIG}
-)
-
-which yq >/dev/null 2>&1 || (
-    if [ "$INSTALL_TYPE" == "online" ];then
-        curl -s https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
-        chmod +x /usr/local/bin/yq
-    else
-        cp -a ./scripts/yq /usr/local/bin/yq
-        chmod +x /usr/local/bin/yq
-    fi
-)
-
-YQBIN="/usr/local/bin/yq"
-
-# redhat and centos
-if [ "$SYS_NAME" == "centos" ];then
-    INSTALL_BIN="yum"
-    Cache_PKG="$INSTALL_BIN makecache fast -q"
-    PKG_BIN="rpm -qi"
-    SYS_BASE_PKGS=( perl \
-    bind-utils \
-    dstat iproute \
-    bash-completion )
-
-    if [ "$INSTALL_TYPE" == "online" ] ;then
-        cat > /etc/yum.repos.d/salt-repo.repo << END
-[saltstack]
-name=SaltStack archive/2018.3.2 Release Channel for RHEL/CentOS $releasever
-baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2018.3.2
-skip_if_unavailable=True
-failovermethod=priority
-gpgcheck=0
-enabled=1
-enabled_metadata=1
-END
-
-        [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
-            curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-            yum makecache fast >/dev/null 2>&1
-        ) || (
-            yum install epel-release -y >/dev/null 2>&1
-            yum makecache fast >/dev/null 2>&1
-        )     
-    else
-        mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
-    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
-    cat > /etc/yum.repos.d/rainbond.repo << EOF
-[rainbond]
-name=rainbond_offline_install_repo
-baseurl=file:///opt/rainbond/install/install/pkgs/centos/
-gpgcheck=0
-enabled=1
-EOF
-
-    yum makecache fast >/dev/null 2>&1
-    yum install createrepo -y 1>/dev/null
-    createrepo /opt/rainbond/install/install/pkgs/centos/  1>/dev/null
-    fi
-
-else
-    INSTALL_BIN="apt-get"
-    Cache_PKG="$INSTALL_BIN update -y -q"
-    PKG_BIN="dpkg -l"
-    SYS_BASE_PKGS=( uuid-runtime \
-    iproute2 \
-    systemd \
-    dnsutils \
-    python-pip \
-    apt-transport-https )
-    curl https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
-    # debian salt repo
-    cat > /etc/apt/sources.list.d/salt.list << END
-deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
-END
-
-fi
-
-#=================== base show func ==========================================
 which_cmd() {
     which "${1}" 2>/dev/null || \
         command -v "${1}" 2>/dev/null
@@ -188,6 +102,124 @@ if [ $(( $(tput colors 2>/dev/null) )) -ge 8 ];then
             TPUT_CLEAR="$(tput clear)"
 fi
 
+Echo_Failed() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+}
+
+Echo_Error() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
+    exit 1
+}
+
+Echo_Exist() {
+    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} EXIST ${TPUT_RESET} ${*} \n\n"
+}
+
+Echo_Info() {
+    echo >&2 " --- ${TPUT_DIM}${TPUT_BOLD}${*}${TPUT_RESET} --- "
+}
+
+Echo_Ok() {
+   printf >&2 "${TPUT_BGGREEN}${TPUT_WHITE}${TPUT_BOLD} OK ${TPUT_RESET} ${*} \n\n"
+}
+
+check_cmd cp | grep "alias" > /dev/null
+if [ "$?" -eq 0 ];then
+    unalias cp
+fi
+
+[ ! -d "/srv/pillar/" ] && (
+    mkdir -p /srv/pillar/
+    cp rainbond.yaml.default ${MAIN_CONFIG}
+)
+
+check_cmd curl || (
+    Echo_Info "Not found curl, will try install curl"
+    if [ "$SYS_NAME" == "centos" ];then
+        yum makecache fast >/dev/null 2>&1
+        yum install curl -y >/dev/null 2>&1
+    else
+        apt update >/dev/null 2>&1
+        apt install curl -y >/dev/null 2>&1
+    fi
+)
+
+check_cmd yq >/dev/null 2>&1 || (
+    if [[ "$INSTALL_TYPE" =~ "online" ]];then
+        curl -s https://pkg.rainbond.com/releases/common/yq -o /usr/local/bin/yq
+        chmod +x /usr/local/bin/yq
+    else
+        cp -a ./scripts/yq /usr/local/bin/yq
+        chmod +x /usr/local/bin/yq
+    fi
+)
+
+# redhat and centos
+if [ "$SYS_NAME" == "centos" ];then
+    INSTALL_BIN="yum"
+    Cache_PKG="$INSTALL_BIN makecache fast -q"
+    PKG_BIN="rpm -qi"
+    SYS_BASE_PKGS=( perl \
+    bind-utils \
+    dstat iproute \
+    bash-completion )
+
+    if [[ "$INSTALL_TYPE" =~ "online" ]] ;then
+        cat > /etc/yum.repos.d/salt-repo.repo << END
+[saltstack]
+name=SaltStack archive/2018.3.2 Release Channel for RHEL/CentOS $releasever
+baseurl=http://mirrors.ustc.edu.cn/salt/yum/redhat/7/\$basearch/archive/2018.3.2
+skip_if_unavailable=True
+failovermethod=priority
+gpgcheck=0
+enabled=1
+enabled_metadata=1
+END
+
+        [ ! -f "/etc/yum.repos.d/epel.repo" ] && (
+            curl -s -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+            yum makecache fast >/dev/null 2>&1
+        ) || (
+            yum install epel-release -y >/dev/null 2>&1
+            yum makecache fast >/dev/null 2>&1
+        )     
+    else
+        mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
+    mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
+    cat > /etc/yum.repos.d/rainbond.repo << EOF
+[rainbond]
+name=rainbond_offline_install_repo
+baseurl=file:///opt/rainbond/install/install/pkgs/centos/
+gpgcheck=0
+enabled=1
+EOF
+
+    yum makecache fast >/dev/null 2>&1
+    yum install createrepo -y 1>/dev/null
+    createrepo /opt/rainbond/install/install/pkgs/centos/  1>/dev/null
+    fi
+
+else
+    INSTALL_BIN="apt-get"
+    Cache_PKG="$INSTALL_BIN update -y -q"
+    PKG_BIN="dpkg -l"
+    SYS_BASE_PKGS=( uuid-runtime \
+    sudo \
+    iproute2 \
+    systemd \
+    dnsutils \
+    python-pip \
+    apt-transport-https )
+    curl https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
+    # debian salt repo
+    cat > /etc/apt/sources.list.d/salt.list << END
+deb https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
+END
+
+fi
+
+#=================== base show func ==========================================
+
 echo_banner() {
 
 local l1=" ^" \
@@ -215,27 +247,6 @@ local l1=" ^" \
     echo >&2 "${chartcolor}${l6}${TPUT_RESET}"
     echo >&2 "${chartcolor}${l7}${TPUT_RESET}"
     echo >&2
-}
-
-Echo_Failed() {
-    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
-}
-
-Echo_Error() {
-    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} FAILED ${TPUT_RESET} ${*} \n\n"
-    exit 1
-}
-
-Echo_Exist() {
-    printf >&2 "${TPUT_BGRED}${TPUT_WHITE}${TPUT_BOLD} EXIST ${TPUT_RESET} ${*} \n\n"
-}
-
-Echo_Info() {
-    echo >&2 " --- ${TPUT_DIM}${TPUT_BOLD}${*}${TPUT_RESET} --- "
-}
-
-Echo_Ok() {
-   printf >&2 "${TPUT_BGGREEN}${TPUT_WHITE}${TPUT_BOLD} OK ${TPUT_RESET} ${*} \n\n"
 }
 
 REG_Status(){
@@ -461,7 +472,7 @@ System_Check(){
 )
 
   Echo_Info "Checking internet connect ..."
-  if [ "$INSTALL_TYPE" == "online" ];then
+  if [[ "$INSTALL_TYPE" =~ "online" ]];then
         Check_Internet $RAINBOND_HOMEPAGE && Echo_Ok
   else
         Echo_Ok
@@ -475,8 +486,11 @@ System_Check(){
 
   # disk cpu memory
   Echo_Info "Getting Hardware information ..."
-  Get_Hardware_Info && Echo_Ok
-
+  if [ "$DEBUG" ];then
+    Echo_Info "Skip Check Hardware ..."
+  else
+    Get_Hardware_Info && Echo_Ok
+  fi
   #ipaddr(inet pub) type .mark in .sls
   Echo_Info "Getting Network information ..."
   Check_Net && Echo_Ok
@@ -745,7 +759,7 @@ install_func(){
     done
 
     if [ "$fail_num" -eq 0 ];then
-        if [ "$INSTALL_TYPE" == "online" ];then
+        if [[ "$INSTALL_TYPE" =~ "online" ]];then
             REG_Status || return 0
         fi
         
