@@ -8,3 +8,10 @@ please complete the following information:
 - [ ] Install details: [Online,Offline,Single node,HA]
 - [ ] Steps to reproduce
 - [ ] Screenshots(If applicable, add screenshots to help explain your problem.)
+
+请提供如下信息：
+- Rainbond版本信息
+- 服务器信息(云服务商或者虚拟环境，系统版本，内核版本)
+- 安装类型
+- salt报错,请提供salt相关日志/var/log/salt/master
+- salt --versions-report
