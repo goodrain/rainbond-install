@@ -390,7 +390,7 @@ services:
     --volume={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:{{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
     {{ pillar['private-image-domain'] }}/{{pillar['kubernetes']['schedule']['image']}}:{{pillar['kubernetes']['schedule']['version']}} 
     --logtostderr=true 
-    --v=5 
+    --v=2 
     --master=127.0.0.1:8181 
     --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf 
     --leader-elect=true
@@ -733,7 +733,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     --kubecfg-file=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
-    --v=5
+    --v=2
     --healthz-port=8089
     --dns-bind-address={{ grains['mip'][0] }}
     --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
