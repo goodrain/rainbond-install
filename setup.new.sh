@@ -153,25 +153,27 @@ which yq >/dev/null 2>&1 || (
 )
 
 progress "Start Check System,will install Rainbond $(cat ./VERSION)"
-
+salt_mirrors
 if [ "$SYS_NAME" == "centos" ];then
+    salt_centos_mirrors
     if [ "$INSTALL_TYPE" == "online" ];then
-        ok "Configuring online $SYS_NAME mirrors"
+        ok "Configuring SaltStack online $SYS_NAME mirrors"
     else
-        ok "Configuring offline $SYS_NAME mirrors"
+        ok "Configuring SaltStack offline $SYS_NAME mirrors"
     fi
 elif  [ "$SYS_NAME" == "debian" -o "$SYS_NAME" == "ubuntu" ];then
+    salt_debian_mirrors
     if [ "$INSTALL_TYPE" == "online" ];then
-        ok "Configuring online $SYS_NAME mirrors"
+        ok "Configuring SaltStack online $SYS_NAME mirrors"
     else
-        ok "Configuring offline $SYS_NAME mirrors"
+        ok "Configuring SaltStack offline $SYS_NAME mirrors"
     fi
 else
     fatal "Only support CentOS/Debian/Ubuntu"
 fi
 
-# CentOS install required packages
-yum_install_func(){
+# config centos salt mirrors
+salt_centos_mirrors(){
     if [ "$INSTALL_TYPE" == "online" ];then
         cat > /etc/yum.repos.d/salt-repo.repo << END
 [saltstack]
@@ -183,14 +185,8 @@ gpgcheck=0
 enabled=1
 enabled_metadata=1
 END
-        yum makecache fast -q >/dev/null 2>&1
         ls /etc/yum.repos.d/ | grep -i epel >/dev/null
         [ $? -ne 0 ] && yum install epel-release -y >/dev/null 2>&1
-        local Centos_PKGS=(ntpdate curl net-tools pwgen perl bind-utils dstat iproute bash-completion salt-ssh)
-        for pkg in ${Centos_PKGS[@]}
-        do
-            yum install -y -q $pkg >/dev/null 
-        done
     else
         mkdir -p /etc/yum.repos.d/backup >/dev/null 2>&1
         mv -f /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup >/dev/null 2>&1
@@ -201,35 +197,42 @@ baseurl=file:///opt/rainbond/install/install/pkgs/centos/
 gpgcheck=0
 enabled=1
 EOF
-        yum makecache fast -q >/dev/null 2>&1
-        local Centos_PKGS=(createrepo ntpdate curl net-tools pwgen perl bind-utils dstat iproute bash-completion salt-ssh)
-        for pkg in ${Centos_PKGS[@]}
-        do
-            yum install -y -q $pkg >/dev/null 
-        done
     fi
+    yum makecache fast -q >/dev/null 2>&1
+}
+
+# config debian salt mirrors
+salt_debian_mirrors(){
+    apt update >/dev/null
+    apt install -y -q curl apt-transport-https >/dev/null
+    if [ "$INSTALL_TYPE" == "online" ];then
+        cat > /etc/apt/sources.list.d/salt.list << END
+deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
+END
+    curl https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
+    else
+         fatal "Not support Now"
+    fi
+    apt update >/dev/null 2>&1
+}
+
+# CentOS install required packages
+yum_install_func(){
+    local Centos_PKGS=(ntpdate curl net-tools pwgen perl bind-utils dstat iproute bash-completion salt-ssh)
+    for pkg in ${Centos_PKGS[@]}
+    do
+        yum install -y -q $pkg >/dev/null 
+    done
     ok "Install required packages successful."
 }
 
 # Debian/Ubuntu install required packages
 apt_install_func(){
-    if [ "$INSTALL_TYPE" == "online" ];then
-    apt update >/dev/null 2>&1
-    local Debian_PKGS=(ntpdate curl net-tools pwgen uuid-runtime iproute2 systemd dnsutils python-pip apt-transport-https)
+    local Debian_PKGS=(ntpdate curl net-tools pwgen uuid-runtime iproute2 systemd dnsutils python-pip salt-ssh)
     for pkg in ${Debian_PKGS[@]}
     do
         apt install -y -q $pkg >/dev/null
     done
-    cat > /etc/apt/sources.list.d/salt.list << END
-deb http://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/2018.3 stretch main
-END
-    curl https://mirrors.ustc.edu.cn/salt/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub 2>/dev/null | apt-key add -
-    apt update >/dev/null 2>&1
-    apt install -y salt-ssh >/dev/null 2>&1
-    else
-        #Todo
-        fatal "Not support Now"
-    fi
     ok "Install required packages successful."
 }
 
