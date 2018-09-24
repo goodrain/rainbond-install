@@ -30,10 +30,11 @@ DEFAULT_PUBLIC_IP=${2:-"$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -
 INIT_FILE="./.initialized"
 YQBIN="/usr/local/bin/yq"
 DOMAIN=$3
+ROLE=$4
 SYS_COMMON_PKGS=(ntpdate curl net-tools pwgen)
-MANAGE_MODULES=(common storage docker image base master worker)
-#MANAGE_MODULES=(common storage)
-COMPUTE_MODULES=(common storage docker image base worker)
+BASE_MODULES=(common storage docker image base)
+MANAGE_MODULES=(master)
+COMPUTE_MODULES=(worker)
 
 which_cmd() {
     which "${1}" 2>/dev/null || \
@@ -606,17 +607,16 @@ config(){
     fi
 }
 
-install_func(){
+install(){
     fail_num=0
     step_num=1
-    all_steps=${#MANAGE_MODULES[@]}
-    progress "will install manage node.It will take 15-30 minutes to install"
+    all_steps=${#BASE_MODULES[@]}
+    progress "Start init node"
   
-    for module in ${MANAGE_MODULES[@]}
+    for module in ${BASE_MODULES[@]}
     do
         if [ "$module" = "image" ];then
-            info "Start install $module(step: $step_num/$all_steps), it will take 8-15 minutes "
-            info "This step will pull/load all docker images"
+            info "Start pull $module(step: $step_num/$all_steps)"
         else
             info "Start install $module(step: $step_num/$all_steps) ..."
         fi
@@ -627,6 +627,20 @@ install_func(){
         ((step_num++))
         sleep 1
     done
+    
+    if [[ "$ROLE" =~ "master" ]];then
+        info "Start install master services"
+        if ! (salt "*" state.sls master);then
+            ((fail_num+=1))
+        fi
+    fi
+
+    if [[ "$ROLE" =~ "worker" ]];then
+        info "Start install worker services"
+        if ! (salt "*" state.sls worker);then
+            ((fail_num+=1))
+        fi
+    fi
 
     if [ "$fail_num" -eq 0 ];then
         if [ "$INSTALL_TYPE" == "online" ];then
@@ -673,6 +687,6 @@ install_func(){
 
 case $1 in
     *)
-        system_check && config && install_func
+        system_check && config && install
     ;;
 esac

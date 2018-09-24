@@ -242,7 +242,7 @@ services:
   start: >-
     docker run --name rbd-monitor
     --network host
-    --memory 1024M
+    --memory 2048M
     -v {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
     --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ grains['mip'][0] }}:9999  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
@@ -390,7 +390,7 @@ services:
     --volume={{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:{{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg 
     {{ pillar['private-image-domain'] }}/{{pillar['kubernetes']['schedule']['image']}}:{{pillar['kubernetes']['schedule']['version']}} 
     --logtostderr=true 
-    --v=5 
+    --v=2 
     --master=127.0.0.1:8181 
     --custom-config={{ pillar['rbd-path'] }}/etc/kubernetes/custom.conf 
     --leader-elect=true
@@ -733,7 +733,7 @@ services:
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
     --kubecfg-file=/opt/rainbond/etc/kubernetes/kubecfg/admin.kubeconfig
-    --v=5
+    --v=2
     --healthz-port=8089
     --dns-bind-address={{ grains['mip'][0] }}
     --nameservers={{ pillar.dns.get('current','114.114.114.114') }},{{ pillar.dns.slave }}
