@@ -461,6 +461,7 @@ services:
   stop: docker stop rbd-db
   restart_policy: always
   restart_sec: 10
+{% if grains['node_role'][0] == "worker" %}
 - name: kubelet
   endpoints:
   - name: KUBELET_ENDPOINTS
@@ -498,6 +499,7 @@ services:
     --v=2
   restart_policy: always
   restart_sec: 10
+{% endif %}
 {% endif %}
 {% else %}
 - name: etcd-proxy
@@ -687,7 +689,7 @@ services:
   health:
     name: storage
     model: cmd
-    address: /opt/rainbond/health/storage.sh
+    address: {{ pillar['rbd-path'] }}/health/storage.sh
     time_interval: 5
   after:
     - network.target
@@ -701,7 +703,7 @@ services:
   health:
     name: local-dns
     model: cmd
-    address: /opt/rainbond/health/local-dns.sh
+    address: {{ pillar['rbd-path'] }}/health/local-dns.sh
     time_interval: 5
   after:
     - network.target
@@ -719,7 +721,7 @@ services:
   health:
     name: rbd-dns
     model: cmd
-    address: /opt/rainbond/health/rbd-dns.sh
+    address: {{ pillar['rbd-path'] }}/health/rbd-dns.sh
     time_interval: 5
   after:
     - docker

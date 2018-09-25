@@ -1,8 +1,10 @@
 #!/bin/bash
 
-ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+#ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
 
 func(){
+    local ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+    systemctl $1 node
     systemctl daemon-reload
     for service in ${ALL_SERVICES[@]}
     do
@@ -64,12 +66,35 @@ reload(){
     done
 }
 
+reset(){
+    local ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd storage local-dns kubelet"
+    echo "remove salt packages"
+    yum remove -y salt-*
+    rm -rf /etc/salt/*/*.conf
+    rm -rf /srv/
+    echo "remove /opt/rainbond "
+    rm -rf /opt/rainbond/
+    echo "disable & remove systemd"
+    for service in ${ALL_SERVICES[@]}
+    do
+        [ -f "/etc/systemd/system/$service.service" ] && (
+            systemctl disable $service
+            [ "$?" -eq 0 ] && rm -rf /etc/systemd/system/$service.service
+        ) || (
+            echo "not found $service service"
+        )
+    done
+}
+
 if [ "$1" == "start" ];then
     func start
 elif [ "$1" == "stop" ];then
     func stop
 elif [ "$1" == "reload" ];then
     reload
+elif [ "$1" == "reset" ];then
+    func stop
+    reset
 elif [ "$1" == "update" ];then
     if [ "$2" == "all" ];then
         update_all
