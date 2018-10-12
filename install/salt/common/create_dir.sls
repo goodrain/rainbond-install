@@ -22,6 +22,11 @@ grdata-dir:
     - name: /grdata
     - makedirs: True
 
+grdata-ssg-dir:
+  file.directory:
+    - name: /grdata/services/ssh
+    - makedirs: True
+
 #=========================== rainbond/templates directory ===========================
 templates-dir:
   file.directory:
@@ -51,11 +56,6 @@ env-dir:
 etc-dir:
   file.directory:
     - name: {{ DIR }}/etc
-    - makedirs: True
-
-etc-chaos-dir:
-  file.directory:
-    - name: {{ DIR }}/etc/rbd-chaos/ssh
     - makedirs: True
 
 etc-lb-dir:

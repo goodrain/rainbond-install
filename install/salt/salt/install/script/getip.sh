@@ -1,6 +1,6 @@
 ip=$(ip ad|grep inet|egrep ' 10.|172.|192.168'|awk '{print $2}'|cut -d '/' -f 1|grep -v '172.30.42.1'|head -1)
 [ -f "/tmp/.role" ] && role="worker" || role="rainbond"
-if [ ! -f "/etc/salt/minion.d/minion.ex.conf" ];then
+#if [ ! -f "/etc/salt/minion.d/minion.ex.conf" ];then
 if [ ! -f "/tmp/LOCAL_IP" ];then
 cat > /etc/salt/minion.d/minion.ex.conf <<EOF
 grains:               
@@ -20,4 +20,4 @@ grains:
     - $role
 EOF
 fi
-fi
+#fi

@@ -140,7 +140,7 @@ services:
     -v /grdata:/grdata
     -v /cache:/cache
     -v /var/run:/var/run
-    -v {{ pillar['rbd-path'] }}/etc/rbd-chaos/ssh:/root/.ssh
+    -v /grdata/services/ssh:/root/.ssh
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-chaos']['image'] }}:{{ pillar['rainbond-modules']['rbd-chaos']['version'] }}
     --etcd-endpoints=${ETCD_ENDPOINTS} --log-level=debug --mysql="{{ pillar['database']['mysql']['user'] }}:{{ pillar['database']['mysql']['pass'] }}@tcp({{ pillar['database']['mysql']['host'] }}:{{ pillar['database']['mysql']['port'] }})/region"
   stop: docker stop rbd-chaos
