@@ -158,14 +158,13 @@ which yq >/dev/null 2>&1 || (
 # setup first node role
 
 [ -f "/tmp/.role" ] && rm -rf /tmp/.role
-[ ! -z "$ROLE" ] && (
-    echo $ROLE | grep "worker" >/dev/null 2>&1
-    if [ "$?" -eq 0 ];then 
-        touch /tmp/.role && INSTALL_MODULES=(common storage docker image base master worker) 
-    else
-        INSTALL_MODULES=(common storage docker image base master) 
-    fi
-)
+echo $ROLE | grep "worker" >/dev/null 2>&1
+if [ "$?" -eq 0 ];then 
+    touch /tmp/.role && INSTALL_MODULES=(common storage docker image base master worker) 
+else
+    INSTALL_MODULES=(common storage docker image base master) 
+fi
+
 
 # config centos salt mirrors
 salt_centos_mirrors(){
