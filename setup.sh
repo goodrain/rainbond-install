@@ -35,7 +35,8 @@ SYS_COMMON_PKGS=(ntpdate curl net-tools pwgen)
 BASE_MODULES=(common storage docker image base)
 MANAGE_MODULES=(master)
 COMPUTE_MODULES=(worker)
-INSTALL_MODULES=(common storage docker image base master)
+
+#INSTALL_MODULES=(common storage docker image base master)
 
 which_cmd() {
     which "${1}" 2>/dev/null || \
@@ -159,7 +160,11 @@ which yq >/dev/null 2>&1 || (
 [ -f "/tmp/.role" ] && rm -rf /tmp/.role
 [ ! -z "$ROLE" ] && (
     echo $ROLE | grep "worker" >/dev/null 2>&1
-    [ "$?" -eq 0 ] && touch /tmp/.role && INSTALL_MODULES=(common storage docker image base master worker)
+    if [ "$?" -eq 0 ];then 
+        touch /tmp/.role && INSTALL_MODULES=(common storage docker image base master worker) 
+    else
+        INSTALL_MODULES=(common storage docker image base master) 
+    fi
 )
 
 # config centos salt mirrors
