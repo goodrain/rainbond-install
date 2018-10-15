@@ -18,4 +18,3 @@ nfs_client:
 automount:
   cmd.run:
     - name: mount /grdata
-    - unless: ls /grdata/services

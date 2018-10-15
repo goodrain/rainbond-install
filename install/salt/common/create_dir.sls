@@ -22,10 +22,12 @@ grdata-dir:
     - name: /grdata
     - makedirs: True
 
+{% if grains['id']  == 'manage01' %}
 grdata-ssg-dir:
   file.directory:
     - name: /grdata/services/ssh
     - makedirs: True
+{% endif %}
 
 #=========================== rainbond/templates directory ===========================
 templates-dir:
