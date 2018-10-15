@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
+version=$(yq r /srv/pillar/rainbond.sls rbd-version)
 
 func(){
     local ALL_SERVICES="rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd"
@@ -25,9 +26,9 @@ core(){
     do
         if [ "$img" == "$update_img" ];then
             echo "update ${update_img}"
-            docker pull rainbond/${update_img}:3.7.1
-            docker tag rainbond/${update_img}:3.7.1 goodrain.me/${update_img}:3.7.1
-            docker push goodrain.me/${update_img}:3.7.1
+            docker pull rainbond/${update_img}:${version}
+            docker tag rainbond/${update_img}:${version} goodrain.me/${update_img}:${version}
+            docker push goodrain.me/${update_img}:${version}
             echo "restart ${update_img}"
             systemctl restart ${update_img}
             time=1
@@ -44,9 +45,9 @@ update_all(){
     for update_img in ${all[@]}
     do
         echo "update ${update_img}"
-        docker pull rainbond/${update_img}:3.7.1
-        docker tag rainbond/${update_img}:3.7.1 goodrain.me/${update_img}:3.7.1
-        docker push goodrain.me/${update_img}:3.7.1
+        docker pull rainbond/${update_img}:${version}
+        docker tag rainbond/${update_img}:${version} goodrain.me/${update_img}:${version}
+        docker push goodrain.me/${update_img}:${version}
         echo "restart ${update_img}"
         systemctl restart ${update_img}
     done
@@ -102,5 +103,5 @@ elif [ "$1" == "update" ];then
         core update $2
     fi
 else
-    echo "grclis <start|stop>"
+    echo "grclis <start|stop|update all>"
 fi
