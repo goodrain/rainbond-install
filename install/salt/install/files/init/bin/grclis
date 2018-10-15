@@ -67,7 +67,7 @@ reload(){
 }
 
 reset(){
-    local ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd storage local-dns kubelet"
+    local ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd etcd-proxy storage local-dns kubelet"
     echo "remove salt packages"
     yum remove -y salt-*
     rm -rf /etc/salt/*/*.conf
