@@ -16,7 +16,6 @@
     docker run
     --name rbd-grafana
     --network host
-    --memory 1024M
     --user 0
     -e GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     -e GF_SECURITY_ADMIN_PASSWORD={{ pillar['secretkey'] }}
@@ -39,7 +38,6 @@
     docker run
     --name rbd-alert
     --network host
-    --memory 1024M
     -v {{ pillar['rbd-path'] }}/etc/rbd-monitor:/etc/alertmanager
     -i goodrain.me/rbd-alert:{{ pillar['rainbond-modules']['rbd-alert']['version'] }}
   stop: docker stop rbd-alert

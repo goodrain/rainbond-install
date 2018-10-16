@@ -75,14 +75,19 @@ reset(){
     rm -rf /srv/
     echo "remove /opt/rainbond "
     rm -rf /opt/rainbond/
+    echo "rm /grdata"
+    df -h | grep grdata >/dev/null
+    [ "$?" -eq 0 ] && (
+        umount /grdata
+        #num=$(cat -n  /etc/fstab | grep grdata | awk '{print $1}')
+        sed -i '/grdata/d' /etc/fstab
+    )
     echo "disable & remove systemd"
     for service in ${ALL_SERVICES[@]}
     do
         [ -f "/etc/systemd/system/$service.service" ] && (
             systemctl disable $service
             [ "$?" -eq 0 ] && rm -rf /etc/systemd/system/$service.service
-        ) || (
-            echo "not found $service service"
         )
     done
 }

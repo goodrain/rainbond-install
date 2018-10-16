@@ -18,7 +18,6 @@ services:
   start: >-
     docker run --name rbd-hub
     --network host
-    --memory 1024M
     -v /grdata/services/registry/:/var/lib/registry
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-registry']['image'] }}:{{ pillar['rainbond-modules']['rbd-registry']['version'] }}
   stop: docker stop rbd-hub
@@ -63,7 +62,6 @@ services:
   start: >-
     docker run --name rbd-entrance
     --network host
-    --memory 1024M
     -e DEFAULT_HTTP_PORT=80
     -e DEFAULT_HTTPS_PORT=443
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
@@ -94,7 +92,6 @@ services:
   start: >-
     docker run --name rbd-api
     --network host
-    --memory 1024M
     -e LicenseSwitch="off"
     -e EX_DOMAIN={{ pillar['domain'] }}
     -v /grdata:/grdata
@@ -133,7 +130,6 @@ services:
   start: >-
     docker run --name rbd-chaos
     --network host
-    --memory 2048M
     -e SOURCE_DIR="/cache/source"
     -e CACHE_DIR="/cache"
     -v /logs:/logs
@@ -163,7 +159,6 @@ services:
   start: >-
     docker run --name rbd-mq
     --network host
-    --memory 1024M
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-mq']['image'] }}:{{ pillar['rainbond-modules']['rbd-mq']['version'] }}
     --log-level=debug --etcd-endpoints=${ETCD_ENDPOINTS}
   stop: docker stop rbd-mq
@@ -186,7 +181,6 @@ services:
   start: >-
     docker run --name rbd-webcli
     --network host
-    --memory 1024M
     -v /usr/local/bin/kubectl:/usr/bin/kubectl
     -v /root/.kube:/root/.kube
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-webcli']['image'] }}:{{ pillar['rainbond-modules']['rbd-webcli']['version'] }}
@@ -211,7 +205,6 @@ services:
   start: >-
     docker run --name rbd-worker
     --network host
-    --memory 1024M
     -e K8S_MASTER=http://127.0.0.1:8181
     -e CUR_NET=calico
     -e EX_DOMAIN={{ pillar['domain'] }}
@@ -242,7 +235,6 @@ services:
   start: >-
     docker run --name rbd-monitor
     --network host
-    --memory 2048M
     -v {{ pillar['rbd-path'] }}/data/prom:/prometheusdata
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-monitor']['image'] }}:{{ pillar['rainbond-modules']['rbd-monitor']['version'] }}
     --etcd-endpoints=${ETCD_ENDPOINTS} --advertise-addr={{ grains['mip'][0] }}:9999  --web.listen-address=0.0.0.0:9999 --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheusdata --storage.tsdb.no-lockfile --storage.tsdb.retention=7d --log.level=info
@@ -266,7 +258,6 @@ services:
   start: >-
     docker run --name rbd-eventlog
     --network host
-    --memory 1024M
     -e K8S_MASTER=http://127.0.0.1:8181
     -v {{ pillar['rbd-path'] }}/logs/rbd-eventlog:/var/log
     -v {{ pillar['rbd-path'] }}/etc/rbd-node/node_host_uuid.conf:/opt/rainbond/etc/node/node_host_uuid.conf
@@ -293,7 +284,6 @@ services:
   start: >-
     docker run --name rbd-app-ui
     --network host
-    --memory 1024M
     -e MANAGE_SECRET_KEY={{ pillar['secretkey'] }}
     -e MYSQL_HOST={{ pillar['database']['mysql']['host'] }}
     -e MYSQL_PORT={{ pillar['database']['mysql']['port'] }}
@@ -453,7 +443,6 @@ services:
   start: >-
     docker run --name rbd-db
     --network host
-    --memory 1024M
     -e MYSQL_ALLOW_EMPTY_PASSWORD="true"
     -v {{ pillar['rbd-path'] }}/data/rbd-db:/data
     -v {{ pillar['rbd-path'] }}/etc/rbd-db:/etc/mysql
@@ -675,7 +664,6 @@ services:
   start: >-
     docker run --name rbd-lb
     --network host
-    --memory 1024M
     -e HTTP_SUFFIX_URL={{ pillar['domain'] }}
     -e DEFAULT_PORT=80
     -v {{ pillar['rbd-path'] }}/etc/rbd-lb/dynamics:/usr/local/openresty/nginx/conf/dynamics
@@ -730,7 +718,6 @@ services:
   start: >-
     docker run --name rbd-dns
     --network host
-    --memory 1024M
     -e VERBOSE=true
     -v {{ pillar['rbd-path'] }}/etc/kubernetes/kubecfg:/opt/rainbond/etc/kubernetes/kubecfg
     -i {{ pillar['private-image-domain'] }}/{{ pillar['rainbond-modules']['rbd-dns']['image'] }}:{{ pillar['rainbond-modules']['rbd-dns']['version'] }}
