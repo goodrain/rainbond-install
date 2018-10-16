@@ -1,4 +1,4 @@
-[![Docs](https://img.shields.io/badge/docs-v3.7.1-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
+[![Docs](https://img.shields.io/badge/docs-v3.7.2-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/pre-install.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
 
 ## Description
 
