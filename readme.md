@@ -36,7 +36,7 @@ Plugins Version:
 - Quick start
 
 ```Bash
-# Mainline v3.7.1
+# Mainline v3.7.2
 
 git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git /opt/rainbond/install
 cd /opt/rainbond/install
