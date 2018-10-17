@@ -20,7 +20,7 @@ func(){
 
 core(){
     local update_img=$1
-    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui"
+    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui rbd-monitor"
     local time=0
     for img in ${all[@]}
     do
@@ -41,7 +41,7 @@ core(){
 }
 
 update_all(){
-    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui"
+    local all="rbd-chaos rbd-worker rbd-entrance rbd-api rbd-eventlog rbd-webcli rbd-mq rbd-app-ui rbd-monitor"
     for update_img in ${all[@]}
     do
         echo "update ${update_img}"
