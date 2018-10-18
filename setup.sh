@@ -388,8 +388,8 @@ Check_Net(){
     echo "The system has multiple network cards, please select the device to use:"
     for eth in ${eths[@]}
     do
-      ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
-      isinternal=$(echo $ipaddr | egrep '10.|172.|192.168' | grep -v '172.30.42.1')
+      ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' | egrep '^10.|^172.|^192.168' | head -1)
+      isinternal=$(echo $ipaddr | egrep '^10.|^172.|^192.168' | grep -v '172.30.42.1')
       if [ ! -z "$isinternal" ] && [ -z $default_eths ];then
         echo "$eth: $ipaddr (default)"
         default_eths=$ipaddr
@@ -404,7 +404,7 @@ Check_Net(){
     IFS=$old_ifs
 
     if [ "$selectip" != "" ];then
-      ipaddr=$(ip addr show $selectip | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
+      ipaddr=$(ip addr show $selectip | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' | egrep '^10.|^172.|^192.168' | head -1 )
       if [ "$ipaddr" != "" ];then
         export DEFAULT_LOCAL_IP=$ipaddr
       else
@@ -414,7 +414,7 @@ Check_Net(){
       export DEFAULT_LOCAL_IP
     fi
   else
-    DEFAULT_LOCAL_IP=$(ip addr show ${eths[*]} | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' )
+    DEFAULT_LOCAL_IP=$(ip addr show ${eths[*]} | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' | egrep '^10.|^172.|^192.168' | head -1)
   fi
 
   # write sls file
