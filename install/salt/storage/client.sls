@@ -18,3 +18,4 @@ nfs_client:
 automount:
   cmd.run:
     - name: mount /grdata
+  unless: df -h | grep /grdata

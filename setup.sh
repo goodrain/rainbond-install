@@ -35,6 +35,9 @@ SYS_COMMON_PKGS=(ntpdate curl net-tools pwgen)
 BASE_MODULES=(common storage docker image base)
 MANAGE_MODULES=(master)
 COMPUTE_MODULES=(worker)
+STORAGE=${5:-nfs}
+STORAGE_CLIENT_ARGS=${6:-"/grdata nfs rw 0 0"}
+
 
 #INSTALL_MODULES=(common storage docker image base master)
 
