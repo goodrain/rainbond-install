@@ -29,14 +29,15 @@ DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | 
 DEFAULT_PUBLIC_IP=${3:-"$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep -v '^10\.|^172.|^192.168|^127.' | head -1)"}
 INIT_FILE="./.initialized"
 YQBIN="/usr/local/bin/yq"
-DOMAIN=$4
+DOMAIN=$6
 ROLE=$1
 SYS_COMMON_PKGS=(ntpdate curl net-tools pwgen)
 BASE_MODULES=(common storage docker image base)
 MANAGE_MODULES=(master)
 COMPUTE_MODULES=(worker)
-
-#INSTALL_MODULES=(common storage docker image base master)
+STORAGE=$4
+NETWORK=$5
+#STORAGE_CLIENT_ARGS=${5:-"/grdata nfs rw 0 0"}
 
 which_cmd() {
     which "${1}" 2>/dev/null || \
@@ -472,6 +473,12 @@ Init_system(){
 
   # configure hostname and hosts
   # reset /etc/hosts
+  #cp /etc/hosts /tmp/hosts.bak
+  [ -f "/tmp/.new.hosts" ] || (
+      #cat /etc/hosts | grep storage > /tmp/.new.hosts
+      cp /etc/hosts /tmp/hosts.bak
+      cat /etc/hosts | grep storage > /opt/rainbond/install/install/salt/install/files/storage/storage.hosts
+  )
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
   MASTER_HOSTNAME=$(Read_Sls_File master-hostname)
   hostname -b $MASTER_HOSTNAME
@@ -514,6 +521,13 @@ run(){
     Write_Sls_File database.$DB_TYPE.user ${DB_USER}
     Write_Sls_File database.$DB_TYPE.pass ${DB_PASS}
 
+    STORAGE_CLIENT_ARGS=$(cat /tmp/.storage.value )
+    [ -z "$STORAGE_CLIENT_ARGS" ] && STORAGE_CLIENT_ARGS="/grdata nfs rw 0 0"
+    #rm -rf /tmp/.storage.value
+    Write_Sls_File storage.type ${STORAGE}
+    #Write_Sls_File storage.client_args ${STORAGE_CLIENT_ARGS:-"/grdata nfs rw 0 0"}
+    Write_Sls_File storage.client_args "${STORAGE_CLIENT_ARGS}"
+
     Write_Sls_File etcd.server.bind.host ${DEFAULT_LOCAL_IP}
     Write_Sls_File etcd.server.token $(uuidgen)
     Write_Sls_File etcd.server.members[0].host ${DEFAULT_LOCAL_IP}
@@ -530,7 +544,7 @@ run(){
     else
         CALICO_NET=172.16.0.0/16
     fi
-
+    Write_Sls_File network.type ${NETWORK}
     Write_Sls_File network.calico.bind ${DEFAULT_LOCAL_IP}
     Write_Sls_File network.calico.net ${CALICO_NET}
 
