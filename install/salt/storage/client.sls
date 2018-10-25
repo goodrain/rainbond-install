@@ -12,10 +12,11 @@ nfs_client:
   file.append:
     - text:
       - "{{ pillar['master-private-ip'] }}:/grdata /grdata nfs rw 0 0"
+    - unless: df -h | grep /grdata
     - require:
       - pkg: nfs_client
 
 automount:
   cmd.run:
     - name: mount /grdata
-  unless: df -h | grep /grdata
+    - unless: df -h | grep /grdata

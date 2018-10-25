@@ -8,7 +8,7 @@ nfs_server:
     - unless: dpkg -l | grep nfs-kernel-server
    {% endif %}
 
-{% if pillar.storage.get('type','nfs') == 'nfs' %}}
+{% if pillar.storage.get('type','nfs') == 'nfs' %}
 nfs_server_running:
   service.running:
     - name: nfs-server
@@ -43,11 +43,12 @@ show_exports:
   file.append:
     - text:
       - "{{ pillar.storage.get('client_args') }}"
+    - unless: df -h | grep /grdata
 
 automount:
   cmd.run:
     - name: mount /grdata
-  unless: df -h | grep /grdata
+    - unless: df -h | grep /grdata
 
 {% endif %}
 

@@ -136,6 +136,7 @@ kubernetes:
 
 # network
 network:
+  type: 
   calico:
     image: calico-node
     version: v2.4.1
@@ -227,3 +228,15 @@ rainbond-modules:
   rbd-scope:
     image: scope
     version: 1.9.1
+  zookeeper:
+    image: zookeeper
+    version: 3.4
+  cassandra:
+    image: cassandra
+    version: 3.11.3
+  midonet-api:
+    image: midonet-api
+    version: v2015.06
+  midolman:
+    image: midolman
+    version: v2015.06
