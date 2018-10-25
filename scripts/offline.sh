@@ -29,17 +29,17 @@ init(){
 
 debian_pkg(){
     echo "download debian offline package"
-    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/debian:${PKG_PATH}/debian rainbond/pkg-download:debian-95
+    docker run --rm -v ${PKG_PATH}/debian:${PKG_PATH}/debian rainbond/pkg-download:debian-95-v2
 }
 
 ubuntu_pkg(){
     echo "download ubuntu offline package"
-    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/ubuntu:${PKG_PATH}/ubuntu rainbond/pkg-download:ubuntu-1604
+    docker run --rm -v ${PKG_PATH}/ubuntu:${PKG_PATH}/ubuntu rainbond/pkg-download:ubuntu-1604-v2
 }
 
 centos_pkg(){
     echo "download centos offline package"
-    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/centos:${PKG_PATH}/centos rainbond/pkg-download:centos-1708
+    docker run --rm -v ${PKG_PATH}/centos:${PKG_PATH}/centos rainbond/pkg-download:centos-1708-v2
 }
 
 download_img(){
