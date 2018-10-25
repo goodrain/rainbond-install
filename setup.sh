@@ -473,6 +473,12 @@ Init_system(){
 
   # configure hostname and hosts
   # reset /etc/hosts
+  #cp /etc/hosts /tmp/hosts.bak
+  [ -f "/tmp/.new.hosts" ] || (
+      #cat /etc/hosts | grep storage > /tmp/.new.hosts
+      cp /etc/hosts /tmp/hosts.bak
+      cat /etc/hosts | grep storage > /opt/rainbond/install/install/salt/install/files/storage/storage.hosts
+  )
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
   MASTER_HOSTNAME=$(Read_Sls_File master-hostname)
   hostname -b $MASTER_HOSTNAME
