@@ -39,6 +39,14 @@ show_exports:
     - name: showmount -e 127.0.0.1
 
 {% else %}
+
+{% if grains['os_family']|lower == 'redhat' %}
+gfs_server:
+  pkg.installed:
+    - name: glusterfs-fuse
+    - unless: rpm -qa | grep glusterfs-fuse
+{% endif %}
+
 /etc/fstab:
   file.append:
     - text:
