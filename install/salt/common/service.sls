@@ -27,7 +27,7 @@ remove_pkgs:
       - cmd: dnsmasq
 #      - cmd: kill-dhclient
 
-{% if grains['os_family']|lower == 'debian' %}
+#{% if grains['os_family']|lower == 'debian' %}
 #NetworkManager:
 #  service.dead:
 #    - name: NetworkManager
@@ -39,7 +39,7 @@ NetworkManager-conf:
     - template: jinja
     - mode: 755
     - makedirs: True
-{% endif %}
+#{% endif %}
 
 iptables:
   cmd.run:

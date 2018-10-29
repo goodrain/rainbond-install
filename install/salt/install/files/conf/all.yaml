@@ -30,8 +30,8 @@ services:
     port: 8081
   health:
     name: rbd-repo
-    model: http
-    address: 127.0.0.1:8081/artifactory/libs-release
+    model: cmd
+    address: {{ pillar['rbd-path'] }}/health/repo.sh
     time_interval: 5
   after:
     - docker
