@@ -97,6 +97,10 @@ network:
     enabled: true
     bind: 
     net: 
+  midonet:
+    net:
+    cidr:
+    router_id:
 
 # plugins
 plugins:
