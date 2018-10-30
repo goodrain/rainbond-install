@@ -537,16 +537,28 @@ run(){
     IP_INFO=$(ip ad | grep 'inet ' | egrep ' 10.|172.|192.168' | awk '{print $2}' | cut -d '/' -f 1 | grep -v '172.30.42.1')
     IP_ITEMS=($IP_INFO)
     INET_IP=${IP_ITEMS%%.*}
-    if [[ $INET_IP == '172' ]];then
-        CALICO_NET=10.0.0.0/16
-    elif [[ $INET_IP == '10' ]];then
-        CALICO_NET=172.16.0.0/16
-    else
-        CALICO_NET=172.16.0.0/16
-    fi
+    [ -f "/tmp/.role" ] && export NETWORK=calico
     Write_Sls_File network.type ${NETWORK}
-    Write_Sls_File network.calico.bind ${DEFAULT_LOCAL_IP}
-    Write_Sls_File network.calico.net ${CALICO_NET}
+    if [ "$NETWORK" == "calico" ];then
+        if [[ $INET_IP == '172' ]];then
+            CALICO_NET=10.0.0.0/16
+        elif [[ $INET_IP == '10' ]];then
+            CALICO_NET=172.16.0.0/16
+        else
+            CALICO_NET=172.16.0.0/16
+        fi
+        Write_Sls_File network.calico.bind ${DEFAULT_LOCAL_IP}
+        Write_Sls_File network.calico.net ${CALICO_NET}
+    else
+        if [[ $INET_IP == '192' ]];then
+            MIDONET_NET=10.0.0.0/16
+        else
+            MIDONET_NET=172.16.0.0/16
+        fi
+        Write_Sls_File network.midonet.cidr ${MIDONET_NET}
+        Write_Sls_File network.midonet.net ${MIDONET_NET}
+    fi
+
 
     Write_Sls_File lb-endpoints "http://${DEFAULT_LOCAL_IP}:10002"
 
