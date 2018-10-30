@@ -13,6 +13,11 @@ rbd-registry-domain:
     - names:
       - goodrain.me
 
+rbd-api-domain:
+  host.present:
+    - ip: {{ hostip }}
+    - names:
+      - region.goodrain.me
 
 uuid-localip:
   host.present:
@@ -27,12 +32,12 @@ hostname-localname:
     - names:
       - {{ grains['id'] }}
 
-
 #rbd-app-ui-domain:
 #  host.present:
 #    - ip: {{ hostip }}
 #    - names:
 #      - console.goodrain.me
+
 
 {% else %}
 # Todo:support VIP
