@@ -546,44 +546,6 @@ services:
     --v=2
   restart_policy: always
   restart_sec: 10
-- name: calico
-  endpoints:
-  - name: CALICO_ENDPOINTS
-    protocol:
-    port: 187
-  health:
-    name: calico
-    model: cmd
-    address: ((`calicoctl node status | grep 'Calico process is running' | wc -l` == 1))
-    time_interval: 5
-  after:
-    - docker
-  type: simple
-  pre_start: docker rm calico
-  start: >-
-    /usr/bin/docker run --net=host 
-    --privileged 
-    --name=calico  
-    --restart=always 
-    -e NO_DEFAULT_POOLS= 
-    -e CALICO_LIBNETWORK_ENABLED=true 
-    -e IP={{ grains['mip'][0] }} 
-    -e CALICO_LIBNETWORK_CREATE_PROFILES=true 
-    -e CALICO_LIBNETWORK_LABEL_ENDPOINTS=false 
-    -e CALICO_LIBNETWORK_IFPREFIX=cali 
-    -e NODENAME=${HOSTNAME} 
-    -e CALICO_NETWORKING_BACKEND=bird 
-    -e IP6_AUTODETECTION_METHOD=first-found 
-    -e ETCD_ENDPOINTS=http://{{ pillar.etcd.server.bind.get('host', '127.0.0.1') }}:2379 
-    -v /var/log/calico:/var/log/calico 
-    -v /var/run/calico:/var/run/calico 
-    -v /lib/modules:/lib/modules 
-    -v /run/docker/plugins:/run/docker/plugins 
-    -v /var/run/docker.sock:/var/run/docker.sock 
-    {{ pillar['private-image-domain'] }}/{{ pillar['network']['calico']['image'] }}:{{ pillar['network']['calico']['version'] }}
-  stop: docker stop calico
-  restart_policy: always
-  restart_sec: 10
 {% endif %}
 - name: docker
   endpoints:
