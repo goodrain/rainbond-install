@@ -26,52 +26,6 @@ dns:
 etcd-endpoints:
 lb-endpoints: 
 
-rbd-pkgs:
-  common:
-    - gr-docker-engine
-    - tar
-    - ntpdate
-    - wget
-    - curl
-    - tree
-    - lsof
-    - htop
-    - nload
-    - net-tools
-    - telnet
-    - rsync
-    - git
-    - dstat 
-    - salt-master
-    - salt-minion
-    - salt-ssh
-    - iotop
-    - lvm2
-    - ntpdate
-    - pwgen
-  centos:
-    - nfs-utils
-    - portmap
-    - perl
-    - bind-utils
-    - iproute
-    - bash-completion
-    - createrepo
-    - centos-release-gluster
-    - glusterfs-server
-  debian:
-    - nfs-kernel-server
-    - nfs-common
-    - dnsutils
-    - python-pip
-    - python-apt
-    - apt-transport-https
-    - uuid-runtime
-    - iproute2
-    - systemd
-
-
-
 # rbd-db
 database:
   type: mysql

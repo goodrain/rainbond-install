@@ -22,24 +22,24 @@ init(){
     git clone --depth 1 -b v3.7 https://github.com/goodrain/rainbond-install.git $REPO_PATH
     [ -d "$PKG_PATH" ] || mkdir -p $PKG_PATH/{debian,centos}
     [ -d "$IMG_PATH" ] || mkdir -p $IMG_PATH
-    curl https://pkg.rainbond.com/releases/common/v3.7.0/grctl -o $REPO_PATH/grctl
+    curl https://pkg.rainbond.com/releases/common/v3.7.2/grctl -o $REPO_PATH/grctl
     #cp $REPO_PATH/install/rainbond.yaml.default $REPO_PATH/rainbond.yaml.default
     chmod +x $REPO_PATH/grctl
 }
 
 debian_pkg(){
     echo "download debian offline package"
-    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/debian:${PKG_PATH}/debian rainbond/pkg-download:debian-95
+    docker run --rm -v ${PKG_PATH}/debian:${PKG_PATH}/debian rainbond/pkg-download:debian-95-v2
 }
 
 ubuntu_pkg(){
     echo "download ubuntu offline package"
-    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/ubuntu:${PKG_PATH}/ubuntu rainbond/pkg-download:ubuntu-1604
+    docker run --rm -v ${PKG_PATH}/ubuntu:${PKG_PATH}/ubuntu rainbond/pkg-download:ubuntu-1604-v2
 }
 
 centos_pkg(){
     echo "download centos offline package"
-    docker run --rm -v ${REPO_PATH}/rainbond.yaml.default:${REPO_PATH}/rainbond.yaml.default -v ${PKG_PATH}/centos:${PKG_PATH}/centos rainbond/pkg-download:centos-1708
+    docker run --rm -v ${PKG_PATH}/centos:${PKG_PATH}/centos rainbond/pkg-download:centos-1708-v2
 }
 
 download_img(){
