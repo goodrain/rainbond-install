@@ -6,7 +6,7 @@ else
     #YAML_PATH=/opt/rainbond/install/rainbond.yaml.default
     PKG_PATH=/opt/rainbond/install/install/pkgs
     #cpkg=$(yq r $YAML_PATH rbd-pkgs.centos | awk '{print $2}')
-    cpkg=(nfs-utils portmap perl bind-utils iproute bash-completion createrepo centos-release-gluster glusterfs-server)
+    cpkg=(nfs-utils portmap perl bind-utils iproute bash-completion createrepo centos-release-gluster glusterfs-server bridge-utils)
     #common_pkg=$(yq r $YAML_PATH rbd-pkgs.common | awk '{print $2}')
     common_pkg=(gr-docker-engine tar ntpdate wget curl tree lsof htop nload net-tools telnet rsync git dstat salt-master salt-minion salt-ssh iotop lvm2 ntpdate pwgen)
     for pkg in ${cpkg[@]} ${common_pkg[@]}
