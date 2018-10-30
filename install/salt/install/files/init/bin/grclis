@@ -69,12 +69,14 @@ reload(){
 
 reset(){
     local ALL_SERVICES="node rbd-db rbd-hub rbd-lb rbd-chaos rbd-repo rbd-worker kube-scheduler rbd-entrance rbd-api rbd-dns rbd-eventlog calico rbd-webcli rbd-mq rbd-monitor kube-controller-manager rbd-app-ui kube-apiserver etcd etcd-proxy storage local-dns kubelet"
-    echo "remove salt packages"
+    echo "uninstall salt packages"
     yum remove -y salt-*
-    rm -rf /etc/salt/*/*.conf
+    rm -rf /etc/salt/
     rm -rf /srv/
-    echo "remove /opt/rainbond "
+    echo "rm /opt/rainbond"
     rm -rf /opt/rainbond/
+    rm -rf /root/.kube/
+    rm -rf /root/.rbd/
     echo "rm /grdata"
     df -h | grep grdata >/dev/null
     [ "$?" -eq 0 ] && (
@@ -90,6 +92,8 @@ reset(){
             [ "$?" -eq 0 ] && rm -rf /etc/systemd/system/$service.service
         )
     done
+    iptables -F;iptables -X;iptables -Z
+    echo "clean all."
 }
 
 if [ "$1" == "start" ];then
