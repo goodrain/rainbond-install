@@ -8,11 +8,11 @@ RUN apt update && apt-get install --no-install-recommends --no-install-suggests 
 
 ADD rbd.list /etc/apt/sources.list.d/rbd.list
 
-ADD yq /usr/bin/yq
+#ADD yq /usr/bin/yq
 
 ADD download.sh /download.sh
 
-RUN chmod +x download.sh /usr/bin/yq
+#RUN chmod +x download.sh /usr/bin/yq
 
 ENTRYPOINT [ "/download.sh" ]
 
