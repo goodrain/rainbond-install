@@ -77,7 +77,7 @@ kubernetes:
     version: dev
   cni:
     image: cni
-    version: k8s_v3.7
+    version: k8s_v3.7.2
   api:
     image: kube-apiserver
     version: v1.6.4
@@ -176,7 +176,7 @@ rainbond-modules:
     version: rbd_v3.7.2
   k8s-cni:
     image: cni
-    version: k8s_v3.7
+    version: k8s_v3.7.2
   rbd-grafana:
     image: grafana
     version: 5.2.2
