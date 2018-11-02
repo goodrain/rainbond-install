@@ -77,6 +77,23 @@ salt-minion-script:
     - mode: 777
     - template: jinja
 
+salt-uuid-script:
+  file.managed:
+    - name: /tmp/salt-minion-uuid
+    - source: salt://salt/install/script/hosts.yaml
+    - user: root
+    - group: root
+    - mode: 777
+    - template: jinja
+
+yq-bin:
+  file.managed:
+    - name: /usr/local/bin/yq
+    - source: salt://salt/install/files/misc/bin/yq
+    - user: root
+    - group: root
+    - mode: 777
+
 salt-minion-exconf:
   cmd.run:
     - name: bash -x /tmp/salt-minion-install

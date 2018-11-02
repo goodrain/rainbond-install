@@ -25,9 +25,10 @@
 uuid=$5
 
 [ -z "$uuid" ] || (
-yq w /srv/pillar/rainbond.sls manage.$1.hostname $1
-yq w /srv/pillar/rainbond.sls manage.$1.hostname $2
-yq w /srv/pillar/rainbond.sls manage.$1.uuid $5
+yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.hostname $1
+yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.ip $2
+yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.uuid $5
+yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.key "$2+$5"
 )
 
 COMPUTE_MODULES="common \
