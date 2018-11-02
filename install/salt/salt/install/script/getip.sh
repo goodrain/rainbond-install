@@ -1,20 +1,22 @@
-ip=$(ip ad|grep inet|egrep ' 10.|172.|192.168'|awk '{print $2}'|cut -d '/' -f 1|grep -v '172.30.42.1'|head -1)
+[ -f "/tmp/LOCAL_IP" ] && ip=$(cat /tmp/LOCAL_IP 2> /dev/null) ||ip=$(ip ad|grep inet|egrep ' 10.|172.|192.168'|awk '{print $2}'|cut -d '/' -f 1|grep -v '172.30.42.1'|head -1)
 [ -f "/tmp/.role" ] && role="worker" || cat /etc/hostname | grep compute && role="worker" || role="master"
-if [ ! -f "/tmp/LOCAL_IP" ];then
+
+uuid=$(cat /tmp/salt-minion-uuid | grep "$ip+" | awk -F+ '{print $2}')
+
+if [ -z "$uuid" ];then
 cat > /etc/salt/minion.d/minion.ex.conf <<EOF
-grains:               
+grains:
   mip:
     - $ip
   node_role:
     - $role
-
 EOF
 else
-lip=$(cat /tmp/LOCAL_IP 2> /dev/null)
 cat > /etc/salt/minion.d/minion.ex.conf <<EOF
-grains:               
+grains:
+  uuid: $uuid             
   mip:
-    - $lip
+    - $ip
   node_role:
     - $role
 EOF
