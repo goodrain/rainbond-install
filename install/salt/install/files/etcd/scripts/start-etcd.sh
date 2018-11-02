@@ -1,6 +1,8 @@
 #!/bin/sh
 LOCAL_NODE={{ grains['nodename'] }}
 
+[ -z "$LOCAL_IP" ] && LOCAL_IP={{ grains['mip'][0] }}
+
 {% if grains['id'] == "manage01" %}
 INITIAL_CLUSTER_STATE=""
 {% else %}
