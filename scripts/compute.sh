@@ -22,6 +22,14 @@
 # debug
 [[ $DEBUG ]] && set -x
 
+uuid=$5
+
+[ -z "$uuid" ] || (
+yq w /srv/pillar/rainbond.sls manage.$1.hostname $1
+yq w /srv/pillar/rainbond.sls manage.$1.hostname $2
+yq w /srv/pillar/rainbond.sls manage.$1.uuid $5
+)
+
 COMPUTE_MODULES="common \
 storage \
 docker \
