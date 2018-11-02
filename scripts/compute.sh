@@ -176,21 +176,20 @@ install_compute_func(){
     fi
     
     if [ "$fail_num" -eq 0 ];then
-        
-        Echo_Info "install compute node successfully"
         if [ ! -z "$1" ];then
-              [ -z "$uuid" ] && uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+              #[ -z "$uuid" ] && uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
               for ((i=1;i<=30;i++ )); do
                 sleep 2
-                grctl node list | grep "$uuid" > /dev/null 2>&1
+                grctl node list | grep "offline" > /dev/null 2>&1
                 [ "$?" -eq 0 ] && (
+                 uuid=$(grctl node list | grep "offline" | awk '{print $2}' | head -1)
                  grctl node up $uuid && (
                  Echo_Info "compute node($uuid) added to the cluster"
                  echo "$1 $uuid up" >> /tmp/.node_status
                 )
                 ) && break
               done
-            # Echo_Info "compute node($uuid) has been added to the cluster"
+            Echo_Info "Install compute node successfully"
         else
             Echo_Info "you need up compute node"
         fi

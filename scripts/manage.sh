@@ -243,11 +243,14 @@ install(){
         done
     fi
     if [ "$fail_num" -eq 0 ];then
-        Echo_Info "update node config"
-        salt -E "manage" cmd.run 'systemctl restart node' >/dev/null 2>&1
-        salt -E "manage" cmd.run 'systemctl daemon-reload' >/dev/null 2>&1
-        salt -E "manage" cmd.run 'grclis reload' >/dev/null 2>&1
-        Echo_Info "install manage node successfully"
+        Echo_Info "rsync node config"
+        salt -E "manage" cmd.run 'systemctl restart node' 
+        [ "$?" -eq 0 ] && Echo_Ok "restart manage node"
+        salt -E "manage" cmd.run 'systemctl daemon-reload'
+        [ "$?" -eq 0 ] && Echo_Ok "reload manage services"
+        salt -E "manage" cmd.run 'grclis reload'
+        [ "$?" -eq 0 ] && Echo_Ok "restart manage services"
+        Echo_Info "Install manage node successfully"
     else
         Echo_Error "reinstall manage node"
     fi
