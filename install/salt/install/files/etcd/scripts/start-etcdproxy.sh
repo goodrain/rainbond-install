@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ -z "$MASTER_IP" ] && MASTER_IP={{ pillar['vip'] }}
+
 CLUSTER_MASTER=""
 
 for node in $(echo $MASTER_IP | tr "," "\n" | sort -u)
@@ -18,7 +20,7 @@ exec /usr/bin/docker \
   --restart=always \
   --net=host \
   --name etcd-proxy \
-  {{ pillar['private-image-domain'] }}/{{pillar['etcd']['proxy']['image']}}:{{pillar['etcd']['proxy']['version']}} \
+  {{ pillar['private-image-domain'] }}/{{ pillar['etcd']['proxy']['image']}}:{{pillar['etcd']['proxy']['version'] }} \
   /usr/local/bin/etcd \
   grpc-proxy start \
   --endpoints=${CLUSTER_MASTER} \
