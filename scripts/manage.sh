@@ -22,6 +22,15 @@
 # debug
 [[ $DEBUG ]] && set -x
 
+uuid=$5 
+
+[ -z "$uuid" ] || (
+yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.hostname $1
+yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.ip $2
+yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.uuid $5
+yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.key "$2+$5"
+)
+
 MANAGE_MODULES="common \
 storage \
 docker \
@@ -234,11 +243,9 @@ install(){
         done
     fi
     if [ "$fail_num" -eq 0 ];then
-        Echo_Info "update node config"
-        salt -E "manage" cmd.run 'systemctl restart node' >/dev/null 2>&1
-        salt -E "manage" cmd.run 'systemctl daemon-reload' >/dev/null 2>&1
-        salt -E "manage" cmd.run 'grclis reload' >/dev/null 2>&1
-        Echo_Info "install manage node successfully"
+        salt manage01 state.sls common.rsync_manage_node
+        [ "$?" -eq 0 ] && Echo_Ok "rsync node config"
+        Echo_Info "Install manage node successfully"
     else
         Echo_Error "reinstall manage node"
     fi

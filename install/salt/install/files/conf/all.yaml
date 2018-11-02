@@ -505,7 +505,7 @@ services:
     - docker
   type: simple
   pre_start: docker rm etcd-proxy
-  start: MASTER_IP={% for etcdmem in pillar.etcd.server.members %}{{ etcdmem.host}}:2379,{% endfor%} {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
+  start: MASTER_IP=${ETCD_ENDPOINTS} {{ pillar['rbd-path'] }}/scripts/start-etcdproxy.sh
   stop: docker stop etcd-proxy
   restart_policy: always
   restart_sec: 10
