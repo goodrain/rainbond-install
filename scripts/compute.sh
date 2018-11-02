@@ -179,7 +179,7 @@ install_compute_func(){
         
         Echo_Info "install compute node successfully"
         if [ ! -z "$1" ];then
-              uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
+              [ -z "$uuid" ] && uuid=$(salt-ssh -i $1 grains.item uuid | egrep '[a-zA-Z0-9]-' | awk '{print $1}')
               for ((i=1;i<=30;i++ )); do
                 sleep 2
                 grctl node list | grep "$uuid" > /dev/null 2>&1
