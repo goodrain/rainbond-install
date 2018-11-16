@@ -25,18 +25,18 @@ CPU_NUM=$(grep "processor" /proc/cpuinfo | wc -l )
 CPU_LIMIT=2
 MEM_SIZE=$(free -h | grep Mem | awk '{print $2}' | cut -d 'G' -f1)
 MEM_LIMIT=4
-DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep '^10\.|^172.|^192.168' | grep -v '172.30.42.1' | head -1)"
+DEFAULT_LOCAL_IP=${4:-"$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep '^10\.|^172.|^192.168' | grep -v '172.30.42.1' | head -1)"}
 DEFAULT_PUBLIC_IP=${3:-"$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep -v '^10\.|^172.|^192.168|^127.' | head -1)"}
 INIT_FILE="./.initialized"
 YQBIN="/usr/local/bin/yq"
-DOMAIN=$6
+DOMAIN=$7
 ROLE=$1
 SYS_COMMON_PKGS=(ntpdate curl net-tools pwgen)
 BASE_MODULES=(common storage docker image base)
 MANAGE_MODULES=(master)
 COMPUTE_MODULES=(worker)
-STORAGE=$4
-NETWORK=$5
+STORAGE=$5
+NETWORK=$6
 #STORAGE_CLIENT_ARGS=${5:-"/grdata nfs rw 0 0"}
 
 which_cmd() {
@@ -382,45 +382,12 @@ Check_System_Version(){
 }
 
 Check_Net(){
-
-  eths=($(ls -1 /sys/class/net|grep -v lo))
-  default_eths=""
-  if [ ${#eths[@]} -gt 1 ];then
-    echo "The system has multiple network cards, please select the device to use:"
-    for eth in ${eths[@]}
-    do
-      ipaddr=$(ip addr show $eth | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' | egrep '^10.|^172.|^192.168' | head -1)
-      isinternal=$(echo $ipaddr | egrep '^10.|^172.|^192.168' | grep -v '172.30.42.1')
-      if [ ! -z "$isinternal" ] && [ -z $default_eths ];then
-        echo "$eth: $ipaddr (default)"
-        default_eths=$ipaddr
-      else
-        echo "$eth: $ipaddr"
-      fi
-    done
-
-    old_ifs=$IFS
-    IFS=","
-    read -p  "Press Enter to use the default device or input device name ( ${eths[*]} ):" selectip
-    IFS=$old_ifs
-
-    if [ "$selectip" != "" ];then
-      ipaddr=$(ip addr show $selectip | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' | egrep '^10.|^172.|^192.168' | head -1 )
-      if [ "$ipaddr" != "" ];then
-        export DEFAULT_LOCAL_IP=$ipaddr
-      else
-        echo "Select network device error."
-      fi
-    else
-      export DEFAULT_LOCAL_IP
-    fi
-  else
-    DEFAULT_LOCAL_IP=$(ip addr show ${eths[*]} | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}' | egrep '^10.|^172.|^192.168' | head -1)
+  if [[ "$DEFAULT_LOCAL_IP" == "0.0.0.0" ]];then
+    DEFAULT_LOCAL_IP="$(ip ad | grep 'inet ' | awk '{print $2}' | cut -d '/' -f 1 | egrep '^10\.|^172.|^192.168' | grep -v '172.30.42.1' | head -1)"
   fi
-
-  # write sls file
   echo $DEFAULT_LOCAL_IP > ./LOCAL_IP
   echo $DEFAULT_LOCAL_IP > /tmp/LOCAL_IP
+  info "Rainbond default static network ip: ${DEFAULT_LOCAL_IP}."
 }
 
 Get_Hardware_Info(){
