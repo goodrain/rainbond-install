@@ -9,7 +9,6 @@ include:
   - image.tools
   - image.image
 {% endif %}
-  - image.ssl
 {% else %}
   - image.eximage
   - image.tools

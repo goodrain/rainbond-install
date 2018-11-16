@@ -94,7 +94,6 @@ update_sql_sh:
     - template: jinja
 {% endif %}
 
-#==================== init lb ====================
 default_http_conf:
   file.managed:
     - source: salt://install/files/plugins/proxy.conf
