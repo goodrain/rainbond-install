@@ -23,10 +23,11 @@
 [[ $DEBUG ]] && set -x
 
 uuid=$5 
-
-[ -z "$uuid" ] || (
 yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.hostname $1
 yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.ip $2
+yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.hostip "$1+$2"
+
+[ -z "$uuid" ] || (
 yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.uuid $5
 yq w -i /srv/salt/salt/install/script/hosts.yaml manage.$1.key "$2+$5"
 )
