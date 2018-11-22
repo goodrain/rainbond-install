@@ -26,11 +26,11 @@ rbd-api-domain:
 #      - {{ grains['uuid'] }}
 
 
-hostname-localname:
-  host.present:
-    - ip: {{ localip }}
-    - names:
-      - {{ grains['id'] }}
+#hostname-localname:
+#  host.present:
+#    - ip: {{ localip }}
+#    - names:
+#      - {{ grains['id'] }}
 
 #rbd-app-ui-domain:
 #  host.present:
