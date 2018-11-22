@@ -19,18 +19,18 @@ rbd-api-domain:
     - names:
       - region.goodrain.me
 
-uuid-localip:
-  host.present:
-    - ip: {{ localip }}
-    - names:
-      - {{ grains['uuid'] }}
+#uuid-localip:
+#  host.present:
+#    - ip: {{ localip }}
+#    - names:
+#      - {{ grains['uuid'] }}
 
 
-hostname-localname:
-  host.present:
-    - ip: {{ localip }}
-    - names:
-      - {{ grains['id'] }}
+#hostname-localname:
+#  host.present:
+#    - ip: {{ localip }}
+#    - names:
+#      - {{ grains['id'] }}
 
 #rbd-app-ui-domain:
 #  host.present:
