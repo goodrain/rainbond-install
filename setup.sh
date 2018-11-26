@@ -342,7 +342,7 @@ Check_Internet(){
   if [ "$?" -eq 0 ];then
     return 0
   else
-    Echo_Error "Unable to connect to internet."
+    error "Unable to connect to internet."
   fi
 }
 
@@ -352,7 +352,7 @@ Check_Docker_Version(){
     existDocker=$(docker -v | awk '{print $3$5}' 2>/dev/null)
     grDocker=$(Read_Sls_File docker.version)
     if [ "$existDocker" != "$grDocker" ];then
-      Echo_Error "Rainbond integrated customized docker, Please stop and uninstall it first."
+      error "Rainbond integrated customized docker, Please stop and uninstall it first."
     fi
   fi
 
@@ -363,20 +363,20 @@ Check_System_Version(){
   "centos")
     [ "$SYS_VER" == "7" ] \
     && return 0 \
-    || Echo_Error "$SYS_NAME:$SYS_VER is not supported temporarily."
+    || error "$SYS_NAME:$SYS_VER is not supported temporarily."
     ;;
   "ubuntu")
     [ "$SYS_VER" == "16.04" ] \
     && return 0 \
-    || Echo_Error "$SYS_NAME:$SYS_VER is not supported temporarily."
+    || error "$SYS_NAME:$SYS_VER is not supported temporarily."
     ;;
   "debian")
     [ "$SYS_VER" == "8" -o "$SYS_VER" == "9" ] \
     && return 0 \
-    || Echo_Error "$SYS_NAME:$SYS_VER is not supported temporarily."
+    || error "$SYS_NAME:$SYS_VER is not supported temporarily."
     ;;
   *)
-    Echo_Error "$SYS_NAME:$SYS_VER is not supported temporarily."
+    error "$SYS_NAME:$SYS_VER is not supported temporarily."
     ;;
   esac
 }
@@ -397,7 +397,7 @@ Get_Hardware_Info(){
     if [ "$CPU_STATUS" == '0' -a "$MEM_STATUS" == '0' ];then
       info "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
     else
-      Echo_Error "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
+      error "Rainbond minimum requirement is ${CPU_LIMIT} CPUs,${MEM_LIMIT}G memory.You Have ${CPU_NUM} CPUs,${MEM_SIZE}G memory."
     fi
 }
 
