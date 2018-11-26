@@ -1,5 +1,5 @@
 # rainbond global config
-rbd-version: 3.7.2
+rbd-version: 3.7.3
 rbd-path: /opt/rainbond
 install-type: 
 master-hostname: manage01
@@ -77,7 +77,7 @@ kubernetes:
     version: dev
   cni:
     image: cni
-    version: k8s_v3.7.2
+    version: k8s_v3.7.3
   api:
     image: kube-apiserver
     version: v1.6.4
@@ -143,40 +143,40 @@ rainbond-modules:
     version: 3.7
   rbd-api:
     image: rbd-api
-    version: 3.7.2
+    version: 3.7.3
   rbd-worker: 
     image: rbd-worker
-    version: 3.7.2
+    version: 3.7.3
   rbd-eventlog: 
     image: rbd-eventlog
-    version: 3.7.2
+    version: 3.7.3
   rbd-entrance: 
     image: rbd-entrance
-    version: 3.7.2
+    version: 3.7.3
   rbd-chaos: 
     image: rbd-chaos
-    version: 3.7.2
+    version: 3.7.3
   rbd-lb: 
     image: rbd-lb
     version: 3.7
   rbd-mq: 
     image: rbd-mq
-    version: 3.7.2
+    version: 3.7.3
   rbd-webcli: 
     image: rbd-webcli
-    version: 3.7.2
+    version: 3.7.3
   rbd-app-ui: 
     image: rbd-app-ui
-    version: 3.7.2
+    version: 3.7.3
   rbd-monitor: 
     image: rbd-monitor
-    version: 3.7.2
+    version: 3.7.3
   rbd-cni:
     image: cni
-    version: rbd_v3.7.2
+    version: rbd_v3.7.3
   k8s-cni:
     image: cni
-    version: k8s_v3.7.2
+    version: k8s_v3.7.3
   rbd-grafana:
     image: grafana
     version: 5.2.2
