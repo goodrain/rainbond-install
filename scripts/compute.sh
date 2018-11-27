@@ -26,7 +26,7 @@ uuid=$5
 
 yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.hostname $1
 yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.ip $2
-yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.hostip "$1+$2"
+yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.hostip "$1=$2"
 
 [ -z "$uuid" ] || (
 yq w -i /srv/salt/salt/install/script/hosts.yaml compute.$1.uuid $5
