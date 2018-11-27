@@ -300,16 +300,6 @@ Read_Sls_File(){
     $YQBIN r $slsfile $key
 }
 
-
-#Write_Host(){
-#    ipaddr=$1
-#    name=${2:-null}
-#    if (grep $name /etc/hosts);then
-#        sed -i "/$name/d" /etc/hosts
-#    fi
-#    echo -e "$ipaddr\t$name" >> /etc/hosts
-#}
-
 Check_Service_State(){
     sname=$1
     systemctl  is-active $sname > /dev/null 2>&1
@@ -440,17 +430,17 @@ Init_system(){
 
   # configure hostname and hosts
   # reset /etc/hosts
-  #cp /etc/hosts /tmp/hosts.bak
+  
   [ -f "/tmp/.new.hosts" ] || (
-      #cat /etc/hosts | grep storage > /tmp/.new.hosts
       cp /etc/hosts /tmp/hosts.bak
-      cat /etc/hosts | grep storage > /opt/rainbond/install/install/salt/install/files/storage/storage.hosts
+      cat /etc/hosts | grep -E 'storage|compute' > /opt/rainbond/install/install/salt/install/files/storage/storage.hosts
   )
   echo -e "127.0.0.1\tlocalhost" > /etc/hosts
   MASTER_HOSTNAME=$(Read_Sls_File master-hostname)
   hostname -b $MASTER_HOSTNAME
   echo $MASTER_HOSTNAME > /etc/hostname
-  #Write_Host "${DEFAULT_LOCAL_IP}" "${MASTER_HOSTNAME}"
+  #grep "$MASTER_HOSTNAME" /etc/hosts && sed -i '/$MASTER_HOSTNAME/d' /etc/hosts
+  echo -e "$DEFAULT_LOCAL_IP\t$MASTER_HOSTNAME" >> /etc/hosts
 
   # Get current directory
   Write_Sls_File install-script-path "$PWD"
