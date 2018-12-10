@@ -213,11 +213,16 @@ END
 
 progress "Start Check System,will install Rainbond $(cat ./VERSION)"
 if [ "$SYS_NAME" == "centos" ];then
-    salt_centos_mirrors
-    if [ "$INSTALL_TYPE" == "online" ];then
-        ok "Configuring SaltStack online $SYS_NAME mirrors"
+    CENTOS_RELEASE=$(cat /etc/redhat-release | cut -d' '  -f4)
+    if [ "$CENTOS_RELEASE" == "7.3.1611" ] || [ "$CENTOS_RELEASE" == "7.4.1708" ];then
+      salt_centos_mirrors
+      if [ "$INSTALL_TYPE" == "online" ];then
+          ok "Configuring SaltStack online $SYS_NAME mirrors"
+      else
+          ok "Configuring SaltStack offline $SYS_NAME mirrors"
+      fi
     else
-        ok "Configuring SaltStack offline $SYS_NAME mirrors"
+      fatal "Support CentOS 7.3 Or CentOS 7.4"
     fi
 elif  [ "$SYS_NAME" == "debian" -o "$SYS_NAME" == "ubuntu" ];then
     salt_debian_mirrors
