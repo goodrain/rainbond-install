@@ -1,5 +1,8 @@
 [![Docs](https://img.shields.io/badge/docs-v3.7.2-brightgreen.svg)](https://www.rainbond.com/docs/stable/getting-started/installation-guide.html)[![Build Status](https://travis-ci.org/goodrain/rainbond-install.svg?branch=dev)](https://travis-ci.org/goodrain/rainbond-install)
 
+## Status
+Install Rainbond that version after 5.0.0, Please reference https://github.com/goodrain/rainbond-ansible
+
 ## Description
 
 A collection of Salt states used to provision an application-centric platform [Rainbond](https://github.com/goodrain/rainbond).
